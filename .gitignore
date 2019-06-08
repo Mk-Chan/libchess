@@ -1,0 +1,18 @@
+# IDEs / Editors
+.idea/*
+.vscode/*
+.vs/*
+.lvimrc
+.vimrc
+
+# Build directories
+cmake-build-*/*
+build/*
+x86/*
+x64/*
+
+# Object files
+*.o
+
+# External libs
+lib/*
