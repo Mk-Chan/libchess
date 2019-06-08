@@ -28,14 +28,12 @@ constexpr inline long long int perft(Position& pos, int depth) {
 }
 
 int main(int argc, char** argv) {
-    if (argc != 2) {
-        std::cout << "Usage: ./libchess_perft <max-depth>\n";
+    if (argc != 3) {
+        std::cout << "Usage: ./libchess_perft <file-path> <max-depth>\n";
         return 1;
     }
-    int max_depth = std::atoi(argv[1]);
-    std::string test_file_path = __FILE__;
-    std::string epd_path =
-        test_file_path.substr(0, test_file_path.find_last_of('/')) + "/perfts.epd";
+    std::string epd_path = argv[1];
+    int max_depth = std::atoi(argv[2]);
     std::ifstream file{epd_path};
     std::string line;
     while (std::getline(file, line)) {
