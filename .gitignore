@@ -13,6 +13,3 @@ x64/*
 
 # Object files
 *.o
-
-# External libs
-lib/*
