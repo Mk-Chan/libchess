@@ -1,20 +1,6 @@
 #ifndef LIBCHESS_METAVALUETYPE_H
 #define LIBCHESS_METAVALUETYPE_H
 
-namespace hax {
-
-template <class T, bool b = std::is_enum<T>::value> class smart_underlying_type {
-  public:
-    using type = typename std::underlying_type<T>::type;
-};
-
-template <class T> class smart_underlying_type<T, false> {
-  public:
-    using type = T;
-};
-
-} // namespace hax
-
 template <class T> class MetaValueType {
   public:
     using value_type = T;
