@@ -14,14 +14,9 @@ constexpr inline long long int perft(Position& pos, int depth) {
         return 1LL;
     }
     long long int count = 0LL;
-    MoveList move_list = pos.pseudo_legal_move_list();
+    MoveList move_list = pos.legal_move_list();
     for (Move move : move_list) {
         pos.make_move(move);
-        if (pos.attackers_to(pos.piece_type_bb(KING, !pos.side_to_move()).forward_bitscan(),
-                             pos.side_to_move())) {
-            pos.unmake_move();
-            continue;
-        }
         count += perft(pos, depth - 1);
         pos.unmake_move();
     }

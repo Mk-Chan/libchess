@@ -66,14 +66,18 @@ class MoveList {
     constexpr static inline int max_size = 256;
 
   public:
-    using iterator = std::array<Move, max_size>::iterator;
-    using const_iterator = std::array<Move, max_size>::const_iterator;
+    using value_type = std::array<Move, max_size>;
+    using iterator = value_type::iterator;
+    using const_iterator = value_type::const_iterator;
+
+    constexpr inline MoveList() : size_(0) {}
 
     constexpr inline iterator begin() { return values_.begin(); }
     constexpr inline iterator end() { return values_.begin() + size(); }
     constexpr inline const_iterator cbegin() const { return values_.begin(); }
     constexpr inline const_iterator cend() const { return values_.begin() + size(); }
 
+    constexpr inline void decrement_size() { --size_; }
     constexpr inline void add(Move move) {
         values_[size()] = move;
         ++size_;
@@ -82,12 +86,13 @@ class MoveList {
         std::sort(begin(), end(), comparator);
     }
     constexpr inline int size() const { return size_; }
-
-  protected:
     constexpr inline const std::array<Move, max_size>& values() const { return values_; }
 
+  protected:
+    constexpr inline std::array<Move, max_size>& values_mut_ref() { return values_; }
+
   private:
-    int size_ = 0;
+    int size_;
     std::array<Move, max_size> values_;
 };
 

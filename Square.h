@@ -26,12 +26,12 @@ class Square : public MetaValueType<int> {
             A7, B7, C7, D7, E7, F7, G7, H7,
             A8, B8, C8, D8, E8, F8, G8, H8,
             NUM_SQUARES,
-            SQUARE_INVALID
+            SQUARE_NONE
         };
         // clang-format off
     };
     constexpr inline Square(value_type value) : MetaValueType<value_type>(value) {}
-    constexpr inline Square() : Square(Value::SQUARE_INVALID) {}
+    constexpr inline Square() : Square(Value::SQUARE_NONE) {}
 
     constexpr inline Square& operator=(value_type val) {
         set_value(val);
@@ -42,7 +42,7 @@ class Square : public MetaValueType<int> {
     constexpr inline Rank rank() const { return value() >> 3; }
 
     inline std::string to_str() const {
-        if (value() == Value::SQUARE_INVALID) {
+        if (value() == Value::SQUARE_NONE) {
             return "-";
         }
         return std::string{file().to_char(), rank().to_char()};
@@ -53,7 +53,7 @@ class Square : public MetaValueType<int> {
     }
     inline static Square from(const std::string& square_str) {
         if (square_str == "-") {
-            return Value::SQUARE_INVALID;
+            return Value::SQUARE_NONE;
         }
         return Square::from(File::from(square_str[0]), Rank::from(square_str[1]));
     }
@@ -150,7 +150,7 @@ constexpr inline Square SQUARES[]{
 };
 // clang-format on
 
-constexpr inline Square SQUARE_INVALID{Square::Value::SQUARE_INVALID};
+constexpr inline Square SQUARE_NONE{Square::Value::SQUARE_NONE};
 constexpr inline int NUM_SQUARES = Square::Value::NUM_SQUARES;
 
 } // namespace constants
