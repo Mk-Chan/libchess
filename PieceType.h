@@ -88,4 +88,10 @@ constexpr inline int NUM_PIECE_TYPES = PieceType::Value::NUM_PIECE_TYPES;
 
 } // namespace libchess
 
+namespace std {
+
+template <> struct hash<libchess::PieceType> : public hash<libchess::PieceType::value_type> {};
+
+} // namespace std
+
 #endif // LIBCHESS_PIECETYPE_H

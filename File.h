@@ -47,4 +47,10 @@ constexpr inline File FILE_H = File{File::Value::FILE_H};
 
 } // namespace libchess
 
+namespace std {
+
+template <> struct hash<libchess::File> : public hash<libchess::File::value_type> {};
+
+} // namespace std
+
 #endif // LIBCHESS_FILE_H

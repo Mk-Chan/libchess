@@ -10,7 +10,7 @@ namespace libchess {
 class Rank : public MetaValueType<std::uint8_t> {
   public:
     class Value {
-    public:
+      public:
         enum RankValue : value_type {
             RANK_1,
             RANK_2,
@@ -26,9 +26,7 @@ class Rank : public MetaValueType<std::uint8_t> {
 
     constexpr inline char to_char() const { return '1' + value(); }
 
-    constexpr static inline Rank from(char c) {
-        return Value::RANK_1 + (c - '1');
-    }
+    constexpr static inline Rank from(char c) { return Value::RANK_1 + (c - '1'); }
 };
 
 namespace constants {
@@ -45,5 +43,11 @@ constexpr inline Rank RANK_8 = Rank{Rank::Value::RANK_8};
 } // namespace constants
 
 } // namespace libchess
+
+namespace std {
+
+template <> struct hash<libchess::Rank> : public hash<libchess::Rank::value_type> {};
+
+} // namespace std
 
 #endif // LIBCHESS_RANK_H

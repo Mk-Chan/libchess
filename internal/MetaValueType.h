@@ -1,6 +1,8 @@
 #ifndef LIBCHESS_METAVALUETYPE_H
 #define LIBCHESS_METAVALUETYPE_H
 
+namespace libchess {
+
 template <class T> class MetaValueType {
   public:
     using value_type = T;
@@ -46,5 +48,7 @@ template <class T> class MetaValueType {
   private:
     value_type value_;
 };
+
+} // namespace libchess
 
 #endif // LIBCHESS_METAVALUETYPE_H

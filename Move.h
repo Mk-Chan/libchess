@@ -112,4 +112,10 @@ constexpr inline Move::Type MOVE_TYPE_NONE = Move::Type::NONE;
 
 } // namespace libchess
 
+namespace std {
+
+template <> struct hash<libchess::Move> : public hash<libchess::Move::value_type> {};
+
+} // namespace std
+
 #endif // LIBCHESS_MOVE_H

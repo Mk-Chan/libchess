@@ -87,4 +87,10 @@ inline std::ostream& operator<<(std::ostream& ostream, Bitboard bb) {
 
 } // namespace libchess
 
+namespace std {
+
+template <> struct hash<libchess::Bitboard> : public hash<libchess::Bitboard::value_type> {};
+
+} // namespace std
+
 #endif // LIBCHESS_BITBOARD_H

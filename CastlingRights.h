@@ -41,18 +41,18 @@ class CastlingRight : public MetaValueType<int> {
 inline std::ostream& operator<<(std::ostream& ostream, CastlingRight castling_right) {
     char c = '-';
     switch (castling_right.value()) {
-        case CastlingRight::Value::WHITE_KINGSIDE:
-            c = 'K';
-            break;
-        case CastlingRight::Value::WHITE_QUEENSIDE:
-            c = 'Q';
-            break;
-        case CastlingRight::Value::BLACK_KINGSIDE:
-            c = 'k';
-            break;
-        case CastlingRight::Value::BLACK_QUEENSIDE:
-            c = 'q';
-            break;
+    case CastlingRight::Value::WHITE_KINGSIDE:
+        c = 'K';
+        break;
+    case CastlingRight::Value::WHITE_QUEENSIDE:
+        c = 'Q';
+        break;
+    case CastlingRight::Value::BLACK_KINGSIDE:
+        c = 'k';
+        break;
+    case CastlingRight::Value::BLACK_QUEENSIDE:
+        c = 'q';
+        break;
     }
     return ostream << c;
 }
@@ -136,5 +136,14 @@ constexpr inline CastlingRights CASTLING_RIGHTS_ALL{WHITE_KINGSIDE, WHITE_QUEENS
 } // namespace constants
 
 } // namespace libchess
+
+namespace std {
+
+template <>
+struct hash<libchess::CastlingRight> : public hash<libchess::CastlingRight::value_type> {};
+template <>
+struct hash<libchess::CastlingRights> : public hash<libchess::CastlingRights::value_type> {};
+
+} // namespace std
 
 #endif // LIBCHESS_CASTLINGRIGHTS_H

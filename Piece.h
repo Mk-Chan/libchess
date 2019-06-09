@@ -81,4 +81,10 @@ constexpr inline Piece PIECE_LIST[]{WHITE_PAWN,   WHITE_KNIGHT, WHITE_BISHOP, WH
 
 } // namespace libchess
 
+namespace std {
+
+template <> struct hash<libchess::Piece> : public hash<libchess::Piece::value_type> {};
+
+} // namespace std
+
 #endif // LIBCHESS_PIECE_H

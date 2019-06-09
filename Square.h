@@ -157,4 +157,10 @@ constexpr inline int NUM_SQUARES = Square::Value::NUM_SQUARES;
 
 } // namespace libchess
 
+namespace std {
+
+template <> struct hash<libchess::Square> : public hash<libchess::Square::value_type> {};
+
+} // namespace std
+
 #endif // LIBCHESS_SQUARE_H

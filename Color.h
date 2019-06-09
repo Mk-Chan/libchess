@@ -59,4 +59,10 @@ constexpr inline int NUM_COLORS = Color::Value::NUM_COLORS;
 
 } // namespace libchess
 
+namespace std {
+
+template <> struct hash<libchess::Color> : public hash<libchess::Color::value_type> {};
+
+} // namespace std
+
 #endif // LIBCHESS_COLOR_H
