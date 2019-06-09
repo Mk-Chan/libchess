@@ -73,7 +73,7 @@ int main(int argc, char** argv) {
             }
 	    else {
 		double nps = diff_ts.count() ? actual_result * 1000.0 / diff_ts.count() : actual_result;
-                std::cout << "line: " << line_nr << ", depth: " << depth << ", nps: " << std::setprecision(4) << actual_result * 1000.0 / diff_ts.count() << ", count: " << actual_result << "\n";
+                std::cout << "line: " << line_nr << ", depth: " << depth << ", nps: " << std::setprecision(4) << nps << ", count: " << actual_result << "\n";
 	    }
         }
     }
