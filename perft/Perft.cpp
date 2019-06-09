@@ -1,20 +1,14 @@
+#include <chrono>
 #include <fstream>
 #include <iomanip>
 #include <limits>
 #include <string>
 #include <string_view>
-#include <sys/time.h>
 
 #include "../Position.h"
 
 using namespace libchess;
 using namespace constants;
-
-long long int get_ts_ms() {
-    struct timeval tv;
-    gettimeofday(&tv, nullptr);
-    return tv.tv_sec * 1000 + tv.tv_usec / 1000;
-}
 
 constexpr inline long long int perft(Position& pos, int depth) {
     if (depth <= 0) {
@@ -68,14 +62,18 @@ int main(int argc, char** argv) {
                 break;
             }
             auto expected_result = std::strtoll(result_token.begin(), &endptr, 10);
-	    auto start_ts = get_ts_ms();
+	    auto start_ts = std::chrono::system_clock::now();
             auto actual_result = perft(pos, depth);
-	    auto end_ts = get_ts_ms();
-	    std::cout << depth << ", nps: " << std::setprecision(2) << actual_result * 1000.0 / (end_ts - start_ts) << "\n";
+	    auto end_ts = std::chrono::system_clock::now();
+	    std::chrono::duration<double> diff_ts = end_ts - start_ts;
             if (actual_result != expected_result) {
                 std::cout << "FAILED EPD: " << line << "\n";
                 std::cout << "EXPECTED: " << expected_result << ", GOT: " << actual_result << "\n";
             }
+	    else {
+		double nps = diff_ts.count() ? actual_result * 1000.0 / diff_ts.count() : actual_result;
+                std::cout << "depth: " << depth << ", nps: " << std::setprecision(4) << actual_result * 1000.0 / diff_ts.count() << ", count: " << actual_result << "\n";
+	    }
         }
     }
     return 0;
