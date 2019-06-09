@@ -76,6 +76,7 @@ class Position {
         return color_bb(constants::WHITE) | color_bb(constants::BLACK);
     }
     constexpr inline Color side_to_move() const { return side_to_move_; }
+    constexpr inline void reverse_side_to_move() { side_to_move_ = !side_to_move_; }
     constexpr inline CastlingRights castling_rights() const {
         return history_[ply_].castling_rights_;
     }
@@ -787,7 +788,6 @@ class Position {
         piece_type_bb_[piece_type.value()] ^= from_to_sqs_bb;
         color_bb_[color.value()] ^= from_to_sqs_bb;
     }
-    constexpr inline void reverse_side_to_move() { side_to_move_ = !side_to_move_; }
 
     // clang-format off
     constexpr static inline int castling_spoilers[64] = {
