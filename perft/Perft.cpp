@@ -71,7 +71,7 @@ int main(int argc, char** argv) {
 	    auto start_ts = get_ts_ms();
             auto actual_result = perft(pos, depth);
 	    auto end_ts = get_ts_ms();
-	    std::cout << "nps: " << std::setprecision(2) << actual_result * 1000.0 / (end_ts - start_ts) << "\n";
+	    std::cout << depth << ", nps: " << std::setprecision(2) << actual_result * 1000.0 / (end_ts - start_ts) << "\n";
             if (actual_result != expected_result) {
                 std::cout << "FAILED EPD: " << line << "\n";
                 std::cout << "EXPECTED: " << expected_result << ", GOT: " << actual_result << "\n";
