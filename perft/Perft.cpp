@@ -17,9 +17,8 @@ constexpr inline long long int perft(Position& pos, int depth) {
     MoveList move_list = pos.pseudo_legal_move_list();
     for (Move move : move_list) {
         pos.make_move(move);
-        if (pos.attackers_to(
-                pos.piece_type_bb(KING, !pos.side_to_move()).forward_bitscan(),
-                pos.side_to_move())) {
+        if (pos.attackers_to(pos.piece_type_bb(KING, !pos.side_to_move()).forward_bitscan(),
+                             pos.side_to_move())) {
             pos.unmake_move();
             continue;
         }
@@ -40,7 +39,7 @@ int main(int argc, char** argv) {
     std::string line;
     int line_nr = 0;
     while (std::getline(file, line)) {
-	line_nr++;
+        line_nr++;
         std::string_view line_view{line};
         auto delim_pos = line_view.find_first_of(';');
         if (delim_pos == std::string_view::npos) {
@@ -63,18 +62,19 @@ int main(int argc, char** argv) {
                 break;
             }
             auto expected_result = std::strtoll(result_token.begin(), &endptr, 10);
-	    auto start_ts = std::chrono::system_clock::now();
+            auto start_ts = std::chrono::system_clock::now();
             auto actual_result = perft(pos, depth);
-	    auto end_ts = std::chrono::system_clock::now();
-	    std::chrono::duration<double> diff_ts = end_ts - start_ts;
+            auto end_ts = std::chrono::system_clock::now();
+            std::chrono::duration<double> diff_ts = end_ts - start_ts;
             if (actual_result != expected_result) {
                 std::cout << "FAILED EPD: " << line << " (" << line_nr << ")\n";
                 std::cout << "EXPECTED: " << expected_result << ", GOT: " << actual_result << "\n";
+            } else {
+                double nps = diff_ts.count() ? actual_result / diff_ts.count() : actual_result;
+                std::cout << "line: " << line_nr << ", depth: " << depth
+                          << ", nps: " << std::setprecision(4) << nps
+                          << ", count: " << actual_result << "\n";
             }
-	    else {
-		double nps = diff_ts.count() ? actual_result / diff_ts.count() : actual_result;
-                std::cout << "line: " << line_nr << ", depth: " << depth << ", nps: " << std::setprecision(4) << nps << ", count: " << actual_result << "\n";
-	    }
         }
     }
     return 0;
