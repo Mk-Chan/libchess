@@ -65,7 +65,8 @@ int main(int argc, char** argv) {
                 std::cout << "FAILED EPD: " << line << " (" << line_nr << ")\n";
                 std::cout << "EXPECTED: " << expected_result << ", GOT: " << actual_result << "\n";
             } else {
-                double nps = diff_ts.count() ? actual_result / diff_ts.count() : actual_result;
+                double time_s = diff_ts.count();
+                double nps = time_s ? actual_result / time_s : actual_result;
                 std::cout << "line: " << line_nr << ", depth: " << depth
                           << ", nps: " << std::setprecision(4) << nps
                           << ", count: " << actual_result << "\n";
