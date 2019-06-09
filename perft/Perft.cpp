@@ -72,7 +72,7 @@ int main(int argc, char** argv) {
                 std::cout << "EXPECTED: " << expected_result << ", GOT: " << actual_result << "\n";
             }
 	    else {
-		double nps = diff_ts.count() ? actual_result * 1000.0 / diff_ts.count() : actual_result;
+		double nps = diff_ts.count() ? actual_result / diff_ts.count() : actual_result;
                 std::cout << "line: " << line_nr << ", depth: " << depth << ", nps: " << std::setprecision(4) << nps << ", count: " << actual_result << "\n";
 	    }
         }
