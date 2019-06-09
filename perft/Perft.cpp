@@ -39,7 +39,9 @@ int main(int argc, char** argv) {
     int max_depth = std::atoi(argv[2]);
     std::ifstream file{epd_path};
     std::string line;
+    int line_nr = 0;
     while (std::getline(file, line)) {
+	line_nr++;
         std::string_view line_view{line};
         auto delim_pos = line_view.find_first_of(';');
         if (delim_pos == std::string_view::npos) {
@@ -67,12 +69,12 @@ int main(int argc, char** argv) {
 	    auto end_ts = std::chrono::system_clock::now();
 	    std::chrono::duration<double> diff_ts = end_ts - start_ts;
             if (actual_result != expected_result) {
-                std::cout << "FAILED EPD: " << line << "\n";
+                std::cout << "FAILED EPD: " << line << " (" << line_nr << ")\n";
                 std::cout << "EXPECTED: " << expected_result << ", GOT: " << actual_result << "\n";
             }
 	    else {
 		double nps = diff_ts.count() ? actual_result * 1000.0 / diff_ts.count() : actual_result;
-                std::cout << "depth: " << depth << ", nps: " << std::setprecision(4) << actual_result * 1000.0 / diff_ts.count() << ", count: " << actual_result << "\n";
+                std::cout << "line: " << line_nr << ", depth: " << depth << ", nps: " << std::setprecision(4) << actual_result * 1000.0 / diff_ts.count() << ", count: " << actual_result << "\n";
 	    }
         }
     }
