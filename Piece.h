@@ -60,6 +60,7 @@ inline std::ostream& operator<<(std::ostream& ostream, Piece& piece) {
 
 namespace constants {
 
+constexpr inline Piece PIECE_NONE = Piece{PIECE_TYPE_NONE, COLOR_NONE};
 constexpr inline Piece WHITE_PAWN = Piece::from('P');
 constexpr inline Piece WHITE_KNIGHT = Piece::from('N');
 constexpr inline Piece WHITE_BISHOP = Piece::from('B');

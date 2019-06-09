@@ -59,6 +59,7 @@ class Bitboard {
         value_ ^= rhs;
         return *this;
     }
+    constexpr inline int popcount() const { return __builtin_popcountll(value_); }
     constexpr inline Square forward_bitscan() const { return __builtin_ctzll(value_); }
     constexpr inline Square reverse_bitscan() const { return 63 - __builtin_clzll(value_); }
     constexpr inline void forward_popbit() { value_ &= value_ - 1; }

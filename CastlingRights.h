@@ -39,7 +39,22 @@ class CastlingRight : public MetaValueType<int> {
 };
 
 inline std::ostream& operator<<(std::ostream& ostream, CastlingRight castling_right) {
-    return ostream << castling_right;
+    char c = '-';
+    switch (castling_right.value()) {
+        case CastlingRight::Value::WHITE_KINGSIDE:
+            c = 'K';
+            break;
+        case CastlingRight::Value::WHITE_QUEENSIDE:
+            c = 'Q';
+            break;
+        case CastlingRight::Value::BLACK_KINGSIDE:
+            c = 'k';
+            break;
+        case CastlingRight::Value::BLACK_QUEENSIDE:
+            c = 'q';
+            break;
+    }
+    return ostream << c;
 }
 
 class CastlingRights {
