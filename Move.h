@@ -89,7 +89,7 @@ class MoveList {
     constexpr inline const std::array<Move, max_size>& values() const { return values_; }
 
   protected:
-    constexpr inline std::array<Move, max_size>& values() { return values_; }
+    constexpr inline std::array<Move, max_size>& values_mut_ref() { return values_; }
 
   private:
     int size_;
