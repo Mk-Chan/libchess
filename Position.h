@@ -760,7 +760,7 @@ class Position {
     struct State {
         CastlingRights castling_rights_ = constants::CASTLING_RIGHT_NONE;
         Square enpassant_square_ = constants::SQUARE_NONE;
-        Move previous_move_;
+        Move previous_move_ = constants::MOVE_NONE;
         PieceType captured_pt_ = constants::PIECE_TYPE_NONE;
         Move::Type move_type_ = Move::Type::NONE;
         int halfmoves_ = 0;

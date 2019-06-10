@@ -8,7 +8,7 @@
 
 namespace libchess {
 
-enum class MoveValues : std::uint32_t { MOVE_INVALID };
+enum class MoveValues : std::uint32_t { MOVE_NONE };
 
 class Move {
   private:
@@ -36,7 +36,7 @@ class Move {
 
     using value_type = std::uint32_t;
 
-    constexpr inline Move() : value_(static_cast<value_type>(MoveValues::MOVE_INVALID)) {}
+    constexpr inline Move() : value_(static_cast<value_type>(MoveValues::MOVE_NONE)) {}
     constexpr inline Move(Square from_square, Square to_square,
                           PieceType promotion_pt = constants::PIECE_TYPE_NONE,
                           Move::Type type = Move::Type::NONE)
@@ -117,6 +117,7 @@ inline std::ostream& operator<<(std::ostream& ostream, Move move) {
 namespace constants {
 
 constexpr inline Move::Type MOVE_TYPE_NONE = Move::Type::NONE;
+constexpr inline Move MOVE_NONE{};
 
 } // namespace constants
 
