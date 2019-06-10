@@ -2,4 +2,4 @@ container:
     image: gcc:latest
 
 task:
-    test_script: test.sh
+    test_script: ./test.sh
