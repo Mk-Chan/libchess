@@ -12,12 +12,9 @@ if (NOT CMAKE_BUILD_TYPE)
     set(CMAKE_BUILD_TYPE Release)
 endif ()
 
+enable_testing()
+
 # Subdirs
 add_subdirectory(lib/Catch2)
-
-# Targets
-add_executable(libchess_test tests/Test.cpp tests/Color.cpp tests/Bitboard.cpp tests/Piece.cpp tests/PieceType.cpp tests/Move.cpp tests/CastlingRights.cpp tests/Position.cpp)
-add_executable(libchess_perft perft/Perft.cpp)
-
-# Linked libs
-target_link_libraries(libchess_test Catch2::Catch2)
+add_subdirectory(tests)
+add_subdirectory(perft)

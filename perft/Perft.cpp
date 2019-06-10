@@ -10,11 +10,11 @@ using namespace libchess;
 using namespace constants;
 
 constexpr inline long long int perft(Position& pos, int depth) {
-    if (depth <= 0) {
-        return 1LL;
-    }
     long long int count = 0LL;
     MoveList move_list = pos.legal_move_list();
+    if (depth == 1) {
+        return move_list.size();
+    }
     for (Move move : move_list) {
         pos.make_move(move);
         count += perft(pos, depth - 1);
@@ -33,6 +33,7 @@ int main(int argc, char** argv) {
     std::ifstream file{epd_path};
     std::string line;
     int line_nr = 0;
+    bool failed = false;
     while (std::getline(file, line)) {
         line_nr++;
         std::string_view line_view{line};
@@ -64,14 +65,20 @@ int main(int argc, char** argv) {
             if (actual_result != expected_result) {
                 std::cout << "FAILED EPD: " << line << " (" << line_nr << ")\n";
                 std::cout << "EXPECTED: " << expected_result << ", GOT: " << actual_result << "\n";
+                failed = true;
             } else {
                 double time_s = diff_ts.count();
-                double nps = time_s ? actual_result / time_s : actual_result;
+                double nps = time_s == 0.0 ? actual_result / time_s : actual_result;
                 std::cout << "line: " << line_nr << ", depth: " << depth
                           << ", nps: " << std::setprecision(4) << nps
                           << ", count: " << actual_result << "\n";
             }
         }
     }
+    if (failed) {
+        std::cout << "\nPerft suite failed!\n";
+        return 1;
+    }
+    std::cout << "\nPerft suite passed!\n";
     return 0;
 }

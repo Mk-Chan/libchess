@@ -31,4 +31,6 @@ TEST_CASE("Piece Tests", "[Piece]") {
     REQUIRE(BLACK_ROOK.to_char() == 'r');
     REQUIRE(BLACK_QUEEN.to_char() == 'q');
     REQUIRE(BLACK_KING.to_char() == 'k');
+
+    REQUIRE(Piece{PIECE_TYPE_NONE, COLOR_NONE} == PIECE_NONE);
 }
