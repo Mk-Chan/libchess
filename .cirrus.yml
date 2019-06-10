@@ -1,0 +1,5 @@
+container:
+    image: gcc:latest
+
+task:
+    test_script: test.sh
