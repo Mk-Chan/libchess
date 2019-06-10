@@ -153,15 +153,18 @@ class Position {
         }
     }
     constexpr inline void unmake_move() {
+        if (side_to_move() == constants::WHITE) {
+            --fullmoves_;
+        }
         Move move = state().previous_move_;
         Move::Type move_type = state().move_type_;
         PieceType captured_pt = state().captured_pt_;
         --ply_;
         reverse_side_to_move();
-        Color stm = side_to_move();
-        if (stm == constants::BLACK) {
-            --fullmoves_;
+        if (move == constants::MOVE_NONE) {
+            return;
         }
+        Color stm = side_to_move();
 
         Square from_square = move.from_square();
         Square to_square = move.to_square();
@@ -319,6 +322,19 @@ class Position {
         next_state.captured_pt_ = captured_pt;
         next_state.move_type_ = move_type;
         reverse_side_to_move();
+    }
+    constexpr inline void make_null_move() {
+        if (side_to_move() == constants::BLACK) {
+            ++fullmoves_;
+        }
+        State& prev = state();
+        ++ply_;
+        State& next = state();
+        reverse_side_to_move();
+        next.previous_move_ = constants::MOVE_NONE;
+        next.halfmoves_ = prev.halfmoves_ + 1;
+        next.enpassant_square_ = constants::SQUARE_NONE;
+        next.castling_rights_ = prev.castling_rights_;
     }
 
     constexpr inline Bitboard attackers_to(Square square) const {

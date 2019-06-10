@@ -72,6 +72,10 @@ class CastlingRights {
         }
     }
 
+    constexpr inline bool operator==(CastlingRights rhs) const {
+        return value() == rhs.value();
+    }
+
     constexpr inline void allow(CastlingRight castling_right) {
         value_ |= value_type(castling_right.value());
     }
