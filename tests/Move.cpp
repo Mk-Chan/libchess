@@ -44,3 +44,11 @@ TEST_CASE("Capture Promotion Move Test", "[Move]") {
     REQUIRE(e7d8n.type() == Move::Type::CAPTURE_PROMOTION);
     REQUIRE(e7d8n.promotion_piece_type() == KNIGHT);
 }
+
+TEST_CASE("Move parsing test", "[Move]") {
+    REQUIRE(Move::from("e2e4") == Move{E2, E4});
+    REQUIRE(Move::from("e2e3") == Move{E2, E3});
+    REQUIRE(Move::from("g1f3") == Move{G1, F3});
+    REQUIRE(Move::from("e7e8q") == Move{E7, E8, QUEEN});
+    REQUIRE(Move::from("e2d1n") == Move{E2, D1, KNIGHT});
+}
