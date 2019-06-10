@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.13)
+cmake_minimum_required(VERSION 3.12)
 
 # Targets
 add_executable(libchess_test Test.cpp Color.cpp Bitboard.cpp Piece.cpp PieceType.cpp Move.cpp CastlingRights.cpp Position.cpp)
