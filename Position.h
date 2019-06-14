@@ -152,6 +152,58 @@ class Position {
                    (Bitboard{move.to_square()} & lookups::direction_xray(king_sq, from));
         }
     }
+    constexpr inline Move::Type move_type_of(Move move) const {
+        Move::Type move_type = move.type();
+        if (move_type != constants::MOVE_TYPE_NONE) {
+            return move_type;
+        } else {
+            Square to_square = move.to_square();
+            Square from_square = move.from_square();
+            PieceType moving_pt = piece_type_on(from_square);
+            PieceType captured_pt = piece_type_on(to_square);
+            PieceType promotion_pt = move.promotion_piece_type();
+            if (promotion_pt != constants::PIECE_TYPE_NONE) {
+                return captured_pt != constants::PIECE_TYPE_NONE ? Move::Type::CAPTURE_PROMOTION
+                                                                 : Move::Type::PROMOTION;
+            } else if (captured_pt != constants::PIECE_TYPE_NONE) {
+                return Move::Type::CAPTURE;
+            } else if (moving_pt == constants::PAWN) {
+                int sq_diff = std::abs(to_square - from_square);
+                if (sq_diff == 16) {
+                    return Move::Type::DOUBLE_PUSH;
+                } else if (sq_diff == 9 || sq_diff == 7) {
+                    return Move::Type::ENPASSANT;
+                } else {
+                    return Move::Type::NORMAL;
+                }
+            } else if (moving_pt == constants::KING && std::abs(to_square - from_square) == 2) {
+                return Move::Type::CASTLING;
+            } else {
+                return Move::Type::NORMAL;
+            }
+        }
+    }
+    constexpr inline bool is_capture_move(Move move) const {
+        Move::Type move_type = move.type();
+        switch (move_type) {
+        case Move::Type::CAPTURE:
+        case Move::Type::CAPTURE_PROMOTION:
+        case Move::Type::ENPASSANT:
+            return true;
+        default:
+            return false;
+        }
+    }
+    constexpr inline bool is_promotion_move(Move move) const {
+        Move::Type move_type = move.type();
+        switch (move_type) {
+        case Move::Type::PROMOTION:
+        case Move::Type::CAPTURE_PROMOTION:
+            return true;
+        default:
+            return false;
+        }
+    }
     constexpr inline void unmake_move() {
         if (side_to_move() == constants::WHITE) {
             --fullmoves_;
@@ -241,30 +293,7 @@ class Position {
         PieceType captured_pt = piece_type_on(to_square);
         PieceType promotion_pt = move.promotion_piece_type();
 
-        Move::Type move_type = move.type();
-        if (move_type == constants::MOVE_TYPE_NONE) {
-            move_type = [to_square, from_square, moving_pt, captured_pt, promotion_pt]() {
-                if (promotion_pt != constants::PIECE_TYPE_NONE) {
-                    return captured_pt != constants::PIECE_TYPE_NONE ? Move::Type::CAPTURE_PROMOTION
-                                                                     : Move::Type::PROMOTION;
-                } else if (captured_pt != constants::PIECE_TYPE_NONE) {
-                    return Move::Type::CAPTURE;
-                } else if (moving_pt == constants::PAWN) {
-                    int sq_diff = std::abs(to_square - from_square);
-                    if (sq_diff == 16) {
-                        return Move::Type::DOUBLE_PUSH;
-                    } else if (sq_diff == 9 || sq_diff == 7) {
-                        return Move::Type::ENPASSANT;
-                    } else {
-                        return Move::Type::NORMAL;
-                    }
-                } else if (moving_pt == constants::KING && std::abs(to_square - from_square) == 2) {
-                    return Move::Type::CASTLING;
-                } else {
-                    return Move::Type::NORMAL;
-                }
-            }();
-        }
+        Move::Type move_type = move_type_of(move);
 
         if (moving_pt == constants::PAWN || captured_pt != constants::PIECE_TYPE_NONE) {
             next_state.halfmoves_ = 0;
