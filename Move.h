@@ -8,8 +8,6 @@
 
 namespace libchess {
 
-enum class MoveValues : std::uint32_t { MOVE_NONE };
-
 class Move {
   private:
     enum BitOpLookup : std::uint32_t {
@@ -23,6 +21,10 @@ class Move {
     constexpr inline Move(std::uint32_t value) : value_(value) {}
 
   public:
+    class Value {
+      public:
+        enum MoveValue : std::uint32_t { MOVE_NONE };
+    };
     enum class Type : std::uint8_t {
         NORMAL,
         CASTLING,
@@ -36,7 +38,7 @@ class Move {
 
     using value_type = std::uint32_t;
 
-    constexpr inline Move() : value_(static_cast<value_type>(MoveValues::MOVE_NONE)) {}
+    constexpr inline Move() : value_(static_cast<value_type>(Move::Value::MOVE_NONE)) {}
     constexpr inline Move(Square from_square, Square to_square,
                           PieceType promotion_pt = constants::PIECE_TYPE_NONE,
                           Move::Type type = Move::Type::NONE)
