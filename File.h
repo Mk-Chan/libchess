@@ -34,14 +34,14 @@ class File : public MetaValueType<int> {
 
 namespace constants {
 
-constexpr inline File FILE_A = File{File::Value::FILE_A};
-constexpr inline File FILE_B = File{File::Value::FILE_B};
-constexpr inline File FILE_C = File{File::Value::FILE_C};
-constexpr inline File FILE_D = File{File::Value::FILE_D};
-constexpr inline File FILE_E = File{File::Value::FILE_E};
-constexpr inline File FILE_F = File{File::Value::FILE_F};
-constexpr inline File FILE_G = File{File::Value::FILE_G};
-constexpr inline File FILE_H = File{File::Value::FILE_H};
+constexpr static File FILE_A = File{File::Value::FILE_A};
+constexpr static File FILE_B = File{File::Value::FILE_B};
+constexpr static File FILE_C = File{File::Value::FILE_C};
+constexpr static File FILE_D = File{File::Value::FILE_D};
+constexpr static File FILE_E = File{File::Value::FILE_E};
+constexpr static File FILE_F = File{File::Value::FILE_F};
+constexpr static File FILE_G = File{File::Value::FILE_G};
+constexpr static File FILE_H = File{File::Value::FILE_H};
 
 } // namespace constants
 

@@ -5,7 +5,7 @@
 
 namespace libchess::polyglot {
 
-constexpr inline std::uint64_t random_u64[782] = {
+constexpr static std::uint64_t random_u64[782] = {
     std::uint64_t(0x9D39247E33776D41), std::uint64_t(0x2AF7398005AAA5C7),
     std::uint64_t(0x44DB015024623547), std::uint64_t(0x9C15F73E62A76AE2),
     std::uint64_t(0x75834465489C0C89), std::uint64_t(0x3290AC3A203001BF),

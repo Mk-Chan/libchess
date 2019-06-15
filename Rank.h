@@ -31,14 +31,14 @@ class Rank : public MetaValueType<int> {
 
 namespace constants {
 
-constexpr inline Rank RANK_1 = Rank{Rank::Value::RANK_1};
-constexpr inline Rank RANK_2 = Rank{Rank::Value::RANK_2};
-constexpr inline Rank RANK_3 = Rank{Rank::Value::RANK_3};
-constexpr inline Rank RANK_4 = Rank{Rank::Value::RANK_4};
-constexpr inline Rank RANK_5 = Rank{Rank::Value::RANK_5};
-constexpr inline Rank RANK_6 = Rank{Rank::Value::RANK_6};
-constexpr inline Rank RANK_7 = Rank{Rank::Value::RANK_7};
-constexpr inline Rank RANK_8 = Rank{Rank::Value::RANK_8};
+constexpr static Rank RANK_1 = Rank{Rank::Value::RANK_1};
+constexpr static Rank RANK_2 = Rank{Rank::Value::RANK_2};
+constexpr static Rank RANK_3 = Rank{Rank::Value::RANK_3};
+constexpr static Rank RANK_4 = Rank{Rank::Value::RANK_4};
+constexpr static Rank RANK_5 = Rank{Rank::Value::RANK_5};
+constexpr static Rank RANK_6 = Rank{Rank::Value::RANK_6};
+constexpr static Rank RANK_7 = Rank{Rank::Value::RANK_7};
+constexpr static Rank RANK_8 = Rank{Rank::Value::RANK_8};
 
 } // namespace constants
 

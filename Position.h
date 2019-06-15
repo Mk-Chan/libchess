@@ -68,35 +68,31 @@ class Position {
 
         curr_state.hash_ = calculate_hash();
     }
-    constexpr inline Position() : fullmoves_(1), ply_(0) {}
+    inline Position() : fullmoves_(1), ply_(0) {}
 
-    constexpr inline Bitboard piece_type_bb(PieceType piece_type) const {
+    inline Bitboard piece_type_bb(PieceType piece_type) const {
         return piece_type_bb_[piece_type.value()];
     }
-    constexpr inline Bitboard piece_type_bb(PieceType piece_type, Color color) const {
+    inline Bitboard piece_type_bb(PieceType piece_type, Color color) const {
         return piece_type_bb_[piece_type.value()] & color_bb(color);
     }
-    constexpr inline Bitboard color_bb(Color color) const { return color_bb_[color.value()]; }
-    constexpr inline Bitboard occupancy_bb() const {
+    inline Bitboard color_bb(Color color) const { return color_bb_[color.value()]; }
+    inline Bitboard occupancy_bb() const {
         return color_bb(constants::WHITE) | color_bb(constants::BLACK);
     }
-    constexpr inline Color side_to_move() const { return side_to_move_; }
-    constexpr inline CastlingRights castling_rights() const {
-        return history_[ply_].castling_rights_;
-    }
-    constexpr inline Square enpassant_square() const { return history_[ply_].enpassant_square_; }
-    constexpr inline int halfmoves() const { return history_[ply_].halfmoves_; }
-    constexpr inline int fullmoves() const { return fullmoves_; }
-    constexpr inline Move previous_move() const { return history_[ply_].previous_move_; }
-    constexpr inline PieceType previously_captured_piece() const {
-        return history_[ply_].captured_pt_;
-    }
-    constexpr inline hash_type hash() const { return history_[ply_].hash_; }
+    inline Color side_to_move() const { return side_to_move_; }
+    inline CastlingRights castling_rights() const { return history_[ply_].castling_rights_; }
+    inline Square enpassant_square() const { return history_[ply_].enpassant_square_; }
+    inline int halfmoves() const { return history_[ply_].halfmoves_; }
+    inline int fullmoves() const { return fullmoves_; }
+    inline Move previous_move() const { return history_[ply_].previous_move_; }
+    inline PieceType previously_captured_piece() const { return history_[ply_].captured_pt_; }
+    inline hash_type hash() const { return history_[ply_].hash_; }
 
-    constexpr inline Square king_square(Color color) const {
+    inline Square king_square(Color color) const {
         return piece_type_bb(constants::KING, color).forward_bitscan();
     }
-    constexpr inline PieceType piece_type_on(Square square) const {
+    inline PieceType piece_type_on(Square square) const {
         for (PieceType piece_type : constants::PIECE_TYPES) {
             if (piece_type_bb(piece_type) & Bitboard{square}) {
                 return piece_type;
@@ -104,7 +100,7 @@ class Position {
         }
         return constants::PIECE_TYPE_NONE;
     }
-    constexpr inline Color color_of(Square square) const {
+    inline Color color_of(Square square) const {
         for (Color color : constants::COLORS) {
             if (color_bb(color) & Bitboard{square}) {
                 return color;
@@ -112,11 +108,11 @@ class Position {
         }
         return constants::COLOR_NONE;
     }
-    constexpr inline Piece piece_on(Square square) const {
+    inline Piece piece_on(Square square) const {
         return Piece{piece_type_on(square), color_of(square)};
     }
 
-    constexpr inline Bitboard pinned_pieces(Color to_color) const {
+    inline Bitboard pinned_pieces(Color to_color) const {
         Bitboard pinned_bb;
         Square king_sq = king_square(to_color);
         Bitboard pinners_bb =
@@ -134,11 +130,11 @@ class Position {
         }
         return pinned_bb;
     }
-    constexpr inline Bitboard checkers_to(Color to_color) const {
+    inline Bitboard checkers_to(Color to_color) const {
         return attackers_to(piece_type_bb(constants::KING, to_color).forward_bitscan(), !to_color);
     }
-    constexpr inline bool in_check() const { return checkers_to(side_to_move()) != 0; }
-    constexpr inline bool is_legal_move(Move move) const {
+    inline bool in_check() const { return checkers_to(side_to_move()) != 0; }
+    inline bool is_legal_move(Move move) const {
         Color c = side_to_move();
         Square from = move.from_square();
         Square king_sq = king_square(c);
@@ -158,7 +154,7 @@ class Position {
                    (Bitboard{move.to_square()} & lookups::direction_xray(king_sq, from));
         }
     }
-    constexpr inline Move::Type move_type_of(Move move) const {
+    inline Move::Type move_type_of(Move move) const {
         Move::Type move_type = move.type();
         if (move_type != constants::MOVE_TYPE_NONE) {
             return move_type;
@@ -189,7 +185,7 @@ class Position {
             }
         }
     }
-    constexpr inline bool is_capture_move(Move move) const {
+    inline bool is_capture_move(Move move) const {
         Move::Type move_type = move.type();
         switch (move_type) {
         case Move::Type::CAPTURE:
@@ -200,7 +196,7 @@ class Position {
             return false;
         }
     }
-    constexpr inline bool is_promotion_move(Move move) const {
+    inline bool is_promotion_move(Move move) const {
         Move::Type move_type = move.type();
         switch (move_type) {
         case Move::Type::PROMOTION:
@@ -210,7 +206,7 @@ class Position {
             return false;
         }
     }
-    constexpr inline void unmake_move() {
+    inline void unmake_move() {
         if (side_to_move() == constants::WHITE) {
             --fullmoves_;
         }
@@ -276,7 +272,7 @@ class Position {
             break;
         }
     }
-    constexpr inline void make_move(Move move) {
+    inline void make_move(Move move) {
         Color stm = side_to_move();
         if (stm == constants::BLACK) {
             ++fullmoves_;
@@ -359,7 +355,7 @@ class Position {
         reverse_side_to_move();
         next_state.hash_ = calculate_hash();
     }
-    constexpr inline void make_null_move() {
+    inline void make_null_move() {
         if (side_to_move() == constants::BLACK) {
             ++fullmoves_;
         }
@@ -374,7 +370,7 @@ class Position {
         next.hash_ = calculate_hash();
     }
 
-    constexpr inline Bitboard attackers_to(Square square) const {
+    inline Bitboard attackers_to(Square square) const {
         Bitboard attackers;
         attackers |= (lookups::pawn_attacks(square, constants::WHITE) |
                       lookups::pawn_attacks(square, constants::BLACK)) &
@@ -386,7 +382,7 @@ class Position {
         }
         return attackers;
     }
-    constexpr inline Bitboard attackers_to(Square square, Color attacker_color) const {
+    inline Bitboard attackers_to(Square square, Color attacker_color) const {
         Bitboard attackers;
         attackers |= lookups::pawn_attacks(square, !attacker_color) &
                      piece_type_bb(constants::PAWN, attacker_color);
@@ -397,8 +393,7 @@ class Position {
         }
         return attackers;
     }
-    constexpr inline Bitboard attackers_to(Square square, Color attacker_color,
-                                           Bitboard occupancy) const {
+    inline Bitboard attackers_to(Square square, Color attacker_color, Bitboard occupancy) const {
         Bitboard attackers;
         attackers |= lookups::pawn_attacks(square, !attacker_color) &
                      piece_type_bb(constants::PAWN, attacker_color);
@@ -409,7 +404,7 @@ class Position {
         return attackers;
     }
 
-    constexpr inline void generate_quiet_promotions(MoveList& move_list) const {
+    inline void generate_quiet_promotions(MoveList& move_list) const {
         Color stm = side_to_move();
         Bitboard promotion_candidates =
             lookups::pawn_shift(piece_type_bb(constants::PAWN, stm) &
@@ -429,7 +424,7 @@ class Position {
                                Move::Type::PROMOTION});
         }
     }
-    constexpr inline void generate_capture_promotions(MoveList& move_list) const {
+    inline void generate_capture_promotions(MoveList& move_list) const {
         Bitboard pawn_bb = piece_type_bb(constants::PAWN);
         Color stm = side_to_move();
         pawn_bb &= color_bb(stm) & lookups::relative_rank_mask(constants::RANK_7, stm);
@@ -451,11 +446,11 @@ class Position {
             }
         }
     }
-    constexpr inline void generate_promotions(MoveList& move_list) const {
+    inline void generate_promotions(MoveList& move_list) const {
         generate_capture_promotions(move_list);
         generate_quiet_promotions(move_list);
     }
-    constexpr inline void generate_pawn_quiets(MoveList& move_list) const {
+    inline void generate_pawn_quiets(MoveList& move_list) const {
         generate_quiet_promotions(move_list);
         Color stm = side_to_move();
         Bitboard occupancy = occupancy_bb();
@@ -481,7 +476,7 @@ class Position {
                                Move::Type::NORMAL});
         }
     }
-    constexpr inline void generate_pawn_captures(MoveList& move_list) const {
+    inline void generate_pawn_captures(MoveList& move_list) const {
         generate_capture_promotions(move_list);
         Bitboard pawn_bb = piece_type_bb(constants::PAWN);
         Square ep_sq = enpassant_square();
@@ -508,11 +503,11 @@ class Position {
             }
         }
     }
-    constexpr inline void generate_pawn_moves(MoveList& move_list) const {
+    inline void generate_pawn_moves(MoveList& move_list) const {
         generate_pawn_captures(move_list);
         generate_pawn_quiets(move_list);
     }
-    constexpr inline void generate_non_pawn_quiets(PieceType pt, MoveList& move_list) const {
+    inline void generate_non_pawn_quiets(PieceType pt, MoveList& move_list) const {
         Bitboard piece_bb = piece_type_bb(pt, side_to_move());
         Bitboard occupancy = occupancy_bb();
         while (piece_bb) {
@@ -526,7 +521,7 @@ class Position {
             }
         }
     }
-    constexpr inline void generate_non_pawn_captures(PieceType pt, MoveList& move_list) const {
+    inline void generate_non_pawn_captures(PieceType pt, MoveList& move_list) const {
         Bitboard piece_bb = piece_type_bb(pt, side_to_move());
         Bitboard occupancy = occupancy_bb();
         Bitboard opp_occupancy = color_bb(!side_to_move());
@@ -541,27 +536,27 @@ class Position {
             }
         }
     }
-    constexpr inline void generate_knight_moves(MoveList& move_list) const {
+    inline void generate_knight_moves(MoveList& move_list) const {
         generate_non_pawn_quiets(constants::KNIGHT, move_list);
         generate_non_pawn_captures(constants::KNIGHT, move_list);
     }
-    constexpr inline void generate_bishop_moves(MoveList& move_list) const {
+    inline void generate_bishop_moves(MoveList& move_list) const {
         generate_non_pawn_quiets(constants::BISHOP, move_list);
         generate_non_pawn_captures(constants::BISHOP, move_list);
     }
-    constexpr inline void generate_rook_moves(MoveList& move_list) const {
+    inline void generate_rook_moves(MoveList& move_list) const {
         generate_non_pawn_quiets(constants::ROOK, move_list);
         generate_non_pawn_captures(constants::ROOK, move_list);
     }
-    constexpr inline void generate_queen_moves(MoveList& move_list) const {
+    inline void generate_queen_moves(MoveList& move_list) const {
         generate_non_pawn_quiets(constants::QUEEN, move_list);
         generate_non_pawn_captures(constants::QUEEN, move_list);
     }
-    constexpr inline void generate_king_moves(MoveList& move_list) const {
+    inline void generate_king_moves(MoveList& move_list) const {
         generate_non_pawn_quiets(constants::KING, move_list);
         generate_non_pawn_captures(constants::KING, move_list);
     }
-    constexpr inline void generate_castling(MoveList& move_list) const {
+    inline void generate_castling(MoveList& move_list) const {
         const int castling_possibilities[2][2] = {
             {constants::WHITE_KINGSIDE.value(), constants::WHITE_QUEENSIDE.value()},
             {constants::BLACK_KINGSIDE.value(), constants::BLACK_QUEENSIDE.value()},
@@ -595,7 +590,7 @@ class Position {
                                constants::PIECE_TYPE_NONE, Move::Type::CASTLING});
         }
     }
-    constexpr inline void generate_checker_block_moves(MoveList& move_list) const {
+    inline void generate_checker_block_moves(MoveList& move_list) const {
         Color c = side_to_move();
         Bitboard checkers = checkers_to(c);
         if (checkers.popcount() > 1) {
@@ -649,7 +644,7 @@ class Position {
             }
         }
     }
-    constexpr inline void generate_checker_capture_moves(MoveList& move_list) const {
+    inline void generate_checker_capture_moves(MoveList& move_list) const {
         Color c = side_to_move();
         Bitboard checkers = checkers_to(c);
         if (checkers.popcount() > 1) {
@@ -688,7 +683,7 @@ class Position {
             move_list.add(Move{sq, checker_sq, constants::PIECE_TYPE_NONE, Move::Type::CAPTURE});
         }
     }
-    constexpr inline MoveList check_evasion_move_list() const {
+    inline MoveList check_evasion_move_list() const {
         MoveList move_list;
         Color c = side_to_move();
         Square king_sq = king_square(c);
@@ -719,7 +714,7 @@ class Position {
         generate_checker_block_moves(move_list);
         return move_list;
     }
-    constexpr inline void generate_quiet_moves(MoveList& move_list) const {
+    inline void generate_quiet_moves(MoveList& move_list) const {
         generate_pawn_quiets(move_list);
         generate_non_pawn_quiets(constants::KNIGHT, move_list);
         generate_non_pawn_quiets(constants::BISHOP, move_list);
@@ -728,7 +723,7 @@ class Position {
         generate_non_pawn_quiets(constants::KING, move_list);
         generate_castling(move_list);
     }
-    constexpr inline void generate_capture_moves(MoveList& move_list) const {
+    inline void generate_capture_moves(MoveList& move_list) const {
         generate_pawn_captures(move_list);
         generate_non_pawn_captures(constants::KNIGHT, move_list);
         generate_non_pawn_captures(constants::BISHOP, move_list);
@@ -736,7 +731,7 @@ class Position {
         generate_non_pawn_captures(constants::QUEEN, move_list);
         generate_non_pawn_captures(constants::KING, move_list);
     }
-    constexpr inline MoveList pseudo_legal_move_list() const {
+    inline MoveList pseudo_legal_move_list() const {
         MoveList move_list;
         generate_pawn_moves(move_list);
         generate_knight_moves(move_list);
@@ -747,7 +742,7 @@ class Position {
         generate_castling(move_list);
         return move_list;
     }
-    constexpr inline MoveList legal_move_list() const {
+    inline MoveList legal_move_list() const {
         Color stm = side_to_move();
         MoveList move_list =
             checkers_to(stm) ? check_evasion_move_list() : pseudo_legal_move_list();
@@ -765,7 +760,7 @@ class Position {
         return move_list;
     }
 
-    constexpr inline bool is_repeat(int times = 1) const {
+    inline bool is_repeat(int times = 1) const {
         hash_type curr_hash = hash();
         int num_keys = ply();
         int count = 0;
@@ -779,7 +774,7 @@ class Position {
         }
         return false;
     }
-    constexpr inline int repeat_count() const {
+    inline int repeat_count() const {
         hash_type curr_hash = hash();
         int num_keys = ply();
         int count = 0;
@@ -884,13 +879,13 @@ class Position {
         int halfmoves_ = 0;
     };
 
-    constexpr inline int ply() const { return ply_; }
-    constexpr inline const std::array<State, 256>& history() const { return history_; }
-    constexpr inline State& state_mut_ref() { return history_[ply()]; }
-    constexpr inline State& state_mut_ref(int ply) { return history_[ply]; }
-    constexpr inline const State& state() const { return history_[ply()]; }
-    constexpr inline const State& state(int ply) const { return history_[ply]; }
-    constexpr inline hash_type calculate_hash() const {
+    inline int ply() const { return ply_; }
+    inline const std::array<State, 256>& history() const { return history_; }
+    inline State& state_mut_ref() { return history_[ply()]; }
+    inline State& state_mut_ref(int ply) { return history_[ply]; }
+    inline const State& state() const { return history_[ply()]; }
+    inline const State& state(int ply) const { return history_[ply]; }
+    inline hash_type calculate_hash() const {
         hash_type hash_value = 0;
         for (Color c : constants::COLORS) {
             for (PieceType pt : constants::PIECE_TYPES) {
@@ -909,26 +904,26 @@ class Position {
         return hash_value;
     }
 
-    constexpr inline void put_piece(Square square, PieceType piece_type, Color color) {
+    inline void put_piece(Square square, PieceType piece_type, Color color) {
         Bitboard square_bb = Bitboard{square};
         piece_type_bb_[piece_type.value()] |= square_bb;
         color_bb_[color.value()] |= square_bb;
     }
-    constexpr inline void remove_piece(Square square, PieceType piece_type, Color color) {
+    inline void remove_piece(Square square, PieceType piece_type, Color color) {
         Bitboard square_bb = Bitboard{square};
         piece_type_bb_[piece_type.value()] &= ~square_bb;
         color_bb_[color.value()] &= ~square_bb;
     }
-    constexpr inline void move_piece(Square from_square, Square to_square, PieceType piece_type,
-                                     Color color) {
+    inline void move_piece(Square from_square, Square to_square, PieceType piece_type,
+                           Color color) {
         Bitboard from_to_sqs_bb = Bitboard{from_square} ^ Bitboard { to_square };
         piece_type_bb_[piece_type.value()] ^= from_to_sqs_bb;
         color_bb_[color.value()] ^= from_to_sqs_bb;
     }
-    constexpr inline void reverse_side_to_move() { side_to_move_ = !side_to_move_; }
+    inline void reverse_side_to_move() { side_to_move_ = !side_to_move_; }
 
     // clang-format off
-    constexpr static inline int castling_spoilers[64] = {
+    constexpr static int castling_spoilers[64] = {
         13, 15, 15, 15, 12, 15, 15, 14,
         15, 15, 15, 15, 15, 15, 15, 15,
         15, 15, 15, 15, 15, 15, 15, 15,
@@ -947,11 +942,11 @@ class Position {
     int fullmoves_;
     int ply_;
     std::array<State, 256> history_;
-}; // namespace libchess
+};
 
 namespace constants {
 
-inline const std::string STARTPOS_FEN = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1";
+static std::string STARTPOS_FEN = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1";
 
 }
 

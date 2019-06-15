@@ -72,9 +72,7 @@ class CastlingRights {
         }
     }
 
-    constexpr inline bool operator==(CastlingRights rhs) const {
-        return value() == rhs.value();
-    }
+    constexpr inline bool operator==(CastlingRights rhs) const { return value() == rhs.value(); }
 
     constexpr inline void allow(CastlingRight castling_right) {
         value_ |= value_type(castling_right.value());
@@ -131,14 +129,14 @@ inline std::ostream& operator<<(std::ostream& ostream, CastlingRights castling_r
 
 namespace constants {
 
-constexpr inline CastlingRight CASTLING_RIGHT_NONE{CastlingRight::Value::CASTLING_RIGHT_NONE};
-constexpr inline CastlingRight WHITE_KINGSIDE{CastlingRight::Value::WHITE_KINGSIDE};
-constexpr inline CastlingRight WHITE_QUEENSIDE{CastlingRight::Value::WHITE_QUEENSIDE};
-constexpr inline CastlingRight BLACK_KINGSIDE{CastlingRight::Value::BLACK_KINGSIDE};
-constexpr inline CastlingRight BLACK_QUEENSIDE{CastlingRight::Value::BLACK_QUEENSIDE};
+constexpr static CastlingRight CASTLING_RIGHT_NONE{CastlingRight::Value::CASTLING_RIGHT_NONE};
+constexpr static CastlingRight WHITE_KINGSIDE{CastlingRight::Value::WHITE_KINGSIDE};
+constexpr static CastlingRight WHITE_QUEENSIDE{CastlingRight::Value::WHITE_QUEENSIDE};
+constexpr static CastlingRight BLACK_KINGSIDE{CastlingRight::Value::BLACK_KINGSIDE};
+constexpr static CastlingRight BLACK_QUEENSIDE{CastlingRight::Value::BLACK_QUEENSIDE};
 
-constexpr inline CastlingRights CASTLING_RIGHTS_NONE{};
-constexpr inline CastlingRights CASTLING_RIGHTS_ALL{WHITE_KINGSIDE, WHITE_QUEENSIDE, BLACK_KINGSIDE,
+constexpr static CastlingRights CASTLING_RIGHTS_NONE{};
+constexpr static CastlingRights CASTLING_RIGHTS_ALL{WHITE_KINGSIDE, WHITE_QUEENSIDE, BLACK_KINGSIDE,
                                                     BLACK_QUEENSIDE};
 
 } // namespace constants

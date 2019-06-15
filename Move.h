@@ -78,7 +78,7 @@ class Move {
 
 class MoveList {
   protected:
-    constexpr static inline int max_size = 256;
+    constexpr static int max_size = 256;
 
   public:
     using value_type = std::array<Move, max_size>;
@@ -140,8 +140,8 @@ inline std::ostream& operator<<(std::ostream& ostream, Move move) {
 
 namespace constants {
 
-constexpr inline Move::Type MOVE_TYPE_NONE = Move::Type::NONE;
-constexpr inline Move MOVE_NONE{};
+constexpr static Move::Type MOVE_TYPE_NONE = Move::Type::NONE;
+constexpr static Move MOVE_NONE{};
 
 } // namespace constants
 

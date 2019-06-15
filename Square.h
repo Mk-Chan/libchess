@@ -65,80 +65,80 @@ inline std::ostream& operator<<(std::ostream& ostream, Square square) {
 
 namespace constants {
 
-constexpr inline Square A1{Square::Value::A1};
-constexpr inline Square A2{Square::Value::A2};
-constexpr inline Square A3{Square::Value::A3};
-constexpr inline Square A4{Square::Value::A4};
-constexpr inline Square A5{Square::Value::A5};
-constexpr inline Square A6{Square::Value::A6};
-constexpr inline Square A7{Square::Value::A7};
-constexpr inline Square A8{Square::Value::A8};
+constexpr static Square A1{Square::Value::A1};
+constexpr static Square A2{Square::Value::A2};
+constexpr static Square A3{Square::Value::A3};
+constexpr static Square A4{Square::Value::A4};
+constexpr static Square A5{Square::Value::A5};
+constexpr static Square A6{Square::Value::A6};
+constexpr static Square A7{Square::Value::A7};
+constexpr static Square A8{Square::Value::A8};
 
-constexpr inline Square B1{Square::Value::B1};
-constexpr inline Square B2{Square::Value::B2};
-constexpr inline Square B3{Square::Value::B3};
-constexpr inline Square B4{Square::Value::B4};
-constexpr inline Square B5{Square::Value::B5};
-constexpr inline Square B6{Square::Value::B6};
-constexpr inline Square B7{Square::Value::B7};
-constexpr inline Square B8{Square::Value::B8};
+constexpr static Square B1{Square::Value::B1};
+constexpr static Square B2{Square::Value::B2};
+constexpr static Square B3{Square::Value::B3};
+constexpr static Square B4{Square::Value::B4};
+constexpr static Square B5{Square::Value::B5};
+constexpr static Square B6{Square::Value::B6};
+constexpr static Square B7{Square::Value::B7};
+constexpr static Square B8{Square::Value::B8};
 
-constexpr inline Square C1{Square::Value::C1};
-constexpr inline Square C2{Square::Value::C2};
-constexpr inline Square C3{Square::Value::C3};
-constexpr inline Square C4{Square::Value::C4};
-constexpr inline Square C5{Square::Value::C5};
-constexpr inline Square C6{Square::Value::C6};
-constexpr inline Square C7{Square::Value::C7};
-constexpr inline Square C8{Square::Value::C8};
+constexpr static Square C1{Square::Value::C1};
+constexpr static Square C2{Square::Value::C2};
+constexpr static Square C3{Square::Value::C3};
+constexpr static Square C4{Square::Value::C4};
+constexpr static Square C5{Square::Value::C5};
+constexpr static Square C6{Square::Value::C6};
+constexpr static Square C7{Square::Value::C7};
+constexpr static Square C8{Square::Value::C8};
 
-constexpr inline Square D1{Square::Value::D1};
-constexpr inline Square D2{Square::Value::D2};
-constexpr inline Square D3{Square::Value::D3};
-constexpr inline Square D4{Square::Value::D4};
-constexpr inline Square D5{Square::Value::D5};
-constexpr inline Square D6{Square::Value::D6};
-constexpr inline Square D7{Square::Value::D7};
-constexpr inline Square D8{Square::Value::D8};
+constexpr static Square D1{Square::Value::D1};
+constexpr static Square D2{Square::Value::D2};
+constexpr static Square D3{Square::Value::D3};
+constexpr static Square D4{Square::Value::D4};
+constexpr static Square D5{Square::Value::D5};
+constexpr static Square D6{Square::Value::D6};
+constexpr static Square D7{Square::Value::D7};
+constexpr static Square D8{Square::Value::D8};
 
-constexpr inline Square E1{Square::Value::E1};
-constexpr inline Square E2{Square::Value::E2};
-constexpr inline Square E3{Square::Value::E3};
-constexpr inline Square E4{Square::Value::E4};
-constexpr inline Square E5{Square::Value::E5};
-constexpr inline Square E6{Square::Value::E6};
-constexpr inline Square E7{Square::Value::E7};
-constexpr inline Square E8{Square::Value::E8};
+constexpr static Square E1{Square::Value::E1};
+constexpr static Square E2{Square::Value::E2};
+constexpr static Square E3{Square::Value::E3};
+constexpr static Square E4{Square::Value::E4};
+constexpr static Square E5{Square::Value::E5};
+constexpr static Square E6{Square::Value::E6};
+constexpr static Square E7{Square::Value::E7};
+constexpr static Square E8{Square::Value::E8};
 
-constexpr inline Square F1{Square::Value::F1};
-constexpr inline Square F2{Square::Value::F2};
-constexpr inline Square F3{Square::Value::F3};
-constexpr inline Square F4{Square::Value::F4};
-constexpr inline Square F5{Square::Value::F5};
-constexpr inline Square F6{Square::Value::F6};
-constexpr inline Square F7{Square::Value::F7};
-constexpr inline Square F8{Square::Value::F8};
+constexpr static Square F1{Square::Value::F1};
+constexpr static Square F2{Square::Value::F2};
+constexpr static Square F3{Square::Value::F3};
+constexpr static Square F4{Square::Value::F4};
+constexpr static Square F5{Square::Value::F5};
+constexpr static Square F6{Square::Value::F6};
+constexpr static Square F7{Square::Value::F7};
+constexpr static Square F8{Square::Value::F8};
 
-constexpr inline Square G1{Square::Value::G1};
-constexpr inline Square G2{Square::Value::G2};
-constexpr inline Square G3{Square::Value::G3};
-constexpr inline Square G4{Square::Value::G4};
-constexpr inline Square G5{Square::Value::G5};
-constexpr inline Square G6{Square::Value::G6};
-constexpr inline Square G7{Square::Value::G7};
-constexpr inline Square G8{Square::Value::G8};
+constexpr static Square G1{Square::Value::G1};
+constexpr static Square G2{Square::Value::G2};
+constexpr static Square G3{Square::Value::G3};
+constexpr static Square G4{Square::Value::G4};
+constexpr static Square G5{Square::Value::G5};
+constexpr static Square G6{Square::Value::G6};
+constexpr static Square G7{Square::Value::G7};
+constexpr static Square G8{Square::Value::G8};
 
-constexpr inline Square H1{Square::Value::H1};
-constexpr inline Square H2{Square::Value::H2};
-constexpr inline Square H3{Square::Value::H3};
-constexpr inline Square H4{Square::Value::H4};
-constexpr inline Square H5{Square::Value::H5};
-constexpr inline Square H6{Square::Value::H6};
-constexpr inline Square H7{Square::Value::H7};
-constexpr inline Square H8{Square::Value::H8};
+constexpr static Square H1{Square::Value::H1};
+constexpr static Square H2{Square::Value::H2};
+constexpr static Square H3{Square::Value::H3};
+constexpr static Square H4{Square::Value::H4};
+constexpr static Square H5{Square::Value::H5};
+constexpr static Square H6{Square::Value::H6};
+constexpr static Square H7{Square::Value::H7};
+constexpr static Square H8{Square::Value::H8};
 
 // clang-format off
-constexpr inline Square SQUARES[]{
+constexpr static Square SQUARES[]{
   A1, B1, C1, D1, E1, F1, G1, H1,
   A2, B2, C2, D2, E2, F2, G2, H2,
   A3, B3, C3, D3, E3, F3, G3, H3,
@@ -150,8 +150,8 @@ constexpr inline Square SQUARES[]{
 };
 // clang-format on
 
-constexpr inline Square SQUARE_NONE{Square::Value::SQUARE_NONE};
-constexpr inline int NUM_SQUARES = Square::Value::NUM_SQUARES;
+constexpr static Square SQUARE_NONE{Square::Value::SQUARE_NONE};
+constexpr static int NUM_SQUARES = Square::Value::NUM_SQUARES;
 
 } // namespace constants
 

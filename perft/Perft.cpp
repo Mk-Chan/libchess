@@ -9,7 +9,7 @@
 using namespace libchess;
 using namespace constants;
 
-constexpr inline long long int perft(Position& pos, int depth) {
+inline long long int perft(Position& pos, int depth) {
     long long int count = 0LL;
     MoveList move_list = pos.legal_move_list();
     if (depth == 1) {

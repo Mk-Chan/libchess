@@ -74,15 +74,15 @@ inline std::ostream& operator<<(std::ostream& ostream, PieceType piece_type) {
 
 namespace constants {
 
-constexpr inline PieceType PAWN{PieceType::Value::PAWN};
-constexpr inline PieceType KNIGHT{PieceType::Value::KNIGHT};
-constexpr inline PieceType BISHOP{PieceType::Value::BISHOP};
-constexpr inline PieceType ROOK{PieceType::Value::ROOK};
-constexpr inline PieceType QUEEN{PieceType::Value::QUEEN};
-constexpr inline PieceType KING{PieceType::Value::KING};
-constexpr inline PieceType PIECE_TYPE_NONE{PieceType::Value::NONE};
-constexpr inline PieceType PIECE_TYPES[]{PAWN, KNIGHT, BISHOP, ROOK, QUEEN, KING};
-constexpr inline int NUM_PIECE_TYPES = PieceType::Value::NUM_PIECE_TYPES;
+constexpr static PieceType PAWN{PieceType::Value::PAWN};
+constexpr static PieceType KNIGHT{PieceType::Value::KNIGHT};
+constexpr static PieceType BISHOP{PieceType::Value::BISHOP};
+constexpr static PieceType ROOK{PieceType::Value::ROOK};
+constexpr static PieceType QUEEN{PieceType::Value::QUEEN};
+constexpr static PieceType KING{PieceType::Value::KING};
+constexpr static PieceType PIECE_TYPE_NONE{PieceType::Value::NONE};
+constexpr static PieceType PIECE_TYPES[]{PAWN, KNIGHT, BISHOP, ROOK, QUEEN, KING};
+constexpr static int NUM_PIECE_TYPES = PieceType::Value::NUM_PIECE_TYPES;
 
 } // namespace constants
 

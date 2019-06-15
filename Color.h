@@ -49,11 +49,11 @@ inline std::ostream& operator<<(std::ostream& ostream, Color color) {
 
 namespace constants {
 
-constexpr inline Color WHITE{Color::Value::WHITE};
-constexpr inline Color BLACK{Color::Value::BLACK};
-constexpr inline Color COLOR_NONE{Color::Value::NONE};
-constexpr inline Color COLORS[]{WHITE, BLACK};
-constexpr inline int NUM_COLORS = Color::Value::NUM_COLORS;
+constexpr static Color WHITE{Color::Value::WHITE};
+constexpr static Color BLACK{Color::Value::BLACK};
+constexpr static Color COLOR_NONE{Color::Value::NONE};
+constexpr static Color COLORS[]{WHITE, BLACK};
+constexpr static int NUM_COLORS = Color::Value::NUM_COLORS;
 
 } // namespace constants
 
