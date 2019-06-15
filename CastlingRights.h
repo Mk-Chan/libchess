@@ -94,6 +94,30 @@ class CastlingRights {
         }
         return castling_rights;
     }
+    inline std::string to_str() const {
+        std::string cr_str;
+        bool any = false;
+        if (is_allowed(CastlingRight::Value::WHITE_KINGSIDE)) {
+            cr_str += "K";
+            any = true;
+        }
+        if (is_allowed(CastlingRight::Value::WHITE_QUEENSIDE)) {
+            cr_str += "Q";
+            any = true;
+        }
+        if (is_allowed(CastlingRight::Value::BLACK_KINGSIDE)) {
+            cr_str += "k";
+            any = true;
+        }
+        if (is_allowed(CastlingRight::Value::BLACK_QUEENSIDE)) {
+            cr_str += "q";
+            any = true;
+        }
+        if (!any) {
+            cr_str += "-";
+        }
+        return cr_str;
+    }
 
     constexpr inline value_type value() const { return value_; }
 
@@ -102,27 +126,7 @@ class CastlingRights {
 };
 
 inline std::ostream& operator<<(std::ostream& ostream, CastlingRights castling_rights) {
-    bool any = false;
-    if (castling_rights.is_allowed(CastlingRight::Value::WHITE_KINGSIDE)) {
-        ostream << "K";
-        any = true;
-    }
-    if (castling_rights.is_allowed(CastlingRight::Value::WHITE_QUEENSIDE)) {
-        ostream << "Q";
-        any = true;
-    }
-    if (castling_rights.is_allowed(CastlingRight::Value::BLACK_KINGSIDE)) {
-        ostream << "k";
-        any = true;
-    }
-    if (castling_rights.is_allowed(CastlingRight::Value::BLACK_QUEENSIDE)) {
-        ostream << "q";
-        any = true;
-    }
-    if (!any) {
-        ostream << "-";
-    }
-    return ostream;
+    return ostream << castling_rights.to_str();
 }
 
 namespace constants {

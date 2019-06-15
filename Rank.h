@@ -7,7 +7,7 @@
 
 namespace libchess {
 
-class Rank : public MetaValueType<std::uint8_t> {
+class Rank : public MetaValueType<int> {
   public:
     class Value {
       public:

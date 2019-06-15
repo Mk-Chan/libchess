@@ -16,11 +16,11 @@ class Piece {
     constexpr PieceType type() const { return value_ & 7; }
     constexpr Color color() const { return value_ >> 3; }
 
-    constexpr bool operator==(Piece& rhs) const {
+    constexpr bool operator==(const Piece rhs) const {
         return type() == rhs.type() && color() == rhs.color();
     }
-    constexpr bool operator==(const Piece& rhs) const {
-        return type() == rhs.type() && color() == rhs.color();
+    constexpr bool operator!=(const Piece rhs) const {
+        return type() != rhs.type() || color() != rhs.color();
     }
 
     constexpr char to_char() const {
