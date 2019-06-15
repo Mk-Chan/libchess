@@ -762,9 +762,9 @@ class Position {
 
     inline bool is_repeat(int times = 1) const {
         hash_type curr_hash = hash();
-        int num_keys = ply();
+        int num_keys = std::max(0, ply() - halfmoves());
         int count = 0;
-        for (int i = num_keys - 2; i >= num_keys - halfmoves(); i -= 2) {
+        for (int i = ply() - 2; i >= num_keys; i -= 2) {
             if (state(i).hash_ == curr_hash) {
                 ++count;
                 if (count >= times) {
@@ -776,9 +776,9 @@ class Position {
     }
     inline int repeat_count() const {
         hash_type curr_hash = hash();
-        int num_keys = ply();
+        int num_keys = std::max(0, ply() - halfmoves());
         int count = 0;
-        for (int i = num_keys - 2; i >= num_keys - halfmoves(); i -= 2) {
+        for (int i = ply() - 2; i >= num_keys; i -= 2) {
             if (state(i).hash_ == curr_hash) {
                 ++count;
             }
