@@ -1,0 +1,22 @@
+version: 2
+jobs:
+    gcc7-build:
+        docker:
+            - image: gcc:7
+        steps:
+            - checkout
+            - run: git submodule init && git submodule update
+            - run: bash ./.circleci/test.sh
+    gcc8-build:
+        docker:
+            - image: gcc:8
+        steps:
+            - checkout
+            - run: git submodule init && git submodule update
+            - run: bash ./.circleci/test.sh
+workflows:
+    version: 2
+    all:
+        jobs:
+            - gcc7-build
+            - gcc8-build
