@@ -51,4 +51,9 @@ TEST_CASE("Move parsing test", "[Move]") {
     REQUIRE(Move::from("g1f3") == Move{G1, F3});
     REQUIRE(Move::from("e7e8q") == Move{E7, E8, QUEEN});
     REQUIRE(Move::from("e2d1n") == Move{E2, D1, KNIGHT});
+    REQUIRE(Move{"e2e4"} == Move{E2, E4});
+    REQUIRE(Move{"e2e3"} == Move{E2, E3});
+    REQUIRE(Move{"g1f3"} == Move{G1, F3});
+    REQUIRE(Move{"e7e8q"} == Move{E7, E8, QUEEN});
+    REQUIRE(Move{"e2d1n"} == Move{E2, D1, KNIGHT});
 }

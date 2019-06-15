@@ -45,6 +45,8 @@ class Move {
         : value_(from_square.value() | (to_square.value() << TO_SQUARE_SHIFT) |
                  (promotion_pt.value() << PROMOTION_TYPE_SHIFT) |
                  (std::uint32_t(type) << MOVE_TYPE_SHIFT)) {}
+    inline Move(const std::string& move_str) : value_(from(move_str).value_) {}
+    inline Move(const char* move_str) : value_(from(move_str).value_) {}
 
     static inline Move from(const std::string& str) {
         Square from = Square::from(str.substr(0, 2));
@@ -56,7 +58,8 @@ class Move {
         return Move{from, to, promotion_pt};
     }
 
-    constexpr inline bool operator==(Move rhs) const { return value() == rhs.value(); }
+    constexpr inline bool operator==(const Move rhs) const { return value() == rhs.value(); }
+    constexpr inline bool operator!=(const Move rhs) const { return value() != rhs.value(); }
 
     constexpr inline Square from_square() const { return value() & 0x3f; }
     constexpr inline Square to_square() const { return (value() & 0xfc0) >> 6; }

@@ -15,13 +15,16 @@
 #include "Piece.h"
 #include "PieceType.h"
 #include "Square.h"
+#include "internal/Zobrist.h"
 
 namespace libchess {
 
 class Position {
   public:
+    using hash_type = std::uint64_t;
+
     inline Position(const std::string& fen) : ply_(0) {
-        State& curr_state = state();
+        State& curr_state = state_mut_ref();
 
         std::stringstream fen_stream{fen};
         std::string fen_part;
@@ -62,6 +65,8 @@ class Position {
         // Fullmoves
         fen_stream >> fen_part;
         fullmoves_ = std::strtol(fen_part_cstr, &end, 10);
+
+        curr_state.hash_ = calculate_hash();
     }
     constexpr inline Position() : fullmoves_(1), ply_(0) {}
 
@@ -86,6 +91,7 @@ class Position {
     constexpr inline PieceType previously_captured_piece() const {
         return history_[ply_].captured_pt_;
     }
+    constexpr inline hash_type hash() const { return history_[ply_].hash_; }
 
     constexpr inline Square king_square(Color color) const {
         return piece_type_bb(constants::KING, color).forward_bitscan();
@@ -99,7 +105,7 @@ class Position {
         return constants::PIECE_TYPE_NONE;
     }
     constexpr inline Color color_of(Square square) const {
-        for (Color color : constants::COLOR_LIST) {
+        for (Color color : constants::COLORS) {
             if (color_bb(color) & Bitboard{square}) {
                 return color;
             }
@@ -275,10 +281,10 @@ class Position {
         if (stm == constants::BLACK) {
             ++fullmoves_;
         }
-        State& prev_state = state();
+        State& prev_state = state_mut_ref();
         ++ply_;
-        State& next_state = state();
-        next_state.halfmoves_ = halfmoves() + 1;
+        State& next_state = state_mut_ref();
+        next_state.halfmoves_ = prev_state.halfmoves_ + 1;
         next_state.previous_move_ = move;
         next_state.enpassant_square_ = constants::SQUARE_NONE;
 
@@ -351,19 +357,21 @@ class Position {
         next_state.captured_pt_ = captured_pt;
         next_state.move_type_ = move_type;
         reverse_side_to_move();
+        next_state.hash_ = calculate_hash();
     }
     constexpr inline void make_null_move() {
         if (side_to_move() == constants::BLACK) {
             ++fullmoves_;
         }
-        State& prev = state();
+        State& prev = state_mut_ref();
         ++ply_;
-        State& next = state();
+        State& next = state_mut_ref();
         reverse_side_to_move();
         next.previous_move_ = constants::MOVE_NONE;
         next.halfmoves_ = prev.halfmoves_ + 1;
         next.enpassant_square_ = constants::SQUARE_NONE;
         next.castling_rights_ = prev.castling_rights_;
+        next.hash_ = calculate_hash();
     }
 
     constexpr inline Bitboard attackers_to(Square square) const {
@@ -757,6 +765,32 @@ class Position {
         return move_list;
     }
 
+    constexpr inline bool is_repeat(int times = 1) const {
+        hash_type curr_hash = hash();
+        int num_keys = ply();
+        int count = 0;
+        for (int i = num_keys - 2; i >= num_keys - halfmoves(); i -= 2) {
+            if (state(i).hash_ == curr_hash) {
+                ++count;
+                if (count >= times) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+    constexpr inline int repeat_count() const {
+        hash_type curr_hash = hash();
+        int num_keys = ply();
+        int count = 0;
+        for (int i = num_keys - 2; i >= num_keys - halfmoves(); i -= 2) {
+            if (state(i).hash_ == curr_hash) {
+                ++count;
+            }
+        }
+        return count;
+    }
+
     inline void display_raw(std::ostream& ostream = std::cout) const {
         ostream << "Pawn\n";
         ostream << piece_type_bb(constants::PAWN) << "\n";
@@ -808,13 +842,34 @@ class Position {
         Move previous_move_ = constants::MOVE_NONE;
         PieceType captured_pt_ = constants::PIECE_TYPE_NONE;
         Move::Type move_type_ = Move::Type::NONE;
+        hash_type hash_ = 0;
         int halfmoves_ = 0;
     };
 
     constexpr inline int ply() const { return ply_; }
     constexpr inline const std::array<State, 256>& history() const { return history_; }
-    constexpr inline State& state() { return history_[ply()]; }
-    constexpr inline State& state(int ply) { return history_[ply]; }
+    constexpr inline State& state_mut_ref() { return history_[ply()]; }
+    constexpr inline State& state_mut_ref(int ply) { return history_[ply]; }
+    constexpr inline const State& state() const { return history_[ply()]; }
+    constexpr inline const State& state(int ply) const { return history_[ply]; }
+    constexpr inline hash_type calculate_hash() const {
+        hash_type hash_value = 0;
+        for (Color c : constants::COLORS) {
+            for (PieceType pt : constants::PIECE_TYPES) {
+                Bitboard bb = piece_type_bb(pt, c);
+                while (bb) {
+                    hash_value ^= zobrist::piece_square_key(bb.forward_bitscan(), pt, c);
+                    bb.forward_popbit();
+                }
+            }
+        }
+        if (enpassant_square() != constants::SQUARE_NONE) {
+            hash_value ^= zobrist::enpassant_key(enpassant_square());
+        }
+        hash_value ^= zobrist::castling_rights_key(castling_rights());
+        hash_value ^= zobrist::side_to_move_key(side_to_move());
+        return hash_value;
+    }
 
     constexpr inline void put_piece(Square square, PieceType piece_type, Color color) {
         Bitboard square_bb = Bitboard{square};

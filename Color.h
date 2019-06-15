@@ -52,7 +52,7 @@ namespace constants {
 constexpr inline Color WHITE{Color::Value::WHITE};
 constexpr inline Color BLACK{Color::Value::BLACK};
 constexpr inline Color COLOR_NONE{Color::Value::NONE};
-constexpr inline Color COLOR_LIST[]{WHITE, BLACK};
+constexpr inline Color COLORS[]{WHITE, BLACK};
 constexpr inline int NUM_COLORS = Color::Value::NUM_COLORS;
 
 } // namespace constants
