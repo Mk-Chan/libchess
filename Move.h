@@ -12,13 +12,12 @@ class Move {
   private:
     enum BitOpLookup : std::uint32_t {
         TO_SQUARE_SHIFT = 6,
-        MOVE_TYPE_SHIFT = 12,
-        PROMOTION_TYPE_SHIFT = 15,
+        PROMOTION_TYPE_SHIFT = 12,
+        MOVE_TYPE_SHIFT = 15,
 
-        MOVE_TYPE_MASK = 7 << MOVE_TYPE_SHIFT,
-        PROMOTION_TYPE_MASK = 7 << PROMOTION_TYPE_SHIFT
+        PROMOTION_TYPE_MASK = 7 << PROMOTION_TYPE_SHIFT,
+        MOVE_TYPE_MASK = 7 << MOVE_TYPE_SHIFT
     };
-    constexpr inline Move(std::uint32_t value) : value_(value) {}
 
   public:
     class Value {
@@ -39,6 +38,7 @@ class Move {
     using value_type = std::uint32_t;
 
     constexpr inline Move() : value_(static_cast<value_type>(Move::Value::MOVE_NONE)) {}
+    constexpr inline Move(std::uint32_t value) : value_(value) {}
     constexpr inline Move(Square from_square, Square to_square,
                           PieceType promotion_pt = constants::PIECE_TYPE_NONE,
                           Move::Type type = Move::Type::NONE)

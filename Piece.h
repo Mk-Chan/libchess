@@ -73,9 +73,9 @@ constexpr inline Piece BLACK_BISHOP = Piece::from('b');
 constexpr inline Piece BLACK_ROOK = Piece::from('r');
 constexpr inline Piece BLACK_QUEEN = Piece::from('q');
 constexpr inline Piece BLACK_KING = Piece::from('k');
-constexpr inline Piece PIECES[]{WHITE_PAWN,   WHITE_KNIGHT, WHITE_BISHOP, WHITE_ROOK,
-                                WHITE_QUEEN,  WHITE_KING,   BLACK_PAWN,   BLACK_KNIGHT,
-                                BLACK_BISHOP, BLACK_ROOK,   BLACK_QUEEN,  BLACK_KING};
+constexpr inline Piece PIECES[]{BLACK_PAWN,   WHITE_PAWN,   BLACK_KNIGHT, WHITE_KNIGHT,
+                                BLACK_BISHOP, WHITE_BISHOP, BLACK_ROOK,   WHITE_ROOK,
+                                BLACK_QUEEN,  WHITE_QUEEN,  BLACK_KING,   WHITE_KING};
 
 } // namespace constants
 

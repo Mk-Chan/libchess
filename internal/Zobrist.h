@@ -5,81 +5,42 @@
 
 #include "../PieceType.h"
 #include "../Square.h"
+#include "PolyglotRandoms.h"
 
 namespace libchess::zobrist {
 
-namespace init {
-
-constexpr inline std::uint64_t xorshift(std::uint64_t x) {
-    x ^= x << 13;
-    x ^= x >> 7;
-    x ^= x << 17;
-    return x;
-}
-
-constexpr inline std::uint64_t random_u64(int i) {
-    std::uint64_t seed = 6364136223846793005ULL;
-    std::uint64_t x = seed;
-    for (; i > 0; --i) {
-        x = xorshift(x);
-    }
-    return x;
-}
-
-constexpr inline std::array<std::array<std::array<std::uint64_t, 64>, 6>, 2> piece_square_keys() {
-    int rng_seq = 0;
-    std::array<std::array<std::array<std::uint64_t, 64>, 6>, 2> keys{};
-    for (Color color : constants::COLORS) {
-        for (PieceType piece_type : constants::PIECE_TYPES) {
-            for (Square sq = constants::A1; sq <= constants::H8; ++sq) {
-                keys[color][piece_type][sq] = random_u64(rng_seq);
-                ++rng_seq;
-            }
+constexpr inline std::uint64_t piece_square_key(Square square, PieceType piece_type, Color color) {
+    Piece piece = Piece{piece_type, color};
+    int piece_offset = -1;
+    for (int i = 0; i < 12; ++i) {
+        if (constants::PIECES[i] == piece) {
+            piece_offset = i;
+            break;
         }
     }
-    return keys;
-}
-
-constexpr inline std::array<std::uint64_t, 16> castling_rights_keys() {
-    int rng_seq = 768;
-    std::array<std::uint64_t, 16> keys{};
-    for (int i = 0; i < 16; ++i) {
-        keys[i] = random_u64(rng_seq);
-        ++rng_seq;
-    }
-    return keys;
-}
-
-constexpr inline std::array<std::uint64_t, 64> enpassant_keys() {
-    int rng_seq = 784;
-    std::array<std::uint64_t, 64> keys{};
-    for (Square sq = constants::A1; sq <= constants::H8; ++sq) {
-        keys[sq] = random_u64(rng_seq);
-        ++rng_seq;
-    }
-    return keys;
-}
-
-constexpr inline std::array<std::uint64_t, 2> side_to_move_keys() {
-    return {random_u64(848), random_u64(849)};
-}
-
-} // namespace init
-
-constexpr inline std::array<std::array<std::array<std::uint64_t, 64>, 6>, 2> PIECE_SQUARE_KEYS =
-    init::piece_square_keys();
-constexpr inline std::array<std::uint64_t, 16> CASTLING_RIGHTS_KEYS = init::castling_rights_keys();
-constexpr inline std::array<std::uint64_t, 64> ENPASSANT_KEYS = init::enpassant_keys();
-constexpr inline std::array<std::uint64_t, 2> SIDE_TO_MOVE_KEYS = init::side_to_move_keys();
-
-constexpr inline std::uint64_t piece_square_key(Square square, PieceType piece_type, Color color) {
-    return PIECE_SQUARE_KEYS[color][piece_type][square];
+    return polyglot::random_u64[piece_offset * 64 + square.value()];
 }
 constexpr inline std::uint64_t castling_rights_key(CastlingRights castling_rights) {
-    return CASTLING_RIGHTS_KEYS[castling_rights.value()];
+    if (castling_rights.is_allowed(constants::WHITE_KINGSIDE)) {
+        return polyglot::random_u64[768 + 0];
+    }
+    if (castling_rights.is_allowed(constants::WHITE_QUEENSIDE)) {
+        return polyglot::random_u64[768 + 1];
+    }
+    if (castling_rights.is_allowed(constants::BLACK_KINGSIDE)) {
+        return polyglot::random_u64[768 + 2];
+    }
+    if (castling_rights.is_allowed(constants::BLACK_QUEENSIDE)) {
+        return polyglot::random_u64[768 + 3];
+    }
+    return 0;
 }
-constexpr inline std::uint64_t enpassant_key(Square square) { return ENPASSANT_KEYS[square]; }
-constexpr inline std::uint64_t side_to_move_key(Color stm) { return SIDE_TO_MOVE_KEYS[stm]; }
+constexpr inline std::uint64_t enpassant_key(Square square) {
+    return polyglot::random_u64[772 + square.file().value()];
+}
+constexpr inline std::uint64_t side_to_move_key(Color stm) {
+    return polyglot::random_u64[780 + stm.value()];
+}
 
 } // namespace libchess::zobrist
 
