@@ -41,7 +41,7 @@ constexpr inline std::array<std::array<std::array<std::uint64_t, 64>, 6>, 2> pie
 }
 
 constexpr inline std::array<std::uint64_t, 16> castling_rights_keys() {
-    int rng_seq = 767;
+    int rng_seq = 768;
     std::array<std::uint64_t, 16> keys{};
     for (int i = 0; i < 16; ++i) {
         keys[i] = random_u64(rng_seq);
@@ -51,7 +51,7 @@ constexpr inline std::array<std::uint64_t, 16> castling_rights_keys() {
 }
 
 constexpr inline std::array<std::uint64_t, 64> enpassant_keys() {
-    int rng_seq = 783;
+    int rng_seq = 784;
     std::array<std::uint64_t, 64> keys{};
     for (Square sq = constants::A1; sq <= constants::H8; ++sq) {
         keys[sq] = random_u64(rng_seq);
@@ -61,7 +61,7 @@ constexpr inline std::array<std::uint64_t, 64> enpassant_keys() {
 }
 
 constexpr inline std::array<std::uint64_t, 2> side_to_move_keys() {
-    return {random_u64(847), random_u64(848)};
+    return {random_u64(848), random_u64(849)};
 }
 
 } // namespace init
