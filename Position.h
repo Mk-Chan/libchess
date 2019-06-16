@@ -869,6 +869,8 @@ class Position {
     }
 
   protected:
+    constexpr static int history_max_size = 512;
+
     struct State {
         CastlingRights castling_rights_ = constants::CASTLING_RIGHT_NONE;
         Square enpassant_square_ = constants::SQUARE_NONE;
@@ -880,7 +882,7 @@ class Position {
     };
 
     inline int ply() const { return ply_; }
-    inline const std::array<State, 256>& history() const { return history_; }
+    inline const std::array<State, history_max_size>& history() const { return history_; }
     inline State& state_mut_ref() { return history_[ply()]; }
     inline State& state_mut_ref(int ply) { return history_[ply]; }
     inline const State& state() const { return history_[ply()]; }
@@ -941,7 +943,7 @@ class Position {
     Color side_to_move_;
     int fullmoves_;
     int ply_;
-    std::array<State, 256> history_;
+    std::array<State, history_max_size> history_;
 };
 
 namespace constants {
