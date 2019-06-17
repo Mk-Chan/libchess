@@ -177,11 +177,11 @@ static std::string STARTPOS_FEN = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w
 
 } // namespace libchess
 
-#endif // LIBCHESS_POSITION_H
-
 #include "Position/Attacks.h"
 #include "Position/Constructors.h"
 #include "Position/Getters.h"
 #include "Position/MoveGeneration.h"
 #include "Position/MoveIntegration.h"
 #include "Position/Utilities.h"
+
+#endif // LIBCHESS_POSITION_H
