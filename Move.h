@@ -58,8 +58,12 @@ class Move {
         return Move{from, to, promotion_pt};
     }
 
-    constexpr inline bool operator==(const Move rhs) const { return value() == rhs.value(); }
-    constexpr inline bool operator!=(const Move rhs) const { return value() != rhs.value(); }
+    constexpr inline bool operator==(const Move rhs) const {
+        return value_sans_type() == rhs.value_sans_type();
+    }
+    constexpr inline bool operator!=(const Move rhs) const {
+        return value_sans_type() != rhs.value_sans_type();
+    }
 
     constexpr inline Square from_square() const { return value() & 0x3f; }
     constexpr inline Square to_square() const { return (value() & 0xfc0) >> 6; }
@@ -70,6 +74,7 @@ class Move {
         return (value() & PROMOTION_TYPE_MASK) >> PROMOTION_TYPE_SHIFT;
     }
 
+    constexpr inline value_type value_sans_type() const { return value_ & ~MOVE_TYPE_MASK; }
     constexpr inline value_type value() const { return value_; }
 
   private:

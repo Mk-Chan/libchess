@@ -4,4 +4,4 @@ cd test_build
 cmake ..
 make
 make test
-./perft/perft perft/perts.epd 6
+./perft/perft ./perft/perfts.epd 6
