@@ -75,6 +75,7 @@ inline bool Position::is_repeat(int times) const {
     }
     return false;
 }
+
 inline int Position::repeat_count() const {
     hash_type curr_hash = hash();
     int num_keys = std::max(0, ply() - halfmoves());

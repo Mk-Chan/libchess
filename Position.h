@@ -50,7 +50,6 @@ class Position {
     std::string fen() const;
 
     // Move Integration
-    bool is_legal_move(Move move) const;
     Move::Type move_type_of(Move move) const;
     bool is_capture_move(Move move) const;
     bool is_promotion_move(Move move) const;
@@ -66,24 +65,27 @@ class Position {
     Bitboard pinned_pieces(Color to_color) const;
 
     // Move Generation
-    void generate_quiet_promotions(MoveList& move_list) const;
-    void generate_capture_promotions(MoveList& move_list) const;
-    void generate_promotions(MoveList& move_list) const;
-    void generate_pawn_quiets(MoveList& move_list) const;
-    void generate_pawn_captures(MoveList& move_list) const;
-    void generate_pawn_moves(MoveList& move_list) const;
-    void generate_non_pawn_quiets(PieceType pt, MoveList& move_list) const;
-    void generate_non_pawn_captures(PieceType pt, MoveList& move_list) const;
-    void generate_knight_moves(MoveList& move_list) const;
-    void generate_bishop_moves(MoveList& move_list) const;
-    void generate_rook_moves(MoveList& move_list) const;
-    void generate_queen_moves(MoveList& move_list) const;
-    void generate_king_moves(MoveList& move_list) const;
-    void generate_castling(MoveList& move_list) const;
-    void generate_checker_block_moves(MoveList& move_list) const;
-    void generate_checker_capture_moves(MoveList& move_list) const;
-    void generate_quiet_moves(MoveList& move_list) const;
-    void generate_capture_moves(MoveList& move_list) const;
+    void generate_quiet_promotions(MoveList& move_list, Color stm) const;
+    void generate_capture_promotions(MoveList& move_list, Color stm) const;
+    void generate_promotions(MoveList& move_list, Color stm) const;
+    void generate_pawn_quiets(MoveList& move_list, Color stm) const;
+    void generate_pawn_captures(MoveList& move_list, Color stm) const;
+    void generate_pawn_moves(MoveList& move_list, Color stm) const;
+    void generate_non_pawn_quiets(PieceType pt, MoveList& move_list, Color stm) const;
+    void generate_non_pawn_captures(PieceType pt, MoveList& move_list, Color stm) const;
+    void generate_knight_moves(MoveList& move_list, Color stm) const;
+    void generate_bishop_moves(MoveList& move_list, Color stm) const;
+    void generate_rook_moves(MoveList& move_list, Color stm) const;
+    void generate_queen_moves(MoveList& move_list, Color stm) const;
+    void generate_king_moves(MoveList& move_list, Color stm) const;
+    void generate_castling(MoveList& move_list, Color stm) const;
+    void generate_checker_block_moves(MoveList& move_list, Color stm) const;
+    void generate_checker_capture_moves(MoveList& move_list, Color stm) const;
+    void generate_quiet_moves(MoveList& move_list, Color stm) const;
+    void generate_capture_moves(MoveList& move_list, Color stm) const;
+    MoveList check_evasion_move_list(Color stm) const;
+    MoveList pseudo_legal_move_list(Color stm) const;
+    MoveList legal_move_list(Color stm) const;
     MoveList check_evasion_move_list() const;
     MoveList pseudo_legal_move_list() const;
     MoveList legal_move_list() const;
@@ -159,6 +161,27 @@ class Position {
         color_bb_[color.value()] ^= from_to_sqs_bb;
     }
     inline void reverse_side_to_move() { side_to_move_ = !side_to_move_; }
+
+    inline bool is_legal_move(Move move) const {
+        Color c = side_to_move();
+        Square from = move.from_square();
+        Square king_sq = king_square(c);
+        if (move.type() == Move::Type::ENPASSANT) {
+            Bitboard ep_bb = Bitboard{enpassant_square()};
+            Bitboard post_ep_occupancy =
+                (occupancy_bb() ^ Bitboard{from} ^ lookups::pawn_shift(ep_bb, !c)) | ep_bb;
+
+            return !(lookups::rook_attacks(king_sq, post_ep_occupancy) & color_bb(!c) &
+                     (piece_type_bb(constants::QUEEN) | piece_type_bb(constants::ROOK))) &&
+                   !(lookups::bishop_attacks(king_sq, post_ep_occupancy) & color_bb(!c) &
+                     ((piece_type_bb(constants::QUEEN) | piece_type_bb(constants::BISHOP))));
+        } else if (from == king_sq) {
+            return move.type() == Move::Type::CASTLING || !attackers_to(move.to_square(), !c);
+        } else {
+            return !(pinned_pieces(c) & Bitboard{from}) ||
+                   (Bitboard{move.to_square()} & lookups::direction_xray(king_sq, from));
+        }
+    }
 
   private:
     Bitboard piece_type_bb_[constants::NUM_PIECE_TYPES];

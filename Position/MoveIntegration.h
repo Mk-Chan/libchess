@@ -3,27 +3,6 @@
 
 namespace libchess {
 
-inline bool Position::is_legal_move(Move move) const {
-    Color c = side_to_move();
-    Square from = move.from_square();
-    Square king_sq = king_square(c);
-    if (move.type() == Move::Type::ENPASSANT) {
-        Bitboard ep_bb = Bitboard{enpassant_square()};
-        Bitboard post_ep_occupancy =
-            (occupancy_bb() ^ Bitboard{from} ^ lookups::pawn_shift(ep_bb, !c)) | ep_bb;
-
-        return !(lookups::rook_attacks(king_sq, post_ep_occupancy) & color_bb(!c) &
-                 (piece_type_bb(constants::QUEEN) | piece_type_bb(constants::ROOK))) &&
-               !(lookups::bishop_attacks(king_sq, post_ep_occupancy) & color_bb(!c) &
-                 ((piece_type_bb(constants::QUEEN) | piece_type_bb(constants::BISHOP))));
-    } else if (from == king_sq) {
-        return move.type() == Move::Type::CASTLING || !attackers_to(move.to_square(), !c);
-    } else {
-        return !(pinned_pieces(c) & Bitboard{from}) ||
-               (Bitboard{move.to_square()} & lookups::direction_xray(king_sq, from));
-    }
-}
-
 inline Move::Type Position::move_type_of(Move move) const {
     Move::Type move_type = move.type();
     if (move_type != constants::MOVE_TYPE_NONE) {
