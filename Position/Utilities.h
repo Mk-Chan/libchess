@@ -3,7 +3,7 @@
 
 namespace libchess {
 
-void Position::display_raw(std::ostream& ostream) const {
+inline void Position::display_raw(std::ostream& ostream) const {
     ostream << "Pawn\n";
     ostream << piece_type_bb(constants::PAWN) << "\n";
     ostream << "Knight\n";
@@ -30,7 +30,8 @@ void Position::display_raw(std::ostream& ostream) const {
     ostream << "Ply: " << ply() << "\n";
     ostream << "\n";
 }
-void Position::display(std::ostream& ostream) const {
+
+inline void Position::display(std::ostream& ostream) const {
     for (Square square : constants::SQUARES) {
         int sq = square.value();
         if (sq && !(sq & 7)) {

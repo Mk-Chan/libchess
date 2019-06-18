@@ -3,11 +3,11 @@
 
 namespace libchess {
 
-Bitboard Position::checkers_to(Color to_color) const {
+inline Bitboard Position::checkers_to(Color to_color) const {
     return attackers_to(piece_type_bb(constants::KING, to_color).forward_bitscan(), !to_color);
 }
 
-Bitboard Position::attackers_to(Square square) const {
+inline Bitboard Position::attackers_to(Square square) const {
     Bitboard attackers;
     attackers |= (lookups::pawn_attacks(square, constants::WHITE) |
                   lookups::pawn_attacks(square, constants::BLACK)) &
@@ -20,7 +20,7 @@ Bitboard Position::attackers_to(Square square) const {
     return attackers;
 }
 
-Bitboard Position::attackers_to(Square square, Color attacker_color) const {
+inline Bitboard Position::attackers_to(Square square, Color attacker_color) const {
     Bitboard attackers;
     attackers |= lookups::pawn_attacks(square, !attacker_color) &
                  piece_type_bb(constants::PAWN, attacker_color);
@@ -32,7 +32,8 @@ Bitboard Position::attackers_to(Square square, Color attacker_color) const {
     return attackers;
 }
 
-Bitboard Position::attackers_to(Square square, Color attacker_color, Bitboard occupancy) const {
+inline Bitboard Position::attackers_to(Square square, Color attacker_color,
+                                       Bitboard occupancy) const {
     Bitboard attackers;
     attackers |= lookups::pawn_attacks(square, !attacker_color) &
                  piece_type_bb(constants::PAWN, attacker_color);
@@ -43,7 +44,7 @@ Bitboard Position::attackers_to(Square square, Color attacker_color, Bitboard oc
     return attackers;
 }
 
-Bitboard Position::pinned_pieces(Color to_color) const {
+inline Bitboard Position::pinned_pieces(Color to_color) const {
     Bitboard pinned_bb;
     Square king_sq = king_square(to_color);
     Bitboard pinners_bb = ((piece_type_bb(constants::QUEEN) | piece_type_bb(constants::ROOK)) &

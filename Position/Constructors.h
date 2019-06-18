@@ -3,7 +3,7 @@
 
 namespace libchess {
 
-Position::Position(const std::string& fen) : ply_(0) {
+inline Position::Position(const std::string& fen) : ply_(0) {
     State& curr_state = state_mut_ref();
 
     std::stringstream fen_stream{fen};
@@ -49,7 +49,7 @@ Position::Position(const std::string& fen) : ply_(0) {
     curr_state.hash_ = calculate_hash();
 }
 
-Position::Position() : fullmoves_(1), ply_(0) {}
+inline Position::Position() : fullmoves_(1), ply_(0) {}
 
 } // namespace libchess
 

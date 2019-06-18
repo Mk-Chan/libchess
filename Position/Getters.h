@@ -3,41 +3,41 @@
 
 namespace libchess {
 
-Bitboard Position::piece_type_bb(PieceType piece_type) const {
+inline Bitboard Position::piece_type_bb(PieceType piece_type) const {
     return piece_type_bb_[piece_type.value()];
 }
 
-Bitboard Position::piece_type_bb(PieceType piece_type, Color color) const {
+inline Bitboard Position::piece_type_bb(PieceType piece_type, Color color) const {
     return piece_type_bb_[piece_type.value()] & color_bb(color);
 }
 
-Bitboard Position::color_bb(Color color) const { return color_bb_[color.value()]; }
+inline Bitboard Position::color_bb(Color color) const { return color_bb_[color.value()]; }
 
-Bitboard Position::occupancy_bb() const {
+inline Bitboard Position::occupancy_bb() const {
     return color_bb(constants::WHITE) | color_bb(constants::BLACK);
 }
 
-Color Position::side_to_move() const { return side_to_move_; }
+inline Color Position::side_to_move() const { return side_to_move_; }
 
-CastlingRights Position::castling_rights() const { return history_[ply_].castling_rights_; }
+inline CastlingRights Position::castling_rights() const { return history_[ply_].castling_rights_; }
 
-Square Position::enpassant_square() const { return history_[ply_].enpassant_square_; }
+inline Square Position::enpassant_square() const { return history_[ply_].enpassant_square_; }
 
-int Position::halfmoves() const { return history_[ply_].halfmoves_; }
+inline int Position::halfmoves() const { return history_[ply_].halfmoves_; }
 
-int Position::fullmoves() const { return fullmoves_; }
+inline int Position::fullmoves() const { return fullmoves_; }
 
-Move Position::previous_move() const { return history_[ply_].previous_move_; }
+inline Move Position::previous_move() const { return history_[ply_].previous_move_; }
 
-PieceType Position::previously_captured_piece() const { return history_[ply_].captured_pt_; }
+inline PieceType Position::previously_captured_piece() const { return history_[ply_].captured_pt_; }
 
-Position::hash_type Position::hash() const { return history_[ply_].hash_; }
+inline Position::hash_type Position::hash() const { return history_[ply_].hash_; }
 
-Square Position::king_square(Color color) const {
+inline Square Position::king_square(Color color) const {
     return piece_type_bb(constants::KING, color).forward_bitscan();
 }
 
-PieceType Position::piece_type_on(Square square) const {
+inline PieceType Position::piece_type_on(Square square) const {
     for (PieceType piece_type : constants::PIECE_TYPES) {
         if (piece_type_bb(piece_type) & Bitboard{square}) {
             return piece_type;
@@ -46,7 +46,7 @@ PieceType Position::piece_type_on(Square square) const {
     return constants::PIECE_TYPE_NONE;
 }
 
-Color Position::color_of(Square square) const {
+inline Color Position::color_of(Square square) const {
     for (Color color : constants::COLORS) {
         if (color_bb(color) & Bitboard{square}) {
             return color;
@@ -55,13 +55,13 @@ Color Position::color_of(Square square) const {
     return constants::COLOR_NONE;
 }
 
-Piece Position::piece_on(Square square) const {
+inline Piece Position::piece_on(Square square) const {
     return Piece{piece_type_on(square), color_of(square)};
 }
 
-bool Position::in_check() const { return checkers_to(side_to_move()) != 0; }
+inline bool Position::in_check() const { return checkers_to(side_to_move()) != 0; }
 
-bool Position::is_repeat(int times) const {
+inline bool Position::is_repeat(int times) const {
     hash_type curr_hash = hash();
     int num_keys = std::max(0, ply() - halfmoves());
     int count = 0;
@@ -75,7 +75,7 @@ bool Position::is_repeat(int times) const {
     }
     return false;
 }
-int Position::repeat_count() const {
+inline int Position::repeat_count() const {
     hash_type curr_hash = hash();
     int num_keys = std::max(0, ply() - halfmoves());
     int count = 0;
@@ -87,7 +87,7 @@ int Position::repeat_count() const {
     return count;
 }
 
-std::string Position::fen() const {
+inline std::string Position::fen() const {
     std::string fen_str;
     for (Rank rank = constants::RANK_8; rank >= constants::RANK_1; --rank) {
         int empty_sq_count = 0;

@@ -3,7 +3,7 @@
 
 namespace libchess {
 
-bool Position::is_legal_move(Move move) const {
+inline bool Position::is_legal_move(Move move) const {
     Color c = side_to_move();
     Square from = move.from_square();
     Square king_sq = king_square(c);
@@ -23,7 +23,8 @@ bool Position::is_legal_move(Move move) const {
                (Bitboard{move.to_square()} & lookups::direction_xray(king_sq, from));
     }
 }
-Move::Type Position::move_type_of(Move move) const {
+
+inline Move::Type Position::move_type_of(Move move) const {
     Move::Type move_type = move.type();
     if (move_type != constants::MOVE_TYPE_NONE) {
         return move_type;
@@ -54,7 +55,8 @@ Move::Type Position::move_type_of(Move move) const {
         }
     }
 }
-bool Position::is_capture_move(Move move) const {
+
+inline bool Position::is_capture_move(Move move) const {
     Move::Type move_type = move.type();
     switch (move_type) {
     case Move::Type::CAPTURE:
@@ -65,7 +67,8 @@ bool Position::is_capture_move(Move move) const {
         return false;
     }
 }
-bool Position::is_promotion_move(Move move) const {
+
+inline bool Position::is_promotion_move(Move move) const {
     Move::Type move_type = move.type();
     switch (move_type) {
     case Move::Type::PROMOTION:
@@ -75,7 +78,8 @@ bool Position::is_promotion_move(Move move) const {
         return false;
     }
 }
-void Position::unmake_move() {
+
+inline void Position::unmake_move() {
     if (side_to_move() == constants::WHITE) {
         --fullmoves_;
     }
@@ -141,7 +145,8 @@ void Position::unmake_move() {
         break;
     }
 }
-void Position::make_move(Move move) {
+
+inline void Position::make_move(Move move) {
     Color stm = side_to_move();
     if (stm == constants::BLACK) {
         ++fullmoves_;
@@ -224,7 +229,8 @@ void Position::make_move(Move move) {
     reverse_side_to_move();
     next_state.hash_ = calculate_hash();
 }
-void Position::make_null_move() {
+
+inline void Position::make_null_move() {
     if (side_to_move() == constants::BLACK) {
         ++fullmoves_;
     }

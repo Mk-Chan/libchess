@@ -3,7 +3,7 @@
 
 namespace libchess {
 
-void Position::generate_quiet_promotions(MoveList& move_list) const {
+inline void Position::generate_quiet_promotions(MoveList& move_list) const {
     Color stm = side_to_move();
     Bitboard promotion_candidates =
         lookups::pawn_shift(piece_type_bb(constants::PAWN, stm) &
@@ -24,7 +24,7 @@ void Position::generate_quiet_promotions(MoveList& move_list) const {
     }
 }
 
-void Position::generate_capture_promotions(MoveList& move_list) const {
+inline void Position::generate_capture_promotions(MoveList& move_list) const {
     Bitboard pawn_bb = piece_type_bb(constants::PAWN);
     Color stm = side_to_move();
     pawn_bb &= color_bb(stm) & lookups::relative_rank_mask(constants::RANK_7, stm);
@@ -44,12 +44,12 @@ void Position::generate_capture_promotions(MoveList& move_list) const {
     }
 }
 
-void Position::generate_promotions(MoveList& move_list) const {
+inline void Position::generate_promotions(MoveList& move_list) const {
     generate_capture_promotions(move_list);
     generate_quiet_promotions(move_list);
 }
 
-void Position::generate_pawn_quiets(MoveList& move_list) const {
+inline void Position::generate_pawn_quiets(MoveList& move_list) const {
     generate_quiet_promotions(move_list);
     Color stm = side_to_move();
     Bitboard occupancy = occupancy_bb();
@@ -76,7 +76,7 @@ void Position::generate_pawn_quiets(MoveList& move_list) const {
     }
 }
 
-void Position::generate_pawn_captures(MoveList& move_list) const {
+inline void Position::generate_pawn_captures(MoveList& move_list) const {
     generate_capture_promotions(move_list);
     Bitboard pawn_bb = piece_type_bb(constants::PAWN);
     Square ep_sq = enpassant_square();
@@ -103,12 +103,12 @@ void Position::generate_pawn_captures(MoveList& move_list) const {
     }
 }
 
-void Position::generate_pawn_moves(MoveList& move_list) const {
+inline void Position::generate_pawn_moves(MoveList& move_list) const {
     generate_pawn_captures(move_list);
     generate_pawn_quiets(move_list);
 }
 
-void Position::generate_non_pawn_quiets(PieceType pt, MoveList& move_list) const {
+inline void Position::generate_non_pawn_quiets(PieceType pt, MoveList& move_list) const {
     Bitboard piece_bb = piece_type_bb(pt, side_to_move());
     Bitboard occupancy = occupancy_bb();
     while (piece_bb) {
@@ -123,7 +123,7 @@ void Position::generate_non_pawn_quiets(PieceType pt, MoveList& move_list) const
     }
 }
 
-void Position::generate_non_pawn_captures(PieceType pt, MoveList& move_list) const {
+inline void Position::generate_non_pawn_captures(PieceType pt, MoveList& move_list) const {
     Bitboard piece_bb = piece_type_bb(pt, side_to_move());
     Bitboard occupancy = occupancy_bb();
     Bitboard opp_occupancy = color_bb(!side_to_move());
@@ -139,32 +139,32 @@ void Position::generate_non_pawn_captures(PieceType pt, MoveList& move_list) con
     }
 }
 
-void Position::generate_knight_moves(MoveList& move_list) const {
+inline void Position::generate_knight_moves(MoveList& move_list) const {
     generate_non_pawn_quiets(constants::KNIGHT, move_list);
     generate_non_pawn_captures(constants::KNIGHT, move_list);
 }
 
-void Position::generate_bishop_moves(MoveList& move_list) const {
+inline void Position::generate_bishop_moves(MoveList& move_list) const {
     generate_non_pawn_quiets(constants::BISHOP, move_list);
     generate_non_pawn_captures(constants::BISHOP, move_list);
 }
 
-void Position::generate_rook_moves(MoveList& move_list) const {
+inline void Position::generate_rook_moves(MoveList& move_list) const {
     generate_non_pawn_quiets(constants::ROOK, move_list);
     generate_non_pawn_captures(constants::ROOK, move_list);
 }
 
-void Position::generate_queen_moves(MoveList& move_list) const {
+inline void Position::generate_queen_moves(MoveList& move_list) const {
     generate_non_pawn_quiets(constants::QUEEN, move_list);
     generate_non_pawn_captures(constants::QUEEN, move_list);
 }
 
-void Position::generate_king_moves(MoveList& move_list) const {
+inline void Position::generate_king_moves(MoveList& move_list) const {
     generate_non_pawn_quiets(constants::KING, move_list);
     generate_non_pawn_captures(constants::KING, move_list);
 }
 
-void Position::generate_castling(MoveList& move_list) const {
+inline void Position::generate_castling(MoveList& move_list) const {
     const int castling_possibilities[2][2] = {
         {constants::WHITE_KINGSIDE.value(), constants::WHITE_QUEENSIDE.value()},
         {constants::BLACK_KINGSIDE.value(), constants::BLACK_QUEENSIDE.value()},
@@ -199,7 +199,7 @@ void Position::generate_castling(MoveList& move_list) const {
     }
 }
 
-void Position::generate_checker_block_moves(MoveList& move_list) const {
+inline void Position::generate_checker_block_moves(MoveList& move_list) const {
     Color c = side_to_move();
     Bitboard checkers = checkers_to(c);
     if (checkers.popcount() > 1) {
@@ -253,7 +253,7 @@ void Position::generate_checker_block_moves(MoveList& move_list) const {
     }
 }
 
-void Position::generate_checker_capture_moves(MoveList& move_list) const {
+inline void Position::generate_checker_capture_moves(MoveList& move_list) const {
     Color c = side_to_move();
     Bitboard checkers = checkers_to(c);
     if (checkers.popcount() > 1) {
@@ -292,7 +292,7 @@ void Position::generate_checker_capture_moves(MoveList& move_list) const {
     }
 }
 
-MoveList Position::check_evasion_move_list() const {
+inline MoveList Position::check_evasion_move_list() const {
     MoveList move_list;
     Color c = side_to_move();
     Square king_sq = king_square(c);
@@ -322,7 +322,7 @@ MoveList Position::check_evasion_move_list() const {
     return move_list;
 }
 
-void Position::generate_quiet_moves(MoveList& move_list) const {
+inline void Position::generate_quiet_moves(MoveList& move_list) const {
     generate_pawn_quiets(move_list);
     generate_non_pawn_quiets(constants::KNIGHT, move_list);
     generate_non_pawn_quiets(constants::BISHOP, move_list);
@@ -332,7 +332,7 @@ void Position::generate_quiet_moves(MoveList& move_list) const {
     generate_castling(move_list);
 }
 
-void Position::generate_capture_moves(MoveList& move_list) const {
+inline void Position::generate_capture_moves(MoveList& move_list) const {
     generate_pawn_captures(move_list);
     generate_non_pawn_captures(constants::KNIGHT, move_list);
     generate_non_pawn_captures(constants::BISHOP, move_list);
@@ -341,14 +341,14 @@ void Position::generate_capture_moves(MoveList& move_list) const {
     generate_non_pawn_captures(constants::KING, move_list);
 }
 
-MoveList Position::pseudo_legal_move_list() const {
+inline MoveList Position::pseudo_legal_move_list() const {
     MoveList move_list;
     generate_capture_moves(move_list);
     generate_quiet_moves(move_list);
     return move_list;
 }
 
-MoveList Position::legal_move_list() const {
+inline MoveList Position::legal_move_list() const {
     Color stm = side_to_move();
     MoveList move_list = checkers_to(stm) ? check_evasion_move_list() : pseudo_legal_move_list();
     for (auto move = move_list.begin(); move != move_list.end();) {
