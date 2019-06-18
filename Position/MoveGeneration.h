@@ -79,7 +79,7 @@ inline void Position::generate_pawn_captures(MoveList& move_list, Color stm) con
     Square ep_sq = enpassant_square();
     if (ep_sq != constants::SQUARE_NONE) {
         Bitboard ep_candidates =
-            pawn_bb & color_bb(side_to_move()) & lookups::pawn_attacks(ep_sq, !side_to_move());
+            pawn_bb & color_bb(stm) & lookups::pawn_attacks(ep_sq, !stm);
         while (ep_candidates) {
             Square sq = ep_candidates.forward_bitscan();
             ep_candidates.forward_popbit();
