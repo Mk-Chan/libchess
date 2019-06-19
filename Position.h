@@ -1,12 +1,12 @@
 #ifndef LIBCHESS_POSITION_H
 #define LIBCHESS_POSITION_H
 
-#include <array>
 #include <cctype>
 #include <optional>
 #include <sstream>
 #include <string>
 #include <tuple>
+#include <vector>
 
 #include "Bitboard.h"
 #include "CastlingRights.h"
@@ -143,7 +143,6 @@ class Position {
     }
 
   protected:
-    constexpr static int history_max_size = 512;
     // clang-format off
     constexpr static int castling_spoilers[64] = {
         13, 15, 15, 15, 12, 15, 15, 14,
@@ -168,7 +167,7 @@ class Position {
     };
 
     inline int ply() const { return ply_; }
-    inline const std::array<State, history_max_size>& history() const { return history_; }
+    inline const std::vector<State>& history() const { return history_; }
     inline State& state_mut_ref() { return history_[ply()]; }
     inline State& state_mut_ref(int ply) { return history_[ply]; }
     inline const State& state() const { return history_[ply()]; }
@@ -237,7 +236,7 @@ class Position {
     Color side_to_move_;
     int fullmoves_;
     int ply_;
-    std::array<State, history_max_size> history_;
+    std::vector<State> history_;
 
     std::string start_fen_;
 };

@@ -3,9 +3,13 @@
 
 namespace libchess {
 
-inline Position::Position() : fullmoves_(1), ply_(0) { start_fen_ = fen(); }
+inline Position::Position() : fullmoves_(1), ply_(0) {
+    history_.push_back(State{});
+    start_fen_ = fen();
+}
 
 inline Position::Position(const std::string& fen) : fullmoves_(1), ply_(0) {
+    history_.push_back(State{});
     State& curr_state = state_mut_ref();
 
     std::stringstream fen_stream{fen};

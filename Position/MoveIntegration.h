@@ -66,6 +66,7 @@ inline void Position::unmake_move() {
     Move::Type move_type = state().move_type_;
     PieceType captured_pt = state().captured_pt_;
     --ply_;
+    history_.pop_back();
     reverse_side_to_move();
     if (move == constants::MOVE_NONE) {
         return;
@@ -130,8 +131,9 @@ inline void Position::make_move(Move move) {
     if (stm == constants::BLACK) {
         ++fullmoves_;
     }
-    State& prev_state = state_mut_ref();
     ++ply_;
+    history_.push_back(State{});
+    State& prev_state = state_mut_ref(ply_ - 1);
     State& next_state = state_mut_ref();
     next_state.halfmoves_ = prev_state.halfmoves_ + 1;
     next_state.previous_move_ = move;
@@ -213,8 +215,9 @@ inline void Position::make_null_move() {
     if (side_to_move() == constants::BLACK) {
         ++fullmoves_;
     }
-    State& prev = state_mut_ref();
     ++ply_;
+    history_.push_back(State{});
+    State& prev = state_mut_ref(ply_ - 1);
     State& next = state_mut_ref();
     reverse_side_to_move();
     next.previous_move_ = constants::MOVE_NONE;
