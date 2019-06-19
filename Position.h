@@ -98,37 +98,39 @@ class Position {
     std::string uci_line() const;
     static std::optional<Position> from_uci_position_line(const std::string& line) {
         /// This function expects a string as a parameter in one of the following formats:
-        /// * `"<fen> moves <move-list>"`.
         /// * `"position <fen> moves <move-list>"`.
         std::stringstream line_stream{line};
-        std::string fen_part;
+        std::string tmp;
+
+        // "position"
+        line_stream >> tmp;
+        if (tmp != "position") {
+            return {};
+        }
 
         std::string fen;
-        // Piece list / "position"
-        line_stream >> fen_part;
-        if (fen_part == "position") {
-            line_stream >> fen_part;
-        }
-        fen += fen_part + " ";
+        // Piece list
+        line_stream >> tmp;
+        fen += tmp + " ";
         // Side to move
-        line_stream >> fen_part;
-        fen += fen_part + " ";
+        line_stream >> tmp;
+        fen += tmp + " ";
         // Castling rights
-        line_stream >> fen_part;
-        fen += fen_part + " ";
+        line_stream >> tmp;
+        fen += tmp + " ";
         // Enpassant square
-        line_stream >> fen_part;
-        fen += fen_part + " ";
+        line_stream >> tmp;
+        fen += tmp + " ";
         // Halfmoves
-        line_stream >> fen_part;
-        fen += fen_part + " ";
+        line_stream >> tmp;
+        fen += tmp + " ";
         // Fullmoves
-        line_stream >> fen_part;
-        fen += fen_part;
+        line_stream >> tmp;
+        fen += tmp;
 
         // "moves"
-        line_stream >> fen_part;
-        if (fen_part != "moves") {
+        line_stream >> tmp;
+        if (tmp != "moves") {
             return {};
         }
 

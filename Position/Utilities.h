@@ -87,7 +87,7 @@ inline std::string Position::fen() const {
 }
 
 inline std::string Position::uci_line() const {
-    std::string result = start_fen();
+    std::string result = "position " + start_fen();
     result += " moves";
     for (int p = 1; p <= ply(); ++p) {
         result += " " + state(p).previous_move_.to_str();

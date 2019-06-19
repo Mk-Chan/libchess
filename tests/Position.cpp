@@ -103,7 +103,7 @@ TEST_CASE("FEN Test", "[Position]") {
 TEST_CASE("UCI Position Line Test", "[Position]") {
     std::string fen = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1";
     std::string moves = "e2e4 e7e5 g1f3 b8c6";
-    std::string line = fen + " moves " + moves;
+    std::string line = "position " + fen + " moves " + moves;
     auto pos = Position::from_uci_position_line(line);
     if (!pos.has_value()) {
         FAIL("Invalid Position from line: " + line);
@@ -112,12 +112,4 @@ TEST_CASE("UCI Position Line Test", "[Position]") {
     REQUIRE(pos->fen() == expected_fen);
     REQUIRE(pos->start_fen() == fen);
     REQUIRE(pos->uci_line() == line);
-
-    line = "position " + fen + " moves " + moves;
-    pos = Position::from_uci_position_line(line);
-    if (!pos.has_value()) {
-        FAIL("Invalid Position from line: " + line);
-    }
-    expected_fen = "r1bqkbnr/pppp1ppp/2n5/4p3/4P3/5N2/PPPP1PPP/RNBQKB1R w KQkq - 2 3";
-    REQUIRE(pos->fen() == expected_fen);
 }
