@@ -68,7 +68,7 @@ int main(int argc, char** argv) {
                 failed = true;
             } else {
                 double time_s = diff_ts.count();
-                double nps = time_s == 0.0 ? actual_result / time_s : actual_result;
+                double nps = time_s > 0.0 ? actual_result / time_s : actual_result;
                 std::cout << "line: " << line_nr << ", depth: " << depth
                           << ", nps: " << std::setprecision(4) << nps
                           << ", count: " << actual_result << "\n";
