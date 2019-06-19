@@ -58,6 +58,14 @@ class Move {
         return Move{from, to, promotion_pt};
     }
 
+    inline std::string to_str() const {
+        std::string move_str = from_square().to_str() + to_square().to_str();
+        if (promotion_piece_type() != constants::PIECE_TYPE_NONE) {
+            move_str += promotion_piece_type().to_char();
+        }
+        return move_str;
+    }
+
     constexpr inline bool operator==(const Move rhs) const {
         return value_sans_type() == rhs.value_sans_type();
     }
@@ -136,11 +144,7 @@ class MoveList {
 };
 
 inline std::ostream& operator<<(std::ostream& ostream, Move move) {
-    ostream << move.from_square() << move.to_square();
-    if (move.promotion_piece_type() != constants::PIECE_TYPE_NONE) {
-        ostream << move.promotion_piece_type();
-    }
-    return ostream;
+    return ostream << move.to_str();
 }
 
 namespace constants {

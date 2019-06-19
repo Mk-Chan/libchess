@@ -47,6 +47,54 @@ inline void Position::display(std::ostream& ostream) const {
     ostream << "\n";
 }
 
+inline std::string Position::fen() const {
+    std::string fen_str;
+    for (Rank rank = constants::RANK_8; rank >= constants::RANK_1; --rank) {
+        int empty_sq_count = 0;
+        for (File file = constants::FILE_A; file <= constants::FILE_H; ++file) {
+            Square sq = Square::from(file, rank);
+            Piece sq_piece = piece_on(sq);
+            if (sq_piece != constants::PIECE_NONE) {
+                if (empty_sq_count) {
+                    fen_str += std::to_string(empty_sq_count);
+                    empty_sq_count = 0;
+                }
+                fen_str += sq_piece.to_char();
+            } else {
+                ++empty_sq_count;
+            }
+        }
+        if (empty_sq_count) {
+            fen_str += std::to_string(empty_sq_count);
+        }
+        if (rank != constants::RANK_1) {
+            fen_str += '/';
+        }
+    }
+
+    fen_str += ' ';
+    fen_str += side_to_move().to_char();
+    fen_str += ' ';
+    fen_str += castling_rights().to_str();
+    fen_str += ' ';
+    fen_str += enpassant_square().to_str();
+    fen_str += ' ';
+    fen_str += std::to_string(halfmoves());
+    fen_str += ' ';
+    fen_str += std::to_string(fullmoves());
+
+    return fen_str;
+}
+
+inline std::string Position::uci_line() const {
+    std::string result = start_fen();
+    result += " moves";
+    for (int p = 1; p <= ply(); ++p) {
+        result += " " + state(p).previous_move_.to_str();
+    }
+    return result;
+}
+
 } // namespace libchess
 
 #endif // LIBCHESS_UTILITIES_H

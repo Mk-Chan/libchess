@@ -110,6 +110,8 @@ TEST_CASE("UCI Position Line Test", "[Position]") {
     }
     std::string expected_fen = "r1bqkbnr/pppp1ppp/2n5/4p3/4P3/5N2/PPPP1PPP/RNBQKB1R w KQkq - 2 3";
     REQUIRE(pos->fen() == expected_fen);
+    REQUIRE(pos->start_fen() == fen);
+    REQUIRE(pos->uci_line() == line);
 
     line = "position " + fen + " moves " + moves;
     pos = Position::from_uci_position_line(line);
