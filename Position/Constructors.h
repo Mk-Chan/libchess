@@ -3,11 +3,6 @@
 
 namespace libchess {
 
-inline Position::Position() : fullmoves_(1), ply_(0) {
-    history_.push_back(State{});
-    start_fen_ = fen();
-}
-
 inline Position::Position(const std::string& fen) : fullmoves_(1), ply_(0) {
     history_.push_back(State{});
     State& curr_state = state_mut_ref();
@@ -55,6 +50,8 @@ inline Position::Position(const std::string& fen) : fullmoves_(1), ply_(0) {
     state_mut_ref().hash_ = calculate_hash();
     start_fen_ = fen;
 }
+
+inline Position::Position() : Position(constants::STARTPOS_FEN) {}
 
 } // namespace libchess
 
