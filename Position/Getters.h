@@ -21,15 +21,15 @@ inline Color Position::side_to_move() const { return side_to_move_; }
 
 inline CastlingRights Position::castling_rights() const { return history_[ply_].castling_rights_; }
 
-inline Square Position::enpassant_square() const { return history_[ply_].enpassant_square_; }
+inline std::optional<Square> Position::enpassant_square() const { return history_[ply_].enpassant_square_; }
 
 inline int Position::halfmoves() const { return history_[ply_].halfmoves_; }
 
 inline int Position::fullmoves() const { return fullmoves_; }
 
-inline Move Position::previous_move() const { return history_[ply_].previous_move_; }
+inline std::optional<Move> Position::previous_move() const { return history_[ply_].previous_move_; }
 
-inline PieceType Position::previously_captured_piece() const { return history_[ply_].captured_pt_; }
+inline std::optional<PieceType> Position::previously_captured_piece() const { return history_[ply_].captured_pt_; }
 
 inline Position::hash_type Position::hash() const { return history_[ply_].hash_; }
 
@@ -37,26 +37,26 @@ inline Square Position::king_square(Color color) const {
     return piece_type_bb(constants::KING, color).forward_bitscan();
 }
 
-inline PieceType Position::piece_type_on(Square square) const {
+inline std::optional<PieceType> Position::piece_type_on(Square square) const {
     for (PieceType piece_type : constants::PIECE_TYPES) {
         if (piece_type_bb(piece_type) & Bitboard{square}) {
             return piece_type;
         }
     }
-    return constants::PIECE_TYPE_NONE;
+    return std::nullopt;
 }
 
-inline Color Position::color_of(Square square) const {
-    for (Color color : constants::COLORS) {
-        if (color_bb(color) & Bitboard{square}) {
-            return color;
+inline std::optional<Color> Position::color_of(Square square) const {
+    for (Color c : constants::COLORS) {
+        if (color_bb(c) & Bitboard{square}) {
+            return c;
         }
     }
-    return constants::COLOR_NONE;
+    return std::nullopt;
 }
 
-inline Piece Position::piece_on(Square square) const {
-    return Piece{piece_type_on(square), color_of(square)};
+inline std::optional<Piece> Position::piece_on(Square square) const {
+    return Piece::from(piece_type_on(square), color_of(square));
 }
 
 inline bool Position::in_check() const { return checkers_to(side_to_move()) != 0; }

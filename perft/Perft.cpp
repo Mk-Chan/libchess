@@ -42,7 +42,7 @@ int main(int argc, char** argv) {
             break;
         }
         auto fen = line_view.substr(0, delim_pos);
-        Position pos{fen.data()};
+        Position pos = *Position::from_fen(fen.data());
         while (true) {
             auto start_pos = delim_pos + 2;
             delim_pos = line_view.find_first_of(';', start_pos);

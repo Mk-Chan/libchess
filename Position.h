@@ -20,13 +20,19 @@
 
 namespace libchess {
 
-class Position {
-  public:
-    using hash_type = std::uint64_t;
+namespace constants {
 
-    // Constructors
-    Position();
-    Position(const std::string& fen);
+static std::string STARTPOS_FEN = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1";
+
+} // namespace constants
+
+class Position {
+  private:
+    Position() : side_to_move_(constants::WHITE), ply_(0) {}
+
+  public:
+    Position(const std::string& fen_str) : Position() { *this = *Position::from_fen(fen_str); }
+    using hash_type = std::uint64_t;
 
     // Getters
     Bitboard piece_type_bb(PieceType piece_type) const;
@@ -35,16 +41,16 @@ class Position {
     Bitboard occupancy_bb() const;
     Color side_to_move() const;
     CastlingRights castling_rights() const;
-    Square enpassant_square() const;
-    int halfmoves() const;
-    int fullmoves() const;
-    Move previous_move() const;
-    PieceType previously_captured_piece() const;
+    std::optional<Square> enpassant_square() const;
+    std::optional<Move> previous_move() const;
+    std::optional<PieceType> previously_captured_piece() const;
+    std::optional<PieceType> piece_type_on(Square square) const;
+    std::optional<Color> color_of(Square square) const;
+    std::optional<Piece> piece_on(Square square) const;
     hash_type hash() const;
     Square king_square(Color color) const;
-    PieceType piece_type_on(Square square) const;
-    Color color_of(Square square) const;
-    Piece piece_on(Square square) const;
+    int halfmoves() const;
+    int fullmoves() const;
     bool in_check() const;
     bool is_repeat(int times = 1) const;
     int repeat_count() const;
@@ -96,6 +102,57 @@ class Position {
     void display(std::ostream& ostream = std::cout) const;
     std::string fen() const;
     std::string uci_line() const;
+    static std::optional<Position> from_fen(const std::string& fen) {
+        Position pos;
+        pos.history_.push_back(State{});
+        State& curr_state = pos.state_mut_ref();
+
+        std::stringstream fen_stream{fen};
+        std::string fen_part;
+
+        // Piece list
+        fen_stream >> fen_part;
+        Square current_square = constants::A8;
+        for (char c : fen_part) {
+            if (c >= '1' && c <= '9') {
+                current_square += (c - '0');
+            } else if (c == '/') {
+                current_square -= 16;
+            } else {
+                auto piece = Piece::from(c);
+                if (piece) {
+                    pos.put_piece(current_square, piece->type(), piece->color());
+                }
+                ++current_square;
+            }
+        }
+
+        // Side to move
+        fen_stream >> fen_part;
+        pos.side_to_move_ = Color::from(fen_part[0]).value_or(constants::WHITE);
+
+        // Castling rights
+        fen_stream >> fen_part;
+        curr_state.castling_rights_ = CastlingRights::from(fen_part);
+
+        // Enpassant square
+        fen_stream >> fen_part;
+        curr_state.enpassant_square_ = Square::from(fen_part);
+
+        // Halfmoves
+        fen_stream >> fen_part;
+        const char* fen_part_cstr = fen_part.c_str();
+        char* end;
+        curr_state.halfmoves_ = std::strtol(fen_part_cstr, &end, 10);
+
+        // Fullmoves
+        fen_stream >> fen_part;
+        pos.fullmoves_ = std::strtol(fen_part_cstr, &end, 10);
+
+        pos.state_mut_ref().hash_ = pos.calculate_hash();
+        pos.start_fen_ = fen;
+        return pos;
+    }
     static std::optional<Position> from_uci_position_line(const std::string& line) {
         /// This function expects a string as a parameter in one of the following formats:
         /// * `"position <fen> moves <move-list>"`.
@@ -135,10 +192,17 @@ class Position {
         }
 
         // Moves
-        Position pos{fen};
-        std::string move;
-        while (line_stream >> move) {
-            pos.make_move({move});
+        auto pos = Position::from_fen(fen);
+        if (!pos) {
+            return {};
+        }
+        std::string move_str;
+        while (line_stream >> move_str) {
+            auto move = Move::from(move_str);
+            if (!move) {
+                return {};
+            }
+            pos->make_move(*move);
         }
 
         return pos;
@@ -160,9 +224,9 @@ class Position {
 
     struct State {
         CastlingRights castling_rights_ = constants::CASTLING_RIGHT_NONE;
-        Square enpassant_square_ = constants::SQUARE_NONE;
-        Move previous_move_ = constants::MOVE_NONE;
-        PieceType captured_pt_ = constants::PIECE_TYPE_NONE;
+        std::optional<Square> enpassant_square_;
+        std::optional<Move> previous_move_;
+        std::optional<PieceType> captured_pt_;
         Move::Type move_type_ = Move::Type::NONE;
         hash_type hash_ = 0;
         int halfmoves_ = 0;
@@ -185,8 +249,9 @@ class Position {
                 }
             }
         }
-        if (enpassant_square() != constants::SQUARE_NONE) {
-            hash_value ^= zobrist::enpassant_key(enpassant_square());
+        auto ep_sq = enpassant_square();
+        if (ep_sq) {
+            hash_value ^= zobrist::enpassant_key(*ep_sq);
         }
         hash_value ^= zobrist::castling_rights_key(castling_rights());
         hash_value ^= zobrist::side_to_move_key(side_to_move());
@@ -216,7 +281,7 @@ class Position {
         Square from = move.from_square();
         Square king_sq = king_square(c);
         if (move.type() == Move::Type::ENPASSANT) {
-            Bitboard ep_bb = Bitboard{enpassant_square()};
+            Bitboard ep_bb = Bitboard{*enpassant_square()};
             Bitboard post_ep_occupancy =
                 (occupancy_bb() ^ Bitboard{from} ^ lookups::pawn_shift(ep_bb, !c)) | ep_bb;
 
@@ -233,8 +298,8 @@ class Position {
     }
 
   private:
-    Bitboard piece_type_bb_[constants::NUM_PIECE_TYPES];
-    Bitboard color_bb_[constants::NUM_COLORS];
+    Bitboard piece_type_bb_[6];
+    Bitboard color_bb_[2];
     Color side_to_move_;
     int fullmoves_;
     int ply_;
@@ -243,16 +308,9 @@ class Position {
     std::string start_fen_;
 };
 
-namespace constants {
-
-static std::string STARTPOS_FEN = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1";
-
-}
-
 } // namespace libchess
 
 #include "Position/Attacks.h"
-#include "Position/Constructors.h"
 #include "Position/Getters.h"
 #include "Position/MoveGeneration.h"
 #include "Position/MoveIntegration.h"

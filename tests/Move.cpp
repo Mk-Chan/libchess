@@ -9,23 +9,23 @@ TEST_CASE("Unknown Move Type", "[Move]") {
     Move e2e3 = Move{E2, E3};
     REQUIRE(e2e3.from_square() == E2);
     REQUIRE(e2e3.to_square() == E3);
-    REQUIRE(e2e3.promotion_piece_type() == PIECE_TYPE_NONE);
+    REQUIRE(!e2e3.promotion_piece_type());
     REQUIRE(e2e3.type() == Move::Type::NONE);
 }
 
 TEST_CASE("Normal Move Test", "[Move]") {
-    Move e2e3 = Move{E2, E3, PIECE_TYPE_NONE, Move::Type::NORMAL};
+    Move e2e3 = Move{E2, E3, Move::Type::NORMAL};
     REQUIRE(e2e3.from_square() == E2);
     REQUIRE(e2e3.to_square() == E3);
-    REQUIRE(e2e3.promotion_piece_type() == PIECE_TYPE_NONE);
+    REQUIRE(!e2e3.promotion_piece_type());
     REQUIRE(e2e3.type() == Move::Type::NORMAL);
 }
 
 TEST_CASE("Capture Move Test", "[Move]") {
-    Move e2d3 = Move{E2, D3, PIECE_TYPE_NONE, Move::Type::CAPTURE};
+    Move e2d3 = Move{E2, D3, Move::Type::CAPTURE};
     REQUIRE(e2d3.from_square() == E2);
     REQUIRE(e2d3.to_square() == D3);
-    REQUIRE(e2d3.promotion_piece_type() == PIECE_TYPE_NONE);
+    REQUIRE(!e2d3.promotion_piece_type());
     REQUIRE(e2d3.type() == Move::Type::CAPTURE);
 }
 
@@ -46,14 +46,11 @@ TEST_CASE("Capture Promotion Move Test", "[Move]") {
 }
 
 TEST_CASE("Move parsing test", "[Move]") {
-    REQUIRE(Move::from("e2e4") == Move{E2, E4});
-    REQUIRE(Move::from("e2e3") == Move{E2, E3});
-    REQUIRE(Move::from("g1f3") == Move{G1, F3});
-    REQUIRE(Move::from("e7e8q") == Move{E7, E8, QUEEN});
-    REQUIRE(Move::from("e2d1n") == Move{E2, D1, KNIGHT});
-    REQUIRE(Move{"e2e4"} == Move{E2, E4});
-    REQUIRE(Move{"e2e3"} == Move{E2, E3});
-    REQUIRE(Move{"g1f3"} == Move{G1, F3});
-    REQUIRE(Move{"e7e8q"} == Move{E7, E8, QUEEN});
-    REQUIRE(Move{"e2d1n"} == Move{E2, D1, KNIGHT});
+    REQUIRE(*Move::from("e2e4") == Move{E2, E4});
+    REQUIRE(*Move::from("e2e3") == Move{E2, E3});
+    REQUIRE(*Move::from("g1f3") == Move{G1, F3});
+    REQUIRE(*Move::from("e7e8q") == Move{E7, E8, QUEEN});
+    REQUIRE(*Move::from("e2d1n") == Move{E2, D1, KNIGHT});
+    REQUIRE(!Move::from("abcde"));
+    REQUIRE(!Move::from("b1c3e"));
 }

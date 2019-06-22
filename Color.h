@@ -11,10 +11,9 @@ class Color : public MetaValueType<int> {
   public:
     class Value {
       public:
-        enum ColorValue : value_type { WHITE = 0, BLACK = 1, NUM_COLORS, NONE };
+        enum ColorValue : value_type { WHITE = 0, BLACK = 1 };
     };
     constexpr inline Color(value_type value) : MetaValueType<value_type>(value) {}
-    constexpr inline Color() : Color(Value::NONE) {}
 
     constexpr inline char to_char() const {
         switch (value()) {
@@ -27,7 +26,7 @@ class Color : public MetaValueType<int> {
         }
     }
 
-    constexpr inline static Color from(char c) {
+    constexpr inline static std::optional<Color> from(char c) {
         switch (c) {
         case 'w':
             return Value::WHITE;
@@ -38,7 +37,7 @@ class Color : public MetaValueType<int> {
         case 'B':
             return Value::BLACK;
         default:
-            return Value::NONE;
+            return {};
         }
     }
 };
@@ -51,9 +50,7 @@ namespace constants {
 
 constexpr static Color WHITE{Color::Value::WHITE};
 constexpr static Color BLACK{Color::Value::BLACK};
-constexpr static Color COLOR_NONE{Color::Value::NONE};
 constexpr static Color COLORS[]{WHITE, BLACK};
-constexpr static int NUM_COLORS = Color::Value::NUM_COLORS;
 
 } // namespace constants
 

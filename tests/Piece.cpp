@@ -6,18 +6,18 @@ using namespace libchess;
 using namespace constants;
 
 TEST_CASE("Piece Tests", "[Piece]") {
-    REQUIRE(WHITE_PAWN == Piece::from(WHITE, PAWN));
-    REQUIRE(WHITE_KNIGHT == Piece::from(WHITE, KNIGHT));
-    REQUIRE(WHITE_BISHOP == Piece::from(WHITE, BISHOP));
-    REQUIRE(WHITE_ROOK == Piece::from(WHITE, ROOK));
-    REQUIRE(WHITE_QUEEN == Piece::from(WHITE, QUEEN));
-    REQUIRE(WHITE_KING == Piece::from(WHITE, KING));
-    REQUIRE(BLACK_PAWN == Piece::from(BLACK, PAWN));
-    REQUIRE(BLACK_KNIGHT == Piece::from(BLACK, KNIGHT));
-    REQUIRE(BLACK_BISHOP == Piece::from(BLACK, BISHOP));
-    REQUIRE(BLACK_ROOK == Piece::from(BLACK, ROOK));
-    REQUIRE(BLACK_QUEEN == Piece::from(BLACK, QUEEN));
-    REQUIRE(BLACK_KING == Piece::from(BLACK, KING));
+    REQUIRE(WHITE_PAWN == Piece::from(PAWN, WHITE));
+    REQUIRE(WHITE_KNIGHT == Piece::from(KNIGHT, WHITE));
+    REQUIRE(WHITE_BISHOP == Piece::from(BISHOP, WHITE));
+    REQUIRE(WHITE_ROOK == Piece::from(ROOK, WHITE));
+    REQUIRE(WHITE_QUEEN == Piece::from(QUEEN, WHITE));
+    REQUIRE(WHITE_KING == Piece::from(KING, WHITE));
+    REQUIRE(BLACK_PAWN == Piece::from(PAWN, BLACK));
+    REQUIRE(BLACK_KNIGHT == Piece::from(KNIGHT, BLACK));
+    REQUIRE(BLACK_BISHOP == Piece::from(BISHOP, BLACK));
+    REQUIRE(BLACK_ROOK == Piece::from(ROOK, BLACK));
+    REQUIRE(BLACK_QUEEN == Piece::from(QUEEN, BLACK));
+    REQUIRE(BLACK_KING == Piece::from(KING, BLACK));
 
     REQUIRE(WHITE_PAWN.to_char() == 'P');
     REQUIRE(WHITE_KNIGHT.to_char() == 'N');
@@ -31,6 +31,4 @@ TEST_CASE("Piece Tests", "[Piece]") {
     REQUIRE(BLACK_ROOK.to_char() == 'r');
     REQUIRE(BLACK_QUEEN.to_char() == 'q');
     REQUIRE(BLACK_KING.to_char() == 'k');
-
-    REQUIRE(Piece{PIECE_TYPE_NONE, COLOR_NONE} == PIECE_NONE);
 }

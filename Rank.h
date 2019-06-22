@@ -26,7 +26,13 @@ class Rank : public MetaValueType<int> {
 
     constexpr inline char to_char() const { return '1' + value(); }
 
-    constexpr static inline Rank from(char c) { return Value::RANK_1 + (c - '1'); }
+    constexpr static inline std::optional<Rank> from(char c) {
+        int offset = c - '1';
+        if (offset < 0 || offset > 7) {
+            return std::nullopt;
+        }
+        return Rank{Value::RANK_1 + offset};
+    }
 };
 
 namespace constants {

@@ -26,9 +26,12 @@ class File : public MetaValueType<int> {
 
     constexpr inline char to_char() const { return 'a' + value(); }
 
-    constexpr static inline File from(char c) {
+    constexpr static inline std::optional<File> from(char c) {
         int offset = c >= 'a' ? (c - 'a') : (c - 'A');
-        return Value::FILE_A + offset;
+        if (offset < 0 || offset > 7) {
+            return {};
+        }
+        return File{Value::FILE_A + offset};
     }
 };
 

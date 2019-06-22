@@ -62,28 +62,25 @@ inline void Position::generate_pawn_quiets(MoveList& move_list, Color stm) const
     while (double_push_pawn_bb) {
         Square to_sq = double_push_pawn_bb.forward_bitscan();
         double_push_pawn_bb.forward_popbit();
-        move_list.add(Move{lookups::pawn_shift(to_sq, !stm, 2), to_sq, constants::PIECE_TYPE_NONE,
-                           Move::Type::DOUBLE_PUSH});
+        move_list.add(Move{lookups::pawn_shift(to_sq, !stm, 2), to_sq, Move::Type::DOUBLE_PUSH});
     }
     while (single_push_pawn_bb) {
         Square to_sq = single_push_pawn_bb.forward_bitscan();
         single_push_pawn_bb.forward_popbit();
-        move_list.add(Move{lookups::pawn_shift(to_sq, !stm), to_sq, constants::PIECE_TYPE_NONE,
-                           Move::Type::NORMAL});
+        move_list.add(Move{lookups::pawn_shift(to_sq, !stm), to_sq, Move::Type::NORMAL});
     }
 }
 
 inline void Position::generate_pawn_captures(MoveList& move_list, Color stm) const {
     generate_capture_promotions(move_list, stm);
     Bitboard pawn_bb = piece_type_bb(constants::PAWN);
-    Square ep_sq = enpassant_square();
-    if (ep_sq != constants::SQUARE_NONE) {
-        Bitboard ep_candidates =
-            pawn_bb & color_bb(stm) & lookups::pawn_attacks(ep_sq, !stm);
+    auto ep_sq = enpassant_square();
+    if (ep_sq) {
+        Bitboard ep_candidates = pawn_bb & color_bb(stm) & lookups::pawn_attacks(*ep_sq, !stm);
         while (ep_candidates) {
             Square sq = ep_candidates.forward_bitscan();
             ep_candidates.forward_popbit();
-            move_list.add(Move{sq, ep_sq, constants::PIECE_TYPE_NONE, Move::Type::ENPASSANT});
+            move_list.add(Move{sq, *ep_sq, Move::Type::ENPASSANT});
         }
     }
     pawn_bb &= color_bb(stm) & ~lookups::relative_rank_mask(constants::RANK_7, stm);
@@ -94,7 +91,7 @@ inline void Position::generate_pawn_captures(MoveList& move_list, Color stm) con
         while (attacks_bb) {
             Square to_sq = attacks_bb.forward_bitscan();
             attacks_bb.forward_popbit();
-            move_list.add(Move{from_sq, to_sq, constants::PIECE_TYPE_NONE, Move::Type::CAPTURE});
+            move_list.add(Move{from_sq, to_sq, Move::Type::CAPTURE});
         }
     }
 }
@@ -114,7 +111,7 @@ inline void Position::generate_non_pawn_quiets(PieceType pt, MoveList& move_list
         while (atks) {
             Square to_sq = atks.forward_bitscan();
             atks.forward_popbit();
-            move_list.add(Move{sq, to_sq, constants::PIECE_TYPE_NONE, Move::Type::NORMAL});
+            move_list.add(Move{sq, to_sq, Move::Type::NORMAL});
         }
     }
 }
@@ -131,7 +128,7 @@ inline void Position::generate_non_pawn_captures(PieceType pt, MoveList& move_li
         while (atks) {
             Square to_sq = atks.forward_bitscan();
             atks.forward_popbit();
-            move_list.add(Move{sq, to_sq, constants::PIECE_TYPE_NONE, Move::Type::CAPTURE});
+            move_list.add(Move{sq, to_sq, Move::Type::CAPTURE});
         }
     }
 }
@@ -183,15 +180,15 @@ inline void Position::generate_castling(MoveList& move_list, Color c) const {
         !(castle_mask[c][0] & occupancy) && !(attackers_to(castling_king_sqs[c][0][0], !c)) &&
         !(attackers_to(castling_intermediate_sqs[c][0][0], !c)) &&
         !(attackers_to(castling_intermediate_sqs[c][0][1], !c))) {
-        move_list.add(Move{castling_king_sqs[c][0][0], castling_king_sqs[c][0][1],
-                           constants::PIECE_TYPE_NONE, Move::Type::CASTLING});
+        move_list.add(
+            Move{castling_king_sqs[c][0][0], castling_king_sqs[c][0][1], Move::Type::CASTLING});
     }
     if ((castling_possibilities[c][1] & castling_rights().value()) &&
         !(castle_mask[c][1] & occupancy) && !(attackers_to(castling_king_sqs[c][0][0], !c)) &&
         !(attackers_to(castling_intermediate_sqs[c][1][0], !c)) &&
         !(attackers_to(castling_intermediate_sqs[c][1][1], !c))) {
-        move_list.add(Move{castling_king_sqs[c][1][0], castling_king_sqs[c][1][1],
-                           constants::PIECE_TYPE_NONE, Move::Type::CASTLING});
+        move_list.add(
+            Move{castling_king_sqs[c][1][0], castling_king_sqs[c][1][1], Move::Type::CASTLING});
     }
 }
 
@@ -217,8 +214,7 @@ inline void Position::generate_checker_block_moves(MoveList& move_list, Color c)
     while (double_push_pawn_blocks) {
         Square pawn_sq = double_push_pawn_blocks.forward_bitscan();
         double_push_pawn_blocks.forward_popbit();
-        move_list.add(Move{pawn_sq, lookups::pawn_shift(pawn_sq, c, 2), constants::PIECE_TYPE_NONE,
-                           Move::Type::DOUBLE_PUSH});
+        move_list.add(Move{pawn_sq, lookups::pawn_shift(pawn_sq, c, 2), Move::Type::DOUBLE_PUSH});
     }
     while (single_push_pawn_blocks) {
         Square pawn_sq = single_push_pawn_blocks.forward_bitscan();
@@ -231,7 +227,7 @@ inline void Position::generate_checker_block_moves(MoveList& move_list, Color c)
             move_list.add(Move{pawn_sq, target_sq, constants::BISHOP, Move::Type::PROMOTION});
             move_list.add(Move{pawn_sq, target_sq, constants::ROOK, Move::Type::PROMOTION});
         } else {
-            move_list.add(Move{pawn_sq, target_sq, constants::PIECE_TYPE_NONE, Move::Type::NORMAL});
+            move_list.add(Move{pawn_sq, target_sq, Move::Type::NORMAL});
         }
     }
 
@@ -243,7 +239,7 @@ inline void Position::generate_checker_block_moves(MoveList& move_list, Color c)
         while (blockers) {
             Square atker_sq = blockers.forward_bitscan();
             blockers.forward_popbit();
-            move_list.add(Move{atker_sq, sq, constants::PIECE_TYPE_NONE, Move::Type::NORMAL});
+            move_list.add(Move{atker_sq, sq, Move::Type::NORMAL});
         }
     }
 }
@@ -255,14 +251,13 @@ inline void Position::generate_checker_capture_moves(MoveList& move_list, Color 
     }
 
     Bitboard pawns = piece_type_bb(constants::PAWN, c);
-    Square ep_square = enpassant_square();
-    if (ep_square != constants::SQUARE_NONE &&
-        (lookups::pawn_shift(Bitboard{ep_square}, !c) & checkers)) {
-        Bitboard ep_candidates = pawns & lookups::pawn_attacks(ep_square, !c);
+    auto ep_square = enpassant_square();
+    if (ep_square && (lookups::pawn_shift(Bitboard{*ep_square}, !c) & checkers)) {
+        Bitboard ep_candidates = pawns & lookups::pawn_attacks(*ep_square, !c);
         while (ep_candidates) {
             Square sq = ep_candidates.forward_bitscan();
             ep_candidates.forward_popbit();
-            move_list.add(Move{sq, ep_square, constants::PIECE_TYPE_NONE, Move::Type::ENPASSANT});
+            move_list.add(Move{sq, *ep_square, Move::Type::ENPASSANT});
         }
     }
 
@@ -282,7 +277,7 @@ inline void Position::generate_checker_capture_moves(MoveList& move_list, Color 
     while (attackers) {
         Square sq = attackers.forward_bitscan();
         attackers.forward_popbit();
-        move_list.add(Move{sq, checker_sq, constants::PIECE_TYPE_NONE, Move::Type::CAPTURE});
+        move_list.add(Move{sq, checker_sq, Move::Type::CAPTURE});
     }
 }
 
@@ -299,9 +294,9 @@ inline MoveList Position::check_evasion_move_list(Color c) const {
         evasions.forward_popbit();
         if (!attackers_to(sq, !c, non_king_occupancy)) {
             if (Bitboard{sq} & opp_occupancy) {
-                move_list.add(Move{king_sq, sq, constants::PIECE_TYPE_NONE, Move::Type::CAPTURE});
+                move_list.add(Move{king_sq, sq, Move::Type::CAPTURE});
             } else {
-                move_list.add(Move{king_sq, sq, constants::PIECE_TYPE_NONE, Move::Type::NORMAL});
+                move_list.add(Move{king_sq, sq, Move::Type::NORMAL});
             }
         }
     }

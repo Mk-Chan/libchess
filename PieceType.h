@@ -16,12 +16,9 @@ class PieceType : public MetaValueType<int> {
             ROOK,
             QUEEN,
             KING,
-            NUM_PIECE_TYPES,
-            NONE
         };
     };
     constexpr inline PieceType(value_type value) : MetaValueType<value_type>(value) {}
-    constexpr inline PieceType() : PieceType(Value::NONE) {}
 
     constexpr inline char to_char() const {
         switch (value()) {
@@ -42,7 +39,7 @@ class PieceType : public MetaValueType<int> {
         }
     }
 
-    constexpr inline static PieceType from(char c) {
+    constexpr inline static std::optional<PieceType> from(char c) {
         switch (c) {
         case 'p':
         case 'P':
@@ -63,7 +60,7 @@ class PieceType : public MetaValueType<int> {
         case 'K':
             return Value::KING;
         default:
-            return Value::NONE;
+            return {};
         }
     }
 };
@@ -80,9 +77,7 @@ constexpr static PieceType BISHOP{PieceType::Value::BISHOP};
 constexpr static PieceType ROOK{PieceType::Value::ROOK};
 constexpr static PieceType QUEEN{PieceType::Value::QUEEN};
 constexpr static PieceType KING{PieceType::Value::KING};
-constexpr static PieceType PIECE_TYPE_NONE{PieceType::Value::NONE};
 constexpr static PieceType PIECE_TYPES[]{PAWN, KNIGHT, BISHOP, ROOK, QUEEN, KING};
-constexpr static int NUM_PIECE_TYPES = PieceType::Value::NUM_PIECE_TYPES;
 
 } // namespace constants
 

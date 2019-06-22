@@ -33,16 +33,21 @@ class Piece {
         return piece_type_char;
     }
 
-    constexpr inline static Piece from(Color piece_color, PieceType piece_type) {
-        return Piece{piece_type, piece_color};
-    }
-    constexpr inline static Piece from(char c) {
-        PieceType piece_type = PieceType::from(c);
-        Color piece_color = c >= 'a' ? constants::BLACK : constants::WHITE;
-        if (piece_type == constants::PIECE_TYPE_NONE) {
-            piece_color = constants::COLOR_NONE;
+    constexpr inline static std::optional<Piece> from(std::optional<PieceType> piece_type,
+                                                      std::optional<Color> piece_color) {
+        if (!(piece_type && piece_color)) {
+            return {};
         }
-        return Piece::from(piece_color, piece_type);
+        return Piece{*piece_type, *piece_color};
+    }
+    constexpr inline static std::optional<Piece> from(char c) {
+        auto piece_type = PieceType::from(c);
+        if (!piece_type) {
+            return {};
+        }
+
+        Color piece_color = std::isupper(c) ? constants::WHITE : constants::BLACK;
+        return Piece::from(*piece_type, piece_color);
     }
 
   private:
@@ -60,19 +65,18 @@ inline std::ostream& operator<<(std::ostream& ostream, Piece& piece) {
 
 namespace constants {
 
-constexpr static Piece PIECE_NONE = Piece{PIECE_TYPE_NONE, COLOR_NONE};
-constexpr static Piece WHITE_PAWN = Piece::from('P');
-constexpr static Piece WHITE_KNIGHT = Piece::from('N');
-constexpr static Piece WHITE_BISHOP = Piece::from('B');
-constexpr static Piece WHITE_ROOK = Piece::from('R');
-constexpr static Piece WHITE_QUEEN = Piece::from('Q');
-constexpr static Piece WHITE_KING = Piece::from('K');
-constexpr static Piece BLACK_PAWN = Piece::from('p');
-constexpr static Piece BLACK_KNIGHT = Piece::from('n');
-constexpr static Piece BLACK_BISHOP = Piece::from('b');
-constexpr static Piece BLACK_ROOK = Piece::from('r');
-constexpr static Piece BLACK_QUEEN = Piece::from('q');
-constexpr static Piece BLACK_KING = Piece::from('k');
+constexpr static Piece WHITE_PAWN = *Piece::from(PAWN, WHITE);
+constexpr static Piece WHITE_KNIGHT = *Piece::from(KNIGHT, WHITE);
+constexpr static Piece WHITE_BISHOP = *Piece::from(BISHOP, WHITE);
+constexpr static Piece WHITE_ROOK = *Piece::from(ROOK, WHITE);
+constexpr static Piece WHITE_QUEEN = *Piece::from(QUEEN, WHITE);
+constexpr static Piece WHITE_KING = *Piece::from(KING, WHITE);
+constexpr static Piece BLACK_PAWN = *Piece::from(PAWN, BLACK);
+constexpr static Piece BLACK_KNIGHT = *Piece::from(KNIGHT, BLACK);
+constexpr static Piece BLACK_BISHOP = *Piece::from(BISHOP, BLACK);
+constexpr static Piece BLACK_ROOK = *Piece::from(ROOK, BLACK);
+constexpr static Piece BLACK_QUEEN = *Piece::from(QUEEN, BLACK);
+constexpr static Piece BLACK_KING = *Piece::from(KING, BLACK);
 constexpr static Piece PIECES[]{BLACK_PAWN,   WHITE_PAWN,   BLACK_KNIGHT, WHITE_KNIGHT,
                                 BLACK_BISHOP, WHITE_BISHOP, BLACK_ROOK,   WHITE_ROOK,
                                 BLACK_QUEEN,  WHITE_QUEEN,  BLACK_KING,   WHITE_KING};

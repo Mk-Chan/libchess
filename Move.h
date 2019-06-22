@@ -2,6 +2,8 @@
 #define LIBCHESS_MOVE_H
 
 #include <algorithm>
+#include <optional>
+#include <vector>
 
 #include "PieceType.h"
 #include "Square.h"
@@ -18,12 +20,15 @@ class Move {
         PROMOTION_TYPE_MASK = 7 << PROMOTION_TYPE_SHIFT,
         MOVE_TYPE_MASK = 7 << MOVE_TYPE_SHIFT
     };
+    enum class PromotionPieceType : int {
+        NONE,
+        KNIGHT,
+        BISHOP,
+        ROOK,
+        QUEEN,
+    };
 
   public:
-    class Value {
-      public:
-        enum MoveValue : std::uint32_t { MOVE_NONE };
-    };
     enum class Type : std::uint8_t {
         NORMAL,
         CASTLING,
@@ -37,31 +42,43 @@ class Move {
 
     using value_type = std::uint32_t;
 
-    constexpr inline Move() : value_(static_cast<value_type>(Move::Value::MOVE_NONE)) {}
     constexpr inline Move(std::uint32_t value) : value_(value) {}
-    constexpr inline Move(Square from_square, Square to_square,
-                          PieceType promotion_pt = constants::PIECE_TYPE_NONE,
+    constexpr inline Move(Square from_square, Square to_square, Move::Type type = Move::Type::NONE)
+        : value_(from_square.value() | (to_square.value() << TO_SQUARE_SHIFT) |
+                 (constants::PAWN.value() << PROMOTION_TYPE_SHIFT) |
+                 (std::uint32_t(type) << MOVE_TYPE_SHIFT)) {}
+    constexpr inline Move(Square from_square, Square to_square, PieceType promotion_pt,
                           Move::Type type = Move::Type::NONE)
         : value_(from_square.value() | (to_square.value() << TO_SQUARE_SHIFT) |
                  (promotion_pt.value() << PROMOTION_TYPE_SHIFT) |
                  (std::uint32_t(type) << MOVE_TYPE_SHIFT)) {}
-    inline Move(const std::string& move_str) : value_(from(move_str).value_) {}
-    inline Move(const char* move_str) : value_(from(move_str).value_) {}
 
-    static inline Move from(const std::string& str) {
-        Square from = Square::from(str.substr(0, 2));
-        Square to = Square::from(str.substr(2, 4));
-        PieceType promotion_pt = constants::PIECE_TYPE_NONE;
-        if (str.size() == 5) {
-            promotion_pt = PieceType::from(str[4]);
+    static inline std::optional<Move> from(const std::string& str) {
+        auto strlen = str.length();
+        if (strlen > 5 || strlen < 4) {
+            return std::nullopt;
         }
-        return Move{from, to, promotion_pt};
+        auto from = Square::from(str.substr(0, 2));
+        auto to = Square::from(str.substr(2, 4));
+        if (!(from && to)) {
+            return std::nullopt;
+        }
+
+        if (str.size() == 5) {
+            auto promotion_pt = PieceType::from(str[4]);
+            if (!promotion_pt) {
+                return std::nullopt;
+            }
+            return Move{*from, *to, *promotion_pt};
+        }
+        return Move{*from, *to};
     }
 
     inline std::string to_str() const {
         std::string move_str = from_square().to_str() + to_square().to_str();
-        if (promotion_piece_type() != constants::PIECE_TYPE_NONE) {
-            move_str += promotion_piece_type().to_char();
+        auto promotion_pt = promotion_piece_type();
+        if (promotion_pt) {
+            move_str += promotion_pt->to_char();
         }
         return move_str;
     }
@@ -78,8 +95,12 @@ class Move {
     constexpr inline Move::Type type() const {
         return static_cast<Move::Type>((value() & MOVE_TYPE_MASK) >> MOVE_TYPE_SHIFT);
     }
-    constexpr inline PieceType promotion_piece_type() const {
-        return (value() & PROMOTION_TYPE_MASK) >> PROMOTION_TYPE_SHIFT;
+    constexpr inline std::optional<PieceType> promotion_piece_type() const {
+        PieceType promotion_pt = (value() & PROMOTION_TYPE_MASK) >> PROMOTION_TYPE_SHIFT;
+        if (promotion_pt == constants::PAWN || promotion_pt == constants::KING) {
+            return std::nullopt;
+        }
+        return promotion_pt;
     }
 
     constexpr inline value_type value_sans_type() const { return value_ & ~MOVE_TYPE_MASK; }
@@ -90,29 +111,24 @@ class Move {
 };
 
 class MoveList {
-  protected:
-    constexpr static int max_size = 256;
-
   public:
-    using value_type = std::array<Move, max_size>;
+    using value_type = std::vector<Move>;
     using iterator = value_type::iterator;
     using const_iterator = value_type::const_iterator;
 
-    constexpr inline MoveList() : size_(0) {}
+    inline MoveList() { values_.reserve(32); }
 
-    constexpr inline iterator begin() { return values_.begin(); }
-    constexpr inline iterator end() { return values_.begin() + size(); }
-    constexpr inline const_iterator cbegin() const { return values_.begin(); }
-    constexpr inline const_iterator cend() const { return values_.begin() + size(); }
+    inline iterator begin() { return values_.begin(); }
+    inline iterator end() { return values_.end(); }
+    inline const_iterator cbegin() const { return values_.cbegin(); }
+    inline const_iterator cend() const { return values_.cend(); }
 
-    constexpr inline void decrement_size() { --size_; }
-    constexpr inline void add(Move move) {
-        values_[size()] = move;
-        ++size_;
-    }
-    template <class F> constexpr inline void sort(F move_evaluator) {
+    inline void decrement_size() { values_.pop_back(); }
+    inline void add(Move move) { values_.push_back(move); }
+    template <class F> inline void sort(F move_evaluator) {
         auto& moves = values_mut_ref();
-        std::array<int, max_size> scores{};
+        std::vector<int> scores;
+        scores.reserve(values_.size());
         for (int i = 0; i < size(); ++i) {
             scores[i] = move_evaluator(moves[i]);
         }
@@ -132,27 +148,19 @@ class MoveList {
             moves[j] = moving_move;
         }
     }
-    constexpr inline int size() const { return size_; }
-    constexpr inline const std::array<Move, max_size>& values() const { return values_; }
+    inline int size() const { return values_.size(); }
+    inline const value_type& values() const { return values_; }
 
   protected:
-    constexpr inline std::array<Move, max_size>& values_mut_ref() { return values_; }
+    inline value_type& values_mut_ref() { return values_; }
 
   private:
-    int size_;
-    std::array<Move, max_size> values_;
+    value_type values_;
 };
 
 inline std::ostream& operator<<(std::ostream& ostream, Move move) {
     return ostream << move.to_str();
 }
-
-namespace constants {
-
-constexpr static Move::Type MOVE_TYPE_NONE = Move::Type::NONE;
-constexpr static Move MOVE_NONE{};
-
-} // namespace constants
 
 } // namespace libchess
 
