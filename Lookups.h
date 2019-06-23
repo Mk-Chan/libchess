@@ -27,7 +27,7 @@ static Bitboard FILE_G_MASK{std::uint64_t(0x4040404040404040)};
 static Bitboard FILE_H_MASK{std::uint64_t(0x8080808080808080)};
 
 static Bitboard RANK_MASK[8] = {RANK_1_MASK, RANK_2_MASK, RANK_3_MASK, RANK_4_MASK,
-                                          RANK_5_MASK, RANK_6_MASK, RANK_7_MASK, RANK_8_MASK};
+                                RANK_5_MASK, RANK_6_MASK, RANK_7_MASK, RANK_8_MASK};
 
 inline Bitboard rank_mask(Rank rank) { return RANK_MASK[rank.value()]; }
 
@@ -325,13 +325,11 @@ static std::array<Bitboard, 64> BISHOP_ATTACKS = init::bishop_attacks();
 static std::array<Bitboard, 64> ROOK_ATTACKS = init::rook_attacks();
 static std::array<Bitboard, 64> QUEEN_ATTACKS = init::queen_attacks();
 
-inline Bitboard pawn_attacks(Square square, Color color) {
-    return PAWN_ATTACKS[color][square];
-}
-inline Bitboard knight_attacks(Square square, Bitboard = 0) {
+inline Bitboard pawn_attacks(Square square, Color color) { return PAWN_ATTACKS[color][square]; }
+inline Bitboard knight_attacks(Square square, Bitboard = Bitboard{0}) {
     return KNIGHT_ATTACKS[square];
 }
-inline Bitboard king_attacks(Square square, Bitboard = 0) { return KING_ATTACKS[square]; }
+inline Bitboard king_attacks(Square square, Bitboard = Bitboard{0}) { return KING_ATTACKS[square]; }
 inline Bitboard bishop_attacks(Square square) { return BISHOP_ATTACKS[square]; }
 inline Bitboard rook_attacks(Square square) { return ROOK_ATTACKS[square]; }
 inline Bitboard queen_attacks(Square square) { return QUEEN_ATTACKS[square]; }
@@ -393,11 +391,9 @@ inline Rank relative_rank(Rank rank, Color c) {
                ? rank
                : Rank{static_cast<Rank::value_type>(constants::RANK_8.value() - rank.value())};
 }
-inline Bitboard relative_rank_mask(Rank rank, Color c) {
-    return rank_mask(relative_rank(rank, c));
-}
+inline Bitboard relative_rank_mask(Rank rank, Color c) { return rank_mask(relative_rank(rank, c)); }
 inline Bitboard non_pawn_piece_type_attacks(PieceType piece_type, Square square,
-                                                      Bitboard occupancies = 0) {
+                                            Bitboard occupancies = Bitboard{0}) {
     switch (piece_type) {
     case constants::KNIGHT:
         return knight_attacks(square);
@@ -410,7 +406,7 @@ inline Bitboard non_pawn_piece_type_attacks(PieceType piece_type, Square square,
     case constants::KING:
         return king_attacks(square);
     default:
-        return 0;
+        return Bitboard{0};
     }
 }
 
@@ -452,9 +448,7 @@ inline std::array<std::array<Bitboard, 64>, 64> direction_xray() {
 
 static std::array<std::array<Bitboard, 64>, 64> DIRECTION_XRAY = init::direction_xray();
 
-inline Bitboard direction_xray(Square from, Square to) {
-    return DIRECTION_XRAY[from][to];
-}
+inline Bitboard direction_xray(Square from, Square to) { return DIRECTION_XRAY[from][to]; }
 
 } // namespace libchess::lookups
 

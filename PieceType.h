@@ -18,9 +18,9 @@ class PieceType : public MetaValueType<int> {
             KING,
         };
     };
-    constexpr inline PieceType(value_type value) : MetaValueType<value_type>(value) {}
+    constexpr explicit PieceType(value_type value) : MetaValueType<value_type>(value) {}
 
-    constexpr inline char to_char() const {
+    constexpr char to_char() const {
         switch (value()) {
         case Value::PAWN:
             return 'p';
@@ -39,26 +39,26 @@ class PieceType : public MetaValueType<int> {
         }
     }
 
-    constexpr inline static std::optional<PieceType> from(char c) {
+    constexpr static std::optional<PieceType> from(char c) {
         switch (c) {
         case 'p':
         case 'P':
-            return Value::PAWN;
+            return PieceType{Value::PAWN};
         case 'n':
         case 'N':
-            return Value::KNIGHT;
+            return PieceType{Value::KNIGHT};
         case 'b':
         case 'B':
-            return Value::BISHOP;
+            return PieceType{Value::BISHOP};
         case 'r':
         case 'R':
-            return Value::ROOK;
+            return PieceType{Value::ROOK};
         case 'q':
         case 'Q':
-            return Value::QUEEN;
+            return PieceType{Value::QUEEN};
         case 'k':
         case 'K':
-            return Value::KING;
+            return PieceType{Value::KING};
         default:
             return {};
         }

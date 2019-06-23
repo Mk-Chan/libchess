@@ -163,10 +163,10 @@ inline void Position::generate_castling(MoveList& move_list, Color c) const {
         {constants::WHITE_KINGSIDE.value(), constants::WHITE_QUEENSIDE.value()},
         {constants::BLACK_KINGSIDE.value(), constants::BLACK_QUEENSIDE.value()},
     };
-    const int castling_intermediate_sqs[2][2][2] = {
+    const Square castling_intermediate_sqs[2][2][2] = {
         {{constants::F1, constants::G1}, {constants::D1, constants::C1}},
         {{constants::F8, constants::G8}, {constants::D8, constants::C8}}};
-    const int castling_king_sqs[2][2][2] = {
+    const Square castling_king_sqs[2][2][2] = {
         {{constants::E1, constants::G1}, {constants::E1, constants::C1}},
         {{constants::E8, constants::G8}, {constants::E8, constants::C8}}};
     const Bitboard castle_mask[2][2] = {
@@ -292,7 +292,7 @@ inline MoveList Position::check_evasion_move_list(Color c) const {
     while (evasions) {
         Square sq = evasions.forward_bitscan();
         evasions.forward_popbit();
-        if (!attackers_to(sq, !c, non_king_occupancy)) {
+        if (!(attackers_to(sq, non_king_occupancy, !c))) {
             if (Bitboard{sq} & opp_occupancy) {
                 move_list.add(Move{king_sq, sq, Move::Type::CAPTURE});
             } else {
@@ -346,12 +346,13 @@ inline MoveList Position::pseudo_legal_move_list() const {
 
 inline MoveList Position::legal_move_list(Color stm) const {
     MoveList move_list = checkers_to(stm) ? check_evasion_move_list() : pseudo_legal_move_list();
+    Bitboard pinned = pinned_pieces_of(stm);
     for (auto move = move_list.begin(); move != move_list.end();) {
-        if (((pinned_pieces(stm) & Bitboard{move->from_square()}) ||
-             move->from_square() == king_square(stm) || move->type() == Move::Type::ENPASSANT) &&
+        if (((pinned & Bitboard{move->from_square()}) || move->from_square() == king_square(stm) ||
+             move->type() == Move::Type::ENPASSANT) &&
             !is_legal_move(*move)) {
-            move_list.decrement_size();
-            *move = *move_list.end();
+            *move = *(move_list.end() - 1);
+            move_list.pop_back();
         } else {
             ++move;
         }

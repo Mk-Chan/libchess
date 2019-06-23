@@ -28,27 +28,34 @@ class Square : public MetaValueType<int> {
         };
         // clang-format off
     };
-    constexpr inline Square(value_type value) : MetaValueType<value_type>(value) {}
+    constexpr explicit Square(value_type value) : MetaValueType<value_type>(value) {}
 
-    constexpr inline Square& operator=(value_type val) {
+    constexpr Square operator+(value_type val) const {
+        return Square{value() + val};
+    }
+    constexpr Square operator-(value_type val) const {
+        return Square{value() - val};
+    }
+    constexpr Square& operator=(value_type val) {
         set_value(val);
         return *this;
     }
 
-    constexpr inline File file() const { return value() & 7; }
-    constexpr inline Rank rank() const { return value() >> 3; }
+    constexpr File file() const { return File{value() & 7}; }
+    constexpr Rank rank() const { return Rank{value() >> 3}; }
+    constexpr Square flipped() const { return Square{value() ^ 56}; }
 
-    inline std::string to_str() const {
+    std::string to_str() const {
         return std::string{file().to_char(), rank().to_char()};
     }
 
-    constexpr static inline std::optional<Square> from(std::optional<File> file, std::optional<Rank> rank) {
+    constexpr static std::optional<Square> from(std::optional<File> file, std::optional<Rank> rank) {
         if (!(file && rank)) {
             return {};
         }
-        return *file | (*rank << 3);
+        return Square{*file | (*rank << 3)};
     }
-    inline static std::optional<Square> from(const std::string& square_str) {
+    static std::optional<Square> from(const std::string& square_str) {
         return Square::from(File::from(square_str[0]), Rank::from(square_str[1]));
     }
 };

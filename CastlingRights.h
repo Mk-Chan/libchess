@@ -20,20 +20,20 @@ class CastlingRight : public MetaValueType<int> {
             BLACK_QUEENSIDE = 8
         };
     };
-    constexpr inline CastlingRight(value_type value) : MetaValueType<value_type>(value) {}
+    constexpr explicit CastlingRight(value_type value) : MetaValueType<value_type>(value) {}
 
-    constexpr static inline CastlingRight from(char c) {
+    constexpr static CastlingRight from(char c) {
         switch (c) {
         case 'K':
-            return Value::WHITE_KINGSIDE;
+            return CastlingRight{Value::WHITE_KINGSIDE};
         case 'Q':
-            return Value::WHITE_QUEENSIDE;
+            return CastlingRight{Value::WHITE_QUEENSIDE};
         case 'k':
-            return Value::BLACK_KINGSIDE;
+            return CastlingRight{Value::BLACK_KINGSIDE};
         case 'q':
-            return Value::BLACK_QUEENSIDE;
+            return CastlingRight{Value::BLACK_QUEENSIDE};
         default:
-            return Value::CASTLING_RIGHT_NONE;
+            return CastlingRight{Value::CASTLING_RIGHT_NONE};
         }
     }
 };
@@ -59,55 +59,54 @@ inline std::ostream& operator<<(std::ostream& ostream, CastlingRight castling_ri
 
 class CastlingRights {
   public:
-    using value_type = std::uint8_t;
+    using value_type = int;
 
-    constexpr inline CastlingRights(CastlingRight castling_right)
+    constexpr CastlingRights() : CastlingRights(CastlingRight::Value::CASTLING_RIGHT_NONE) {}
+    constexpr explicit CastlingRights(value_type value) : value_(value) {}
+    constexpr explicit CastlingRights(CastlingRight castling_right)
         : value_(castling_right.value()) {}
-    constexpr inline CastlingRights() : CastlingRights(CastlingRight::Value::CASTLING_RIGHT_NONE) {}
-    constexpr inline CastlingRights(value_type value) : value_(value) {}
-    constexpr inline CastlingRights(std::initializer_list<CastlingRight> castling_right_list)
-        : value_(0) {
+    constexpr CastlingRights(std::initializer_list<CastlingRight> castling_right_list) : value_(0) {
         for (auto castling_right : castling_right_list) {
             allow(castling_right);
         }
     }
 
-    constexpr inline bool operator==(CastlingRights rhs) const { return value() == rhs.value(); }
+    constexpr bool operator==(CastlingRights rhs) const { return value() == rhs.value(); }
 
-    constexpr inline void allow(CastlingRight castling_right) {
+    constexpr void allow(CastlingRight castling_right) {
         value_ |= value_type(castling_right.value());
     }
-    constexpr inline void disallow(CastlingRight castling_right) {
+    constexpr void disallow(CastlingRight castling_right) {
         value_ &= ~value_type(castling_right.value());
     }
 
-    constexpr inline bool is_allowed(CastlingRight castling_right) const {
+    constexpr bool is_allowed(CastlingRight castling_right) const {
         return value_ & value_type(castling_right.value());
     }
 
-    static inline CastlingRights from(const std::string& str) {
+    static CastlingRights from(const std::string& str) {
         CastlingRights castling_rights;
         for (char c : str) {
             castling_rights.allow(CastlingRight::from(c));
         }
         return castling_rights;
     }
-    inline std::string to_str() const {
+    std::string to_str() const {
         std::string cr_str;
         bool any = false;
-        if (is_allowed(CastlingRight::Value::WHITE_KINGSIDE)) {
+        if (is_allowed(CastlingRight{CastlingRight::Value::WHITE_KINGSIDE})) {
             cr_str += "K";
             any = true;
         }
-        if (is_allowed(CastlingRight::Value::WHITE_QUEENSIDE)) {
+        if (is_allowed(CastlingRight{CastlingRight::Value::WHITE_QUEENSIDE})) {
             cr_str += "Q";
             any = true;
         }
-        if (is_allowed(CastlingRight::Value::BLACK_KINGSIDE)) {
+        if (is_allowed(CastlingRight{CastlingRight::Value::BLACK_KINGSIDE})) {
             cr_str += "k";
             any = true;
         }
-        if (is_allowed(CastlingRight::Value::BLACK_QUEENSIDE)) {
+        if (is_allowed(CastlingRight{CastlingRight::Value::BLACK_QUEENSIDE})) {
             cr_str += "q";
             any = true;
         }
@@ -117,7 +116,7 @@ class CastlingRights {
         return cr_str;
     }
 
-    constexpr inline value_type value() const { return value_; }
+    constexpr value_type value() const { return value_; }
 
   private:
     value_type value_;

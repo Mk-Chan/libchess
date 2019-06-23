@@ -22,11 +22,11 @@ class File : public MetaValueType<int> {
             FILE_H
         };
     };
-    constexpr inline File(value_type value) : MetaValueType<value_type>(value) {}
+    constexpr explicit File(value_type value) : MetaValueType<value_type>(value) {}
 
-    constexpr inline char to_char() const { return 'a' + value(); }
+    constexpr char to_char() const { return 'a' + value(); }
 
-    constexpr static inline std::optional<File> from(char c) {
+    constexpr static std::optional<File> from(char c) {
         int offset = c >= 'a' ? (c - 'a') : (c - 'A');
         if (offset < 0 || offset > 7) {
             return {};

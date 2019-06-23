@@ -35,11 +35,11 @@ inline void Position::display_raw(std::ostream& ostream) const {
 
 inline void Position::display(std::ostream& ostream) const {
     for (Square square : constants::SQUARES) {
-        int sq = square.value();
+        Square sq = square;
         if (sq && !(sq & 7)) {
             ostream << "\n";
         }
-        auto piece = piece_on(sq ^ 56);
+        auto piece = piece_on(sq.flipped());
         if (!piece) {
             ostream << "- ";
         } else {

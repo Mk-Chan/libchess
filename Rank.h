@@ -22,11 +22,11 @@ class Rank : public MetaValueType<int> {
             RANK_8
         };
     };
-    constexpr inline Rank(value_type value) : MetaValueType<value_type>(value) {}
+    constexpr explicit Rank(value_type value) : MetaValueType<value_type>(value) {}
 
-    constexpr inline char to_char() const { return '1' + value(); }
+    constexpr char to_char() const { return '1' + value(); }
 
-    constexpr static inline std::optional<Rank> from(char c) {
+    constexpr static std::optional<Rank> from(char c) {
         int offset = c - '1';
         if (offset < 0 || offset > 7) {
             return std::nullopt;

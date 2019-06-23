@@ -10,20 +10,20 @@ class Piece {
   public:
     using value_type = int;
 
-    constexpr inline Piece(PieceType piece_type, Color piece_color)
+    constexpr Piece(PieceType piece_type, Color piece_color)
         : value_(piece_type.value() | (piece_color.value() << 3)) {}
 
-    constexpr inline PieceType type() const { return value_ & 7; }
-    constexpr inline Color color() const { return value_ >> 3; }
+    constexpr PieceType type() const { return PieceType{value_ & 7}; }
+    constexpr Color color() const { return Color{value_ >> 3}; }
 
-    constexpr inline bool operator==(const Piece rhs) const {
+    constexpr bool operator==(const Piece rhs) const {
         return type() == rhs.type() && color() == rhs.color();
     }
-    constexpr inline bool operator!=(const Piece rhs) const {
+    constexpr bool operator!=(const Piece rhs) const {
         return type() != rhs.type() || color() != rhs.color();
     }
 
-    constexpr inline char to_char() const {
+    constexpr char to_char() const {
         char piece_type_char = type().to_char();
         if (color() == constants::WHITE) {
             piece_type_char = std::toupper(piece_type_char);
@@ -33,14 +33,14 @@ class Piece {
         return piece_type_char;
     }
 
-    constexpr inline static std::optional<Piece> from(std::optional<PieceType> piece_type,
-                                                      std::optional<Color> piece_color) {
+    constexpr static std::optional<Piece> from(std::optional<PieceType> piece_type,
+                                               std::optional<Color> piece_color) {
         if (!(piece_type && piece_color)) {
             return {};
         }
         return Piece{*piece_type, *piece_color};
     }
-    constexpr inline static std::optional<Piece> from(char c) {
+    constexpr static std::optional<Piece> from(char c) {
         auto piece_type = PieceType::from(c);
         if (!piece_type) {
             return {};
