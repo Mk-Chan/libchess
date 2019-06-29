@@ -23,6 +23,7 @@ class Move {
 
   public:
     enum class Type : std::uint8_t {
+        NONE,
         NORMAL,
         CASTLING,
         ENPASSANT,
@@ -30,7 +31,6 @@ class Move {
         DOUBLE_PUSH,
         CAPTURE,
         CAPTURE_PROMOTION,
-        NONE
     };
 
     using value_type = int;
