@@ -6,6 +6,7 @@
 #include <optional>
 #include <sstream>
 #include <string>
+#include <thread>
 #include <variant>
 
 #include "UCIService/UCIOption.h"
@@ -17,8 +18,8 @@ class UCIPositionParameters {
     UCIPositionParameters(std::string fen, std::vector<std::string> move_list) noexcept
         : fen_(std::move(fen)), move_list_(std::move(move_list)) {}
 
-    const std::string &fen() const noexcept { return fen_; }
-    const std::optional<std::vector<std::string>> &move_list() const noexcept { return move_list_; }
+    const std::string& fen() const noexcept { return fen_; }
+    const std::optional<std::vector<std::string>>& move_list() const noexcept { return move_list_; }
 
   private:
     std::string fen_;
@@ -27,25 +28,25 @@ class UCIPositionParameters {
 
 class UCIGoParameters {
   public:
-    UCIGoParameters(const std::optional<uint64_t> &nodes, const std::optional<int> &movetime,
-                    const std::optional<int> &depth, const std::optional<int> &wtime,
-                    const std::optional<int> &winc, const std::optional<int> &btime,
-                    const std::optional<int> &binc, bool infinite, bool ponder,
+    UCIGoParameters(const std::optional<uint64_t>& nodes, const std::optional<int>& movetime,
+                    const std::optional<int>& depth, const std::optional<int>& wtime,
+                    const std::optional<int>& winc, const std::optional<int>& btime,
+                    const std::optional<int>& binc, bool infinite, bool ponder,
                     std::optional<std::vector<std::string>> searchmoves)
         : nodes_(nodes), movetime_(movetime), depth_(depth), wtime_(wtime), winc_(winc),
           btime_(btime), binc_(binc), infinite_(infinite), ponder_(ponder),
           searchmoves_(std::move(searchmoves)) {}
 
-    const std::optional<uint64_t> &nodes() const noexcept { return nodes_; }
-    const std::optional<int> &movetime() const noexcept { return movetime_; }
-    const std::optional<int> &depth() const noexcept { return depth_; }
-    const std::optional<int> &wtime() const noexcept { return wtime_; }
-    const std::optional<int> &winc() const noexcept { return winc_; }
-    const std::optional<int> &btime() const noexcept { return btime_; }
-    const std::optional<int> &binc() const noexcept { return binc_; }
+    const std::optional<uint64_t>& nodes() const noexcept { return nodes_; }
+    const std::optional<int>& movetime() const noexcept { return movetime_; }
+    const std::optional<int>& depth() const noexcept { return depth_; }
+    const std::optional<int>& wtime() const noexcept { return wtime_; }
+    const std::optional<int>& winc() const noexcept { return winc_; }
+    const std::optional<int>& btime() const noexcept { return btime_; }
+    const std::optional<int>& binc() const noexcept { return binc_; }
     bool infinite() const noexcept { return infinite_; }
     bool ponder() const noexcept { return ponder_; }
-    const std::optional<std::vector<std::string>> &searchmoves() const noexcept {
+    const std::optional<std::vector<std::string>>& searchmoves() const noexcept {
         return searchmoves_;
     }
 
@@ -68,7 +69,7 @@ class UCIService {
                                           UCICheckOption, UCIButtonOption>;
 
   public:
-    void register_option(const UCIOptionVariant &uci_option) noexcept {
+    void register_option(const UCIOptionVariant& uci_option) noexcept {
         if (std::holds_alternative<UCISpinOption>(uci_option)) {
             const auto& option = std::get<UCISpinOption>(uci_option);
             spin_options_[option.name()] = std::get<UCISpinOption>(uci_option);
@@ -127,6 +128,7 @@ class UCIService {
 
         std::string word;
         std::string line;
+        std::optional<std::thread> go_thread;
         while (true) {
             std::getline(std::cin, line);
             std::stringstream line_stream{line};
@@ -139,12 +141,16 @@ class UCIService {
             } else if (word == "go") {
                 auto go_parameters = parse_go_line(line_stream);
                 if (go_parameters) {
-                    go_handler_(*go_parameters);
+                    go_thread = std::thread{go_handler_, *go_parameters};
+                }
+            } else if (word == "stop") {
+                if (go_thread) {
+                    stop_handler_();
+                    go_thread->join();
+                    go_thread = {};
                 }
             } else if (word == "setoption") {
                 parse_and_run_setoption_line(line_stream);
-            } else if (word == "stop") {
-                stop_handler_();
             } else if (word == "isready") {
                 std::cout << "readyok\n";
             } else if (word == "quit" || word == "exit") {
