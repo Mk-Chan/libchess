@@ -87,15 +87,15 @@ class UCIService {
         }
     }
 
-    void register_position_handler(
-        std::function<void(const UCIPositionParameters&)>& handler) noexcept {
-        position_handler_ = handler;
+    void
+    register_position_handler(std::function<void(const UCIPositionParameters&)> handler) noexcept {
+        position_handler_ = std::move(handler);
     }
-    void register_go_handler(std::function<void(const UCIGoParameters&)>& handler) noexcept {
-        go_handler_ = handler;
+    void register_go_handler(std::function<void(const UCIGoParameters&)> handler) noexcept {
+        go_handler_ = std::move(handler);
     }
-    void register_stop_handler(std::function<void(void)>& handler) noexcept {
-        stop_handler_ = handler;
+    void register_stop_handler(std::function<void(void)> handler) noexcept {
+        stop_handler_ = std::move(handler);
     }
 
     void run() {
