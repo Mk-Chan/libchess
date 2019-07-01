@@ -145,6 +145,10 @@ class MoveList {
     int size() const { return values_.size(); }
     const value_type& values() const { return values_; }
 
+    bool contains(Move move) const {
+        return std::find(cbegin(), cend(), move) != cend();
+    }
+
   protected:
     value_type& values_mut_ref() { return values_; }
 

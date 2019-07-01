@@ -341,6 +341,9 @@ inline MoveList Position::pseudo_legal_move_list(Color stm) const {
 }
 
 inline MoveList Position::pseudo_legal_move_list() const {
+    if (in_check()) {
+        return check_evasion_move_list(side_to_move());
+    }
     return pseudo_legal_move_list(side_to_move());
 }
 
@@ -350,7 +353,7 @@ inline MoveList Position::legal_move_list(Color stm) const {
     for (auto move = move_list.begin(); move != move_list.end();) {
         if (((pinned & Bitboard{move->from_square()}) || move->from_square() == king_square(stm) ||
              move->type() == Move::Type::ENPASSANT) &&
-            !is_legal_move(*move)) {
+            !is_legal_generated_move(*move)) {
             *move = *(move_list.end() - 1);
             move_list.pop_back();
         } else {
