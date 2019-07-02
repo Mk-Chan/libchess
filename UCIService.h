@@ -1,5 +1,5 @@
-#ifndef LIBCHESS_UCI_H
-#define LIBCHESS_UCI_H
+#ifndef LIBCHESS_UCISERVICE_H
+#define LIBCHESS_UCISERVICE_H
 
 #include <iomanip>
 #include <iostream>
@@ -9,13 +9,14 @@
 #include <thread>
 #include <variant>
 
-#include "UCIService/UCIOption.h"
+#include "UCIOption.h"
 
 namespace libchess {
 
 class UCIPositionParameters {
   public:
-    UCIPositionParameters(std::string fen, std::vector<std::string> move_list) noexcept
+    UCIPositionParameters(std::string fen,
+                          std::optional<std::vector<std::string>> move_list) noexcept
         : fen_(std::move(fen)), move_list_(std::move(move_list)) {}
 
     const std::string& fen() const noexcept { return fen_; }
@@ -159,7 +160,7 @@ class UCIService {
         }
     }
 
-    void parse_and_run_setoption_line(std::stringstream &line_stream) noexcept {
+    void parse_and_run_setoption_line(std::stringstream& line_stream) noexcept {
         std::string tmp;
         line_stream >> tmp;
         if (tmp != "name") {
@@ -201,7 +202,7 @@ class UCIService {
     }
 
     static std::optional<UCIPositionParameters>
-    parse_position_line(std::stringstream &line_stream) noexcept {
+    parse_position_line(std::stringstream& line_stream) noexcept {
         std::string fen;
         std::string tmp;
         line_stream >> tmp;
@@ -232,7 +233,7 @@ class UCIService {
 
         return UCIPositionParameters{fen, moves};
     }
-    static std::optional<UCIGoParameters> parse_go_line(std::stringstream &line_stream) noexcept {
+    static std::optional<UCIGoParameters> parse_go_line(std::stringstream& line_stream) noexcept {
         std::optional<std::uint64_t> nodes_opt;
         std::optional<int> movetime_opt;
         std::optional<int> depth_opt;
@@ -320,4 +321,4 @@ class UCIService {
 
 } // namespace libchess
 
-#endif // LIBCHESS_UCI_H
+#endif // LIBCHESS_UCISERVICE_H
