@@ -7,7 +7,6 @@
 #include <sstream>
 #include <string>
 #include <thread>
-#include <variant>
 
 #include "UCIOption.h"
 
@@ -65,28 +64,21 @@ class UCIGoParameters {
 };
 
 class UCIService {
-  private:
-    using UCIOptionVariant = std::variant<UCISpinOption, UCIComboOption, UCIStringOption,
-                                          UCICheckOption, UCIButtonOption>;
-
   public:
-    void register_option(const UCIOptionVariant& uci_option) noexcept {
-        if (std::holds_alternative<UCISpinOption>(uci_option)) {
-            const auto& option = std::get<UCISpinOption>(uci_option);
-            spin_options_[option.name()] = std::get<UCISpinOption>(uci_option);
-        } else if (std::holds_alternative<UCIComboOption>(uci_option)) {
-            const auto& option = std::get<UCIComboOption>(uci_option);
-            combo_options_[option.name()] = std::get<UCIComboOption>(uci_option);
-        } else if (std::holds_alternative<UCIStringOption>(uci_option)) {
-            const auto& option = std::get<UCIStringOption>(uci_option);
-            string_options_[option.name()] = std::get<UCIStringOption>(uci_option);
-        } else if (std::holds_alternative<UCICheckOption>(uci_option)) {
-            const auto& option = std::get<UCICheckOption>(uci_option);
-            check_options_[option.name()] = std::get<UCICheckOption>(uci_option);
-        } else if (std::holds_alternative<UCIButtonOption>(uci_option)) {
-            const auto& option = std::get<UCIButtonOption>(uci_option);
-            button_options_[option.name()] = std::get<UCIButtonOption>(uci_option);
-        }
+    void register_option(const UCISpinOption& uci_option) noexcept {
+        spin_options_[uci_option.name()] = uci_option;
+    }
+    void register_option(const UCIComboOption& uci_option) noexcept {
+        combo_options_[uci_option.name()] = uci_option;
+    }
+    void register_option(const UCIStringOption& uci_option) noexcept {
+        string_options_[uci_option.name()] = uci_option;
+    }
+    void register_option(const UCICheckOption& uci_option) noexcept {
+        check_options_[uci_option.name()] = uci_option;
+    }
+    void register_option(const UCIButtonOption& uci_option) noexcept {
+        button_options_[uci_option.name()] = uci_option;
     }
 
     void
