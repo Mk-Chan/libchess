@@ -74,6 +74,7 @@ class Position {
     Bitboard attackers_to(Square square, Color c) const;
     Bitboard attackers_to(Square square, Bitboard occupancy) const;
     Bitboard attackers_to(Square square, Bitboard occupancy, Color c) const;
+    Bitboard attacks_of_piece_on(Square square) const;
     Bitboard pinned_pieces_of(Color c) const;
 
     // Move Generation

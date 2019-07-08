@@ -3,9 +3,7 @@
 
 namespace libchess {
 
-inline Bitboard Position::checkers_to(Color c) const {
-    return attackers_to(king_square(c), !c);
-}
+inline Bitboard Position::checkers_to(Color c) const { return attackers_to(king_square(c), !c); }
 
 inline Bitboard Position::attackers_to(Square square, Bitboard occupancy) const {
     Bitboard attackers;
@@ -30,6 +28,19 @@ inline Bitboard Position::attackers_to(Square square, Color c) const {
 
 inline Bitboard Position::attackers_to(Square square, Bitboard occupancy, Color c) const {
     return attackers_to(square, occupancy) & color_bb(c);
+}
+
+inline Bitboard Position::attacks_of_piece_on(libchess::Square square) const {
+    auto piece = piece_on(square);
+    if (!piece) {
+        return Bitboard{0};
+    }
+
+    if (piece->type() == constants::PAWN) {
+        return lookups::pawn_attacks(square, piece->color());
+    } else {
+        return lookups::non_pawn_piece_type_attacks(piece->type(), square, occupancy_bb());
+    }
 }
 
 inline Bitboard Position::pinned_pieces_of(Color c) const {
