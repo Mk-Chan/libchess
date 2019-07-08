@@ -6,7 +6,7 @@ using namespace libchess;
 
 TEST_CASE("Position Line Test", "[UCIService]") {
     std::string line = "startpos moves e2e4 c7c5 g1f3 d7d6 d2d4";
-    std::stringstream line_stream{line};
+    std::istringstream line_stream{line};
     auto position_params = UCIService::parse_position_line(line_stream);
     REQUIRE(position_params);
     REQUIRE(position_params->fen() == "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1");
@@ -22,7 +22,7 @@ TEST_CASE("Position Line Test", "[UCIService]") {
 
 TEST_CASE("Go Line Test Single Parameter", "[UCIService]") {
     std::string line = "movetime 10000";
-    std::stringstream line_stream{line};
+    std::istringstream line_stream{line};
     auto go_params = UCIService::parse_go_line(line_stream);
     REQUIRE(go_params);
     REQUIRE(go_params->movetime());
@@ -34,7 +34,7 @@ TEST_CASE("Go Line Test Single Parameter", "[UCIService]") {
 
 TEST_CASE("Go Line Test Multiple Parameters", "[UCIService]") {
     std::string line = "wtime 32 winc 56 btime 12 binc 54 depth 100 nodes 9991234567899999";
-    std::stringstream line_stream{line};
+    std::istringstream line_stream{line};
     auto go_params = UCIService::parse_go_line(line_stream);
     REQUIRE(go_params);
     REQUIRE_FALSE((go_params->movetime() || go_params->infinite() || go_params->ponder() ||
@@ -49,7 +49,7 @@ TEST_CASE("Go Line Test Multiple Parameters", "[UCIService]") {
 
 TEST_CASE("Go Line Test SearchMoves", "[UCIService]") {
     std::string line = "searchmoves e2e4 d7d5";
-    std::stringstream line_stream{line};
+    std::istringstream line_stream{line};
     auto go_params = UCIService::parse_go_line(line_stream);
     REQUIRE(go_params);
     REQUIRE(go_params->searchmoves());

@@ -265,7 +265,7 @@ class UCIService {
         stop_handler_ = std::move(handler);
     }
     void register_handler(const std::string& command,
-                          std::function<void(std::stringstream&)> handler) noexcept {
+                          std::function<void(std::istringstream&)> handler) noexcept {
         command_handlers_[command] = std::move(handler);
     }
 
@@ -304,7 +304,7 @@ class UCIService {
         keep_running_ = true;
         while (keep_running_) {
             std::getline(std::cin, line);
-            std::stringstream line_stream{line};
+            std::istringstream line_stream{line};
             line_stream >> word;
             if (command_handlers_.find(word) != command_handlers_.end()) {
                 command_handlers_[word](line_stream);
@@ -334,7 +334,7 @@ class UCIService {
         }
     }
 
-    void parse_and_run_setoption_line(std::stringstream& line_stream) noexcept {
+    void parse_and_run_setoption_line(std::istringstream& line_stream) noexcept {
         std::string tmp;
         line_stream >> tmp;
         if (tmp != "name") {
@@ -464,7 +464,7 @@ class UCIService {
     }
 
     static std::optional<UCIPositionParameters>
-    parse_position_line(std::stringstream& line_stream) noexcept {
+    parse_position_line(std::istringstream& line_stream) noexcept {
         std::string fen;
         std::string tmp;
         line_stream >> tmp;
@@ -495,7 +495,7 @@ class UCIService {
 
         return UCIPositionParameters{fen, UCIMoveList{moves}};
     }
-    static std::optional<UCIGoParameters> parse_go_line(std::stringstream& line_stream) noexcept {
+    static std::optional<UCIGoParameters> parse_go_line(std::istringstream& line_stream) noexcept {
         std::optional<std::uint64_t> nodes_opt;
         std::optional<int> movetime_opt;
         std::optional<int> depth_opt;
@@ -579,7 +579,7 @@ class UCIService {
     std::function<void(UCIPositionParameters)> position_handler_;
     std::function<void(UCIGoParameters)> go_handler_;
     std::function<void(void)> stop_handler_;
-    std::unordered_map<std::string, std::function<void(std::stringstream&)>> command_handlers_;
+    std::unordered_map<std::string, std::function<void(std::istringstream&)>> command_handlers_;
 
     std::atomic<bool> keep_running_{true};
 };

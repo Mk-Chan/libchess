@@ -112,7 +112,7 @@ class Position {
         pos.history_.push_back(State{});
         State& curr_state = pos.state_mut_ref();
 
-        std::stringstream fen_stream{fen};
+        std::istringstream fen_stream{fen};
         std::string fen_part;
 
         // Piece list
@@ -161,7 +161,7 @@ class Position {
     static std::optional<Position> from_uci_position_line(const std::string& line) {
         /// This function expects a string as a parameter in one of the following formats:
         /// * `"position <fen> moves <move-list>"`.
-        std::stringstream line_stream{line};
+        std::istringstream line_stream{line};
         std::string tmp;
 
         // "position"
