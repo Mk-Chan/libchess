@@ -4,6 +4,7 @@
 #include "UCIOption.h"
 
 #include <any>
+#include <atomic>
 #include <cassert>
 #include <iomanip>
 #include <iostream>
@@ -32,7 +33,8 @@ class UCIScore {
 
 class UCIMoveList {
   public:
-    UCIMoveList(std::vector<std::string> move_list) noexcept : move_list_(std::move(move_list)) {}
+    explicit UCIMoveList(std::vector<std::string> move_list) noexcept
+        : move_list_(std::move(move_list)) {}
 
     [[nodiscard]] const std::string& operator[](int i) const noexcept { return move_list_[i]; }
 
@@ -194,12 +196,12 @@ class UCIInfoParameters {
     void set_seldepth(const std::optional<int> seldepth) noexcept { seldepth_ = seldepth; }
     void set_time(const std::optional<int> time) noexcept { time_ = time; }
     void set_nodes(const std::optional<uint64_t> nodes) noexcept { nodes_ = nodes; }
-    void set_pv(const std::optional<UCIMoveList> pv) noexcept { pv_ = pv; }
-    void set_multipv(const std::optional<std::vector<UCIMoveList>> multipv) noexcept {
+    void set_pv(const std::optional<UCIMoveList>& pv) noexcept { pv_ = pv; }
+    void set_multipv(const std::optional<std::vector<UCIMoveList>>& multipv) noexcept {
         multipv_ = multipv;
     }
     void set_score(const std::optional<UCIScore> score) noexcept { score_ = score; }
-    void set_currmove(const std::optional<std::string> currmove) noexcept { currmove_ = currmove; }
+    void set_currmove(const std::optional<std::string>& currmove) noexcept { currmove_ = currmove; }
     void set_currmovenumber(const std::optional<int> currmovenumber) noexcept {
         currmovenumber_ = currmovenumber;
     }
@@ -207,13 +209,13 @@ class UCIInfoParameters {
     void set_nps(const std::optional<int> nps) noexcept { nps_ = nps; }
     void set_tbhits(const std::optional<int> tbhits) noexcept { tbhits_ = tbhits; }
     void set_cpuload(const std::optional<int> cpuload) noexcept { cpuload_ = cpuload; }
-    void set_refutation(const std::optional<UCIMoveList> refutation) noexcept {
+    void set_refutation(const std::optional<UCIMoveList>& refutation) noexcept {
         refutation_ = refutation;
     }
-    void set_currline(const std::optional<std::vector<UCIMoveList>> currline) noexcept {
+    void set_currline(const std::optional<std::vector<UCIMoveList>>& currline) noexcept {
         currline_ = currline;
     }
-    void set_string(const std::optional<std::string> string) noexcept { string_ = string; }
+    void set_string(const std::optional<std::string>& string) noexcept { string_ = string; }
 
   private:
     std::optional<int> depth_;
@@ -262,7 +264,12 @@ class UCIService {
     void register_stop_handler(std::function<void(void)> handler) noexcept {
         stop_handler_ = std::move(handler);
     }
+    void register_handler(const std::string& command,
+                          std::function<void(std::stringstream&)> handler) noexcept {
+        command_handlers_[command] = std::move(handler);
+    }
 
+    void stop() { keep_running_ = false; }
     void run() {
         if (!(position_handler_ && go_handler_ && stop_handler_)) {
             throw std::invalid_argument{"Must register a position, go and stop handler!"};
@@ -294,11 +301,13 @@ class UCIService {
         std::string word;
         std::string line;
         std::optional<std::thread> go_thread;
-        while (true) {
+        while (keep_running_) {
             std::getline(std::cin, line);
             std::stringstream line_stream{line};
             line_stream >> word;
-            if (word == "position") {
+            if (command_handlers_.find(word) != command_handlers_.end()) {
+                command_handlers_[word](line_stream);
+            } else if (word == "position") {
                 auto position_parameters = parse_position_line(line_stream);
                 if (position_parameters) {
                     position_handler_(*position_parameters);
@@ -435,7 +444,7 @@ class UCIService {
         std::cout << "\n";
         if (info_parameters.multipv()) {
             auto multipv = *info_parameters.multipv();
-            for (unsigned i = 0; i < multipv.size(); ++i) {
+            for (unsigned long i = 0; i < multipv.size(); ++i) {
                 if (multipv.empty()) {
                     continue;
                 }
@@ -444,7 +453,7 @@ class UCIService {
         }
         if (info_parameters.currline()) {
             auto currline = *info_parameters.currline();
-            for (unsigned i = 0; i < currline.size(); ++i) {
+            for (unsigned long i = 0; i < currline.size(); ++i) {
                 if (currline.empty()) {
                     continue;
                 }
@@ -483,7 +492,7 @@ class UCIService {
             moves.push_back(tmp);
         }
 
-        return UCIPositionParameters{fen, moves};
+        return UCIPositionParameters{fen, UCIMoveList{moves}};
     }
     static std::optional<UCIGoParameters> parse_go_line(std::stringstream& line_stream) noexcept {
         std::optional<std::uint64_t> nodes_opt;
@@ -569,6 +578,9 @@ class UCIService {
     std::function<void(UCIPositionParameters)> position_handler_;
     std::function<void(UCIGoParameters)> go_handler_;
     std::function<void(void)> stop_handler_;
+    std::unordered_map<std::string, std::function<void(std::stringstream&)>> command_handlers_;
+
+    std::atomic<bool> keep_running_{true};
 };
 
 } // namespace libchess
