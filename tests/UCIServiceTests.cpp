@@ -12,7 +12,7 @@ TEST_CASE("Position Line Test", "[UCIService]") {
     REQUIRE(position_params->fen() == "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1");
 
     REQUIRE(position_params->move_list());
-    const std::vector<std::string>& move_list = *position_params->move_list();
+    const UCIMoveList& move_list = *position_params->move_list();
     REQUIRE(move_list[0] == "e2e4");
     REQUIRE(move_list[1] == "c7c5");
     REQUIRE(move_list[2] == "g1f3");
@@ -56,7 +56,7 @@ TEST_CASE("Go Line Test SearchMoves", "[UCIService]") {
     REQUIRE_FALSE((go_params->wtime() || go_params->winc() || go_params->btime() ||
                    go_params->binc() || go_params->depth() || go_params->nodes() ||
                    go_params->infinite() || go_params->ponder() || go_params->movetime()));
-    const std::vector<std::string>& move_list = go_params->searchmoves().value();
+    const UCIMoveList& move_list = go_params->searchmoves().value();
     REQUIRE(move_list[0] == "e2e4");
     REQUIRE(move_list[1] == "d7d5");
 }

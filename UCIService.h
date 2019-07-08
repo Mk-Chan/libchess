@@ -1,29 +1,69 @@
 #ifndef LIBCHESS_UCISERVICE_H
 #define LIBCHESS_UCISERVICE_H
 
+#include "UCIOption.h"
+
+#include <any>
+#include <cassert>
 #include <iomanip>
 #include <iostream>
 #include <optional>
 #include <sstream>
 #include <string>
 #include <thread>
-
-#include "UCIOption.h"
+#include <unordered_map>
+#include <utility>
 
 namespace libchess {
 
+class UCIScore {
+  public:
+    enum class ScoreType { CENTIPAWNS, MATE };
+
+    UCIScore(int value, ScoreType score_type) noexcept : value_(value), score_type_(score_type) {}
+
+    [[nodiscard]] int value() const noexcept { return value_; }
+    [[nodiscard]] ScoreType score_type() const noexcept { return score_type_; }
+
+  private:
+    int value_;
+    ScoreType score_type_;
+};
+
+class UCIMoveList {
+  public:
+    UCIMoveList(std::vector<std::string> move_list) noexcept : move_list_(std::move(move_list)) {}
+
+    [[nodiscard]] const std::string& operator[](int i) const noexcept { return move_list_[i]; }
+
+    [[nodiscard]] const std::vector<std::string>& move_list() const { return move_list_; }
+    [[nodiscard]] bool empty() const { return move_list_.empty(); }
+
+    [[nodiscard]] std::string to_str() const noexcept {
+        std::string pv_line = move_list_[0];
+        for (auto move_iter = move_list_.begin() + 1; move_iter != move_list_.end(); ++move_iter) {
+            pv_line += " " + *move_iter;
+        }
+        return pv_line;
+    }
+
+  private:
+    std::vector<std::string> move_list_;
+};
+
 class UCIPositionParameters {
   public:
-    UCIPositionParameters(std::string fen,
-                          std::optional<std::vector<std::string>> move_list) noexcept
+    UCIPositionParameters(std::string fen, std::optional<UCIMoveList> move_list) noexcept
         : fen_(std::move(fen)), move_list_(std::move(move_list)) {}
 
-    const std::string& fen() const noexcept { return fen_; }
-    const std::optional<std::vector<std::string>>& move_list() const noexcept { return move_list_; }
+    [[nodiscard]] const std::string& fen() const noexcept { return fen_; }
+    [[nodiscard]] const std::optional<UCIMoveList>& move_list() const noexcept {
+        return move_list_;
+    }
 
   private:
     std::string fen_;
-    std::optional<std::vector<std::string>> move_list_;
+    std::optional<UCIMoveList> move_list_;
 };
 
 class UCIGoParameters {
@@ -37,16 +77,16 @@ class UCIGoParameters {
           btime_(btime), binc_(binc), infinite_(infinite), ponder_(ponder),
           searchmoves_(std::move(searchmoves)) {}
 
-    const std::optional<uint64_t>& nodes() const noexcept { return nodes_; }
-    const std::optional<int>& movetime() const noexcept { return movetime_; }
-    const std::optional<int>& depth() const noexcept { return depth_; }
-    const std::optional<int>& wtime() const noexcept { return wtime_; }
-    const std::optional<int>& winc() const noexcept { return winc_; }
-    const std::optional<int>& btime() const noexcept { return btime_; }
-    const std::optional<int>& binc() const noexcept { return binc_; }
-    bool infinite() const noexcept { return infinite_; }
-    bool ponder() const noexcept { return ponder_; }
-    const std::optional<std::vector<std::string>>& searchmoves() const noexcept {
+    [[nodiscard]] const std::optional<uint64_t>& nodes() const noexcept { return nodes_; }
+    [[nodiscard]] const std::optional<int>& movetime() const noexcept { return movetime_; }
+    [[nodiscard]] const std::optional<int>& depth() const noexcept { return depth_; }
+    [[nodiscard]] const std::optional<int>& wtime() const noexcept { return wtime_; }
+    [[nodiscard]] const std::optional<int>& winc() const noexcept { return winc_; }
+    [[nodiscard]] const std::optional<int>& btime() const noexcept { return btime_; }
+    [[nodiscard]] const std::optional<int>& binc() const noexcept { return binc_; }
+    [[nodiscard]] bool infinite() const noexcept { return infinite_; }
+    [[nodiscard]] bool ponder() const noexcept { return ponder_; }
+    [[nodiscard]] const std::optional<UCIMoveList>& searchmoves() const noexcept {
         return searchmoves_;
     }
 
@@ -60,7 +100,138 @@ class UCIGoParameters {
     std::optional<int> binc_;
     bool infinite_;
     bool ponder_;
-    std::optional<std::vector<std::string>> searchmoves_;
+    std::optional<UCIMoveList> searchmoves_;
+};
+
+class UCIInfoParameters {
+  public:
+    UCIInfoParameters() = default;
+    explicit UCIInfoParameters(const std::unordered_map<std::string, std::any>& values) noexcept {
+        auto key_present = [values](const std::string& key) {
+            return values.find(key) != values.end();
+        };
+        if (key_present("depth")) {
+            depth_ = std::any_cast<int>(values.at("depth"));
+        }
+        if (key_present("seldepth")) {
+            seldepth_ = std::any_cast<int>(values.at("seldepth"));
+        }
+        if (key_present("time")) {
+            time_ = std::any_cast<int>(values.at("time"));
+        }
+        if (key_present("nodes")) {
+            nodes_ = std::any_cast<std::uint64_t>(values.at("nodes"));
+        }
+        if (key_present("pv")) {
+            pv_ = std::any_cast<UCIMoveList>(values.at("pv"));
+        }
+        if (key_present("multipv")) {
+            multipv_ = std::any_cast<std::vector<UCIMoveList>>(values.at("multipv"));
+        }
+        if (key_present("score")) {
+            score_ = std::any_cast<UCIScore>(values.at("score"));
+        }
+        if (key_present("currmove")) {
+            currmove_ = std::any_cast<std::string>(values.at("currmove"));
+        }
+        if (key_present("currmovenumber")) {
+            currmovenumber_ = std::any_cast<int>(values.at("currmovenumber"));
+        }
+        if (key_present("hashfull")) {
+            hashfull_ = std::any_cast<int>(values.at("hashfull"));
+        }
+        if (key_present("nps")) {
+            nps_ = std::any_cast<int>(values.at("nps"));
+        }
+        if (key_present("tbhits")) {
+            tbhits_ = std::any_cast<int>(values.at("tbhits"));
+        }
+        if (key_present("cpuload")) {
+            cpuload_ = std::any_cast<int>(values.at("cpuload"));
+        }
+        if (key_present("string")) {
+            string_ = std::any_cast<std::string>(values.at("string"));
+        }
+        if (key_present("refutation")) {
+            refutation_ = std::any_cast<UCIMoveList>(values.at("refutation"));
+        }
+        if (key_present("currline")) {
+            currline_ = std::any_cast<std::vector<UCIMoveList>>(values.at("currline"));
+        }
+    }
+
+    [[nodiscard]] const std::optional<int>& depth() const noexcept { return depth_; }
+    [[nodiscard]] const std::optional<int>& seldepth() const noexcept { return seldepth_; }
+    [[nodiscard]] const std::optional<int>& time() const noexcept { return time_; }
+    [[nodiscard]] const std::optional<uint64_t>& nodes() const noexcept { return nodes_; }
+    [[nodiscard]] const std::optional<UCIMoveList>& pv() const noexcept { return pv_; }
+    [[nodiscard]] const std::optional<std::vector<UCIMoveList>>& multipv() const noexcept {
+        return multipv_;
+    }
+    [[nodiscard]] const std::optional<UCIScore>& score() const noexcept { return score_; }
+    [[nodiscard]] const std::optional<std::string>& currmove() const noexcept { return currmove_; }
+    [[nodiscard]] const std::optional<int>& currmovenumber() const noexcept {
+        return currmovenumber_;
+    }
+    [[nodiscard]] const std::optional<int>& hashfull() const noexcept { return hashfull_; }
+    [[nodiscard]] const std::optional<int>& nps() const noexcept { return nps_; }
+    [[nodiscard]] const std::optional<int>& tbhits() const noexcept { return tbhits_; }
+    [[nodiscard]] const std::optional<int>& cpuload() const noexcept { return cpuload_; }
+    [[nodiscard]] const std::optional<UCIMoveList>& refutation() const noexcept {
+        return refutation_;
+    }
+    [[nodiscard]] const std::optional<std::vector<UCIMoveList>>& currline() const noexcept {
+        return currline_;
+    }
+    [[nodiscard]] const std::optional<std::string>& string() const noexcept { return string_; }
+    [[nodiscard]] bool empty() const noexcept {
+        return !(depth_ || seldepth_ || time_ || nodes_ || pv_ || multipv_ || score_ || currmove_ ||
+                 currmovenumber_ || hashfull_ || nps_ || tbhits_ || cpuload_ || refutation_ ||
+                 currline_ || string_);
+    }
+
+    void set_depth(const std::optional<int> depth) noexcept { depth_ = depth; }
+    void set_seldepth(const std::optional<int> seldepth) noexcept { seldepth_ = seldepth; }
+    void set_time(const std::optional<int> time) noexcept { time_ = time; }
+    void set_nodes(const std::optional<uint64_t> nodes) noexcept { nodes_ = nodes; }
+    void set_pv(const std::optional<UCIMoveList> pv) noexcept { pv_ = pv; }
+    void set_multipv(const std::optional<std::vector<UCIMoveList>> multipv) noexcept {
+        multipv_ = multipv;
+    }
+    void set_score(const std::optional<UCIScore> score) noexcept { score_ = score; }
+    void set_currmove(const std::optional<std::string> currmove) noexcept { currmove_ = currmove; }
+    void set_currmovenumber(const std::optional<int> currmovenumber) noexcept {
+        currmovenumber_ = currmovenumber;
+    }
+    void set_hashfull(const std::optional<int> hashfull) noexcept { hashfull_ = hashfull; }
+    void set_nps(const std::optional<int> nps) noexcept { nps_ = nps; }
+    void set_tbhits(const std::optional<int> tbhits) noexcept { tbhits_ = tbhits; }
+    void set_cpuload(const std::optional<int> cpuload) noexcept { cpuload_ = cpuload; }
+    void set_refutation(const std::optional<UCIMoveList> refutation) noexcept {
+        refutation_ = refutation;
+    }
+    void set_currline(const std::optional<std::vector<UCIMoveList>> currline) noexcept {
+        currline_ = currline;
+    }
+    void set_string(const std::optional<std::string> string) noexcept { string_ = string; }
+
+  private:
+    std::optional<int> depth_;
+    std::optional<int> seldepth_;
+    std::optional<int> time_;
+    std::optional<std::uint64_t> nodes_;
+    std::optional<UCIMoveList> pv_;
+    std::optional<std::vector<UCIMoveList>> multipv_;
+    std::optional<UCIScore> score_;
+    std::optional<std::string> currmove_;
+    std::optional<int> currmovenumber_;
+    std::optional<int> hashfull_;
+    std::optional<int> nps_;
+    std::optional<int> tbhits_;
+    std::optional<int> cpuload_;
+    std::optional<UCIMoveList> refutation_;
+    std::optional<std::vector<UCIMoveList>> currline_;
+    std::optional<std::string> string_;
 };
 
 class UCIService {
@@ -118,6 +289,7 @@ class UCIService {
         for (auto& [name, option] : button_options_) {
             std::cout << "option name " << name << " type button\n";
         }
+        std::cout << "uciok\n";
 
         std::string word;
         std::string line;
@@ -189,6 +361,94 @@ class UCIService {
             bool value = false;
             if (line_stream >> value) {
                 check_options_[name].set_option(value);
+            }
+        }
+    }
+
+    static void bestmove(const std::string& move,
+                         const std::optional<std::string>& ponder_move = {}) noexcept {
+        std::cout << "bestmove " << move;
+        if (ponder_move) {
+            std::cout << " ponder " << *ponder_move;
+        }
+        std::cout << "\n";
+    }
+    static void info(const UCIInfoParameters& info_parameters) noexcept {
+        if (info_parameters.empty()) {
+            return;
+        }
+
+        std::cout << "info";
+        if (info_parameters.depth()) {
+            std::cout << " depth " << *info_parameters.depth();
+        }
+        if (info_parameters.seldepth()) {
+            std::cout << " seldepth " << *info_parameters.seldepth();
+        }
+        if (info_parameters.time()) {
+            std::cout << " time " << *info_parameters.time();
+        }
+        if (info_parameters.nodes()) {
+            std::cout << " nodes " << *info_parameters.nodes();
+        }
+        if (info_parameters.pv()) {
+            auto pv = *info_parameters.pv();
+            if (!pv.empty()) {
+                std::cout << " pv " << pv.to_str();
+            }
+        }
+        if (info_parameters.score()) {
+            auto score = *info_parameters.score();
+            if (score.score_type() == UCIScore::ScoreType::CENTIPAWNS) {
+                std::cout << " cp " << score.value();
+            } else if (score.score_type() == UCIScore::ScoreType::MATE) {
+                std::cout << " mate " << score.value();
+            }
+        }
+        if (info_parameters.currmove()) {
+            std::cout << " currmove " << *info_parameters.currmove();
+        }
+        if (info_parameters.currmovenumber()) {
+            std::cout << " currmovenumber " << *info_parameters.currmovenumber();
+        }
+        if (info_parameters.hashfull()) {
+            std::cout << " hashfull " << *info_parameters.hashfull();
+        }
+        if (info_parameters.nps()) {
+            std::cout << " nps " << *info_parameters.nps();
+        }
+        if (info_parameters.tbhits()) {
+            std::cout << " tbhits " << *info_parameters.tbhits();
+        }
+        if (info_parameters.cpuload()) {
+            std::cout << " cpuload " << *info_parameters.cpuload();
+        }
+        if (info_parameters.refutation()) {
+            auto refutation = *info_parameters.refutation();
+            if (!refutation.empty()) {
+                std::cout << " refutation " << refutation.to_str();
+            }
+        }
+        if (info_parameters.string()) {
+            std::cout << " string " << *info_parameters.string();
+        }
+        std::cout << "\n";
+        if (info_parameters.multipv()) {
+            auto multipv = *info_parameters.multipv();
+            for (unsigned i = 0; i < multipv.size(); ++i) {
+                if (multipv.empty()) {
+                    continue;
+                }
+                std::cout << "info multipv " << (i + 1) << " " << multipv[i].to_str() << "\n";
+            }
+        }
+        if (info_parameters.currline()) {
+            auto currline = *info_parameters.currline();
+            for (unsigned i = 0; i < currline.size(); ++i) {
+                if (currline.empty()) {
+                    continue;
+                }
+                std::cout << "info currline " << (i + 1) << " " << currline[i].to_str() << "\n";
             }
         }
     }
