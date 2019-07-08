@@ -301,6 +301,7 @@ class UCIService {
         std::string word;
         std::string line;
         std::optional<std::thread> go_thread;
+        keep_running_ = true;
         while (keep_running_) {
             std::getline(std::cin, line);
             std::stringstream line_stream{line};
