@@ -26,10 +26,13 @@ static Bitboard FILE_F_MASK{std::uint64_t(0x2020202020202020)};
 static Bitboard FILE_G_MASK{std::uint64_t(0x4040404040404040)};
 static Bitboard FILE_H_MASK{std::uint64_t(0x8080808080808080)};
 
-static Bitboard RANK_MASK[8] = {RANK_1_MASK, RANK_2_MASK, RANK_3_MASK, RANK_4_MASK,
-                                RANK_5_MASK, RANK_6_MASK, RANK_7_MASK, RANK_8_MASK};
+static std::array<Bitboard, 8> RANK_MASK = {RANK_1_MASK, RANK_2_MASK, RANK_3_MASK, RANK_4_MASK,
+                                            RANK_5_MASK, RANK_6_MASK, RANK_7_MASK, RANK_8_MASK};
+static std::array<Bitboard, 8> FILE_MASK = {FILE_A_MASK, FILE_B_MASK, FILE_C_MASK, FILE_D_MASK,
+                                            FILE_E_MASK, FILE_F_MASK, FILE_G_MASK, FILE_H_MASK};
 
 inline Bitboard rank_mask(Rank rank) { return RANK_MASK[rank.value()]; }
+inline Bitboard file_mask(File file) { return FILE_MASK[file.value()]; }
 
 namespace init {
 
