@@ -153,6 +153,7 @@ class Position {
 
         // Fullmoves
         fen_stream >> fen_part;
+        fen_part_cstr = fen_part.c_str();
         pos.fullmoves_ = std::strtol(fen_part_cstr, &end, 10);
 
         pos.state_mut_ref().hash_ = pos.calculate_hash();
