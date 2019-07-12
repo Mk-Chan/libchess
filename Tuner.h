@@ -12,8 +12,8 @@ class TunableParameter {
     TunableParameter(std::string name, int value) noexcept
         : name_(std::move(name)), value_(value) {}
 
-    [[nodiscard]] const std::string& name() const { return name_; }
-    [[nodiscard]] int value() const { return value_; }
+    [[nodiscard]] const std::string& name() const noexcept { return name_; }
+    [[nodiscard]] int value() const noexcept { return value_; }
 
     void set_value(int value) noexcept { value_ = value; }
 
@@ -30,8 +30,7 @@ enum class Result { BLACK_WIN, DRAW, WHITE_WIN };
 
 template <class Position> class NormalizedResult {
   public:
-    NormalizedResult(const Position& position, Result result) noexcept
-        : position_(std::move(position)) {
+    NormalizedResult(Position position, Result result) noexcept : position_(std::move(position)) {
         switch (result) {
         case Result::BLACK_WIN:
             value_ = 0.0;
@@ -45,7 +44,7 @@ template <class Position> class NormalizedResult {
         }
     }
 
-    [[nodiscard]] const Position& position() const noexcept { return position_; }
+    [[nodiscard]] Position& position() noexcept { return position_; }
     [[nodiscard]] float value() const noexcept { return value_; }
 
   private:
@@ -57,7 +56,7 @@ template <class Position> class Tuner {
   public:
     Tuner(std::vector<NormalizedResult<Position>> normalized_results,
           std::vector<TunableParameter> tunable_parameters,
-          std::function<int(const Position&, const std::vector<TunableParameter>&)> eval_function)
+          std::function<int(Position&, const std::vector<TunableParameter>&)> eval_function)
         : normalized_results_(std::move(normalized_results)),
           tunable_parameters_(std::move(tunable_parameters)),
           eval_function_(std::move(eval_function)) {}
@@ -66,20 +65,20 @@ template <class Position> class Tuner {
         return tunable_parameters_;
     }
 
-    [[nodiscard]] float error() const noexcept {
-        float sum =
-            std::accumulate(normalized_results_.cbegin(), normalized_results_.cend(), 0.0,
-                            [this](int, const NormalizedResult<Position>& normalized_result) {
-                                float normalized_eval = sigmoid(eval(normalized_result.position()));
-                                float err = normalized_result.value() - normalized_eval;
-                                return err * err;
-                            });
+    [[nodiscard]] float error() noexcept {
+        float sum = std::accumulate(
+            normalized_results_.begin(), normalized_results_.end(), 0.0,
+            [this](float accumulator, NormalizedResult<Position>& normalized_result) {
+                float normalized_eval = sigmoid(eval(normalized_result.position()));
+                float err = normalized_result.value() - normalized_eval;
+                return accumulator + (err * err);
+            });
         return sum / float(normalized_results_.size());
     }
 
     void step() noexcept {
         float least_error = error();
-        int increment = 1;
+        int increment = 10;
         for (TunableParameter& tunable_parameter : tunable_parameters_) {
             int start_value = tunable_parameter.value();
             tunable_parameter.set_value(start_value + increment);
@@ -120,14 +119,12 @@ template <class Position> class Tuner {
         return 1.0 / (1.0 + std::pow(10.0, -k * score / 400.0));
     }
 
-    int eval(const Position& position) const noexcept {
-        return eval_function_(position, tunable_parameters_);
-    }
+    int eval(Position& position) noexcept { return eval_function_(position, tunable_parameters_); }
 
   private:
     std::vector<NormalizedResult<Position>> normalized_results_{};
     std::vector<TunableParameter> tunable_parameters_{};
-    std::function<int(const Position&, const std::vector<TunableParameter>&)> eval_function_{};
+    std::function<int(Position&, const std::vector<TunableParameter>&)> eval_function_{};
 };
 
 } // namespace libchess
