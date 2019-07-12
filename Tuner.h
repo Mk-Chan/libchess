@@ -66,19 +66,20 @@ template <class Position> class Tuner {
     }
 
     [[nodiscard]] float error() noexcept {
-        float sum = std::accumulate(
-            normalized_results_.begin(), normalized_results_.end(), 0.0,
-            [this](float accumulator, NormalizedResult<Position>& normalized_result) {
-                float normalized_eval = sigmoid(eval(normalized_result.position()));
-                float err = normalized_result.value() - normalized_eval;
-                return accumulator + (err * err);
-            });
+        float sum = 0.0;
+#pragma omp parallel for reduction(+ : sum)
+        for (unsigned i = 0; i < normalized_results_.size(); ++i) {
+            auto& normalized_result = normalized_results_[i];
+            float normalized_eval = sigmoid(eval(normalized_result.position()));
+            float err = normalized_result.value() - normalized_eval;
+            sum += err * err;
+        }
         return sum / float(normalized_results_.size());
     }
 
     void step() noexcept {
         float least_error = error();
-        int increment = 10;
+        int increment = 1;
         for (TunableParameter& tunable_parameter : tunable_parameters_) {
             int start_value = tunable_parameter.value();
             tunable_parameter.set_value(start_value + increment);
