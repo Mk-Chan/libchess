@@ -7,8 +7,10 @@
 
 namespace libchess {
 
+/// Represents a file on the chess board (vertical/column).
 class File : public MetaValueType<int> {
   public:
+    /// Set of possible File values.
     class Value {
       public:
         enum FileValue : value_type {
@@ -22,11 +24,13 @@ class File : public MetaValueType<int> {
             FILE_H
         };
     };
-    constexpr explicit File(value_type value) : MetaValueType<value_type>(value) {}
+    constexpr explicit File(value_type value) noexcept : MetaValueType<value_type>(value) {}
 
-    constexpr char to_char() const { return 'a' + value(); }
+    /// The character representation of a File.
+    [[nodiscard]] constexpr char to_char() const noexcept { return 'a' + value(); }
 
-    constexpr static std::optional<File> from(char c) {
+    /// Parses File from a character.
+    [[nodiscard]] constexpr static std::optional<File> from(char c) noexcept {
         int offset = c >= 'a' ? (c - 'a') : (c - 'A');
         if (offset < 0 || offset > 7) {
             return {};
