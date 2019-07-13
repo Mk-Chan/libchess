@@ -11,8 +11,10 @@
 
 namespace libchess {
 
+/// Represents a square on the chess board which has a File and a Rank.
 class Square : public MetaValueType<int> {
   public:
+    /// Set of possible Square values.
     class Value {
       public:
         // clang-format off
@@ -26,36 +28,46 @@ class Square : public MetaValueType<int> {
             A7, B7, C7, D7, E7, F7, G7, H7,
             A8, B8, C8, D8, E8, F8, G8, H8,
         };
-        // clang-format off
+        // clang-format on
     };
-    constexpr explicit Square(value_type value) : MetaValueType<value_type>(value) {}
+    constexpr explicit Square(value_type value) noexcept : MetaValueType<value_type>(value) {}
 
-    constexpr Square operator+(value_type val) const {
+    [[nodiscard]] constexpr Square operator+(value_type val) const noexcept {
         return Square{value() + val};
     }
-    constexpr Square operator-(value_type val) const {
+    [[nodiscard]] constexpr Square operator-(value_type val) const noexcept {
         return Square{value() - val};
     }
-    constexpr Square& operator=(value_type val) {
+    [[nodiscard]] constexpr Square& operator=(value_type val) noexcept {
         set_value(val);
         return *this;
     }
 
-    constexpr File file() const { return File{value() & 7}; }
-    constexpr Rank rank() const { return Rank{value() >> 3}; }
-    constexpr Square flipped() const { return Square{value() ^ 56}; }
+    /// The File of the Square.
+    [[nodiscard]] constexpr File file() const noexcept { return File{value() & 7}; }
 
-    std::string to_str() const {
+    /// The Rank the Square.
+    [[nodiscard]] constexpr Rank rank() const noexcept { return Rank{value() >> 3}; }
+
+    /// The vertically mirror-flipped Square (A1 -> A8, E1 -> E8).
+    [[nodiscard]] constexpr Square flipped() const noexcept { return Square{value() ^ 56}; }
+
+    /// The string representation of the Square.
+    [[nodiscard]] std::string to_str() const noexcept {
         return std::string{file().to_char(), rank().to_char()};
     }
 
-    constexpr static std::optional<Square> from(std::optional<File> file, std::optional<Rank> rank) {
+    /// Parses a Square from a File and a Rank.
+    [[nodiscard]] constexpr static std::optional<Square> from(std::optional<File> file,
+                                                              std::optional<Rank> rank) noexcept {
         if (!(file && rank)) {
             return {};
         }
         return Square{*file | (*rank << 3)};
     }
-    static std::optional<Square> from(const std::string& square_str) {
+
+    /// Parses a Square from a string.
+    [[nodiscard]] static std::optional<Square> from(const std::string& square_str) noexcept {
         return Square::from(File::from(square_str[0]), Rank::from(square_str[1]));
     }
 };

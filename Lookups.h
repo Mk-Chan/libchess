@@ -7,6 +7,7 @@
 #include "Color.h"
 #include "PieceType.h"
 
+/// A collection of essential lookups.
 namespace libchess::lookups {
 
 static Bitboard RANK_1_MASK{std::uint64_t(0xff)};

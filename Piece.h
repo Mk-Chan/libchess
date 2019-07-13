@@ -1,29 +1,36 @@
 #ifndef LIBCHESS_PIECE_H
 #define LIBCHESS_PIECE_H
 
+#include <array>
+
 #include "Color.h"
 #include "PieceType.h"
 
 namespace libchess {
 
+/// Represents a chess piece which has PieceType and Color.
 class Piece {
   public:
     using value_type = int;
 
-    constexpr Piece(PieceType piece_type, Color piece_color)
+    constexpr Piece(PieceType piece_type, Color piece_color) noexcept
         : value_(piece_type.value() | (piece_color.value() << 3)) {}
 
-    constexpr PieceType type() const { return PieceType{value_ & 7}; }
-    constexpr Color color() const { return Color{value_ >> 3}; }
+    /// The PieceType of the Piece.
+    [[nodiscard]] constexpr PieceType type() const noexcept { return PieceType{value_ & 7}; }
 
-    constexpr bool operator==(const Piece rhs) const {
+    // The Color of the Piece.
+    [[nodiscard]] constexpr Color color() const noexcept { return Color{value_ >> 3}; }
+
+    [[nodiscard]] constexpr bool operator==(const Piece rhs) const noexcept {
         return type() == rhs.type() && color() == rhs.color();
     }
-    constexpr bool operator!=(const Piece rhs) const {
+    [[nodiscard]] constexpr bool operator!=(const Piece rhs) const noexcept {
         return type() != rhs.type() || color() != rhs.color();
     }
 
-    constexpr char to_char() const {
+    /// The character representation of the Piece.
+    [[nodiscard]] constexpr char to_char() const noexcept {
         char piece_type_char = type().to_char();
         if (color() == constants::WHITE) {
             piece_type_char = std::toupper(piece_type_char);
@@ -33,14 +40,17 @@ class Piece {
         return piece_type_char;
     }
 
-    constexpr static std::optional<Piece> from(std::optional<PieceType> piece_type,
-                                               std::optional<Color> piece_color) {
+    /// Parses a Piece from PieceType and Color.
+    [[nodiscard]] constexpr static std::optional<Piece>
+    from(std::optional<PieceType> piece_type, std::optional<Color> piece_color) noexcept {
         if (!(piece_type && piece_color)) {
             return {};
         }
         return Piece{*piece_type, *piece_color};
     }
-    constexpr static std::optional<Piece> from(char c) {
+
+    /// Parses a Piece from a character.
+    [[nodiscard]] constexpr static std::optional<Piece> from(char c) noexcept {
         auto piece_type = PieceType::from(c);
         if (!piece_type) {
             return {};
@@ -77,9 +87,9 @@ constexpr static Piece BLACK_BISHOP = *Piece::from(BISHOP, BLACK);
 constexpr static Piece BLACK_ROOK = *Piece::from(ROOK, BLACK);
 constexpr static Piece BLACK_QUEEN = *Piece::from(QUEEN, BLACK);
 constexpr static Piece BLACK_KING = *Piece::from(KING, BLACK);
-constexpr static Piece PIECES[]{BLACK_PAWN,   WHITE_PAWN,   BLACK_KNIGHT, WHITE_KNIGHT,
-                                BLACK_BISHOP, WHITE_BISHOP, BLACK_ROOK,   WHITE_ROOK,
-                                BLACK_QUEEN,  WHITE_QUEEN,  BLACK_KING,   WHITE_KING};
+constexpr static std::array<Piece, 12> PIECES{
+    BLACK_PAWN, WHITE_PAWN, BLACK_KNIGHT, WHITE_KNIGHT, BLACK_BISHOP, WHITE_BISHOP,
+    BLACK_ROOK, WHITE_ROOK, BLACK_QUEEN,  WHITE_QUEEN,  BLACK_KING,   WHITE_KING};
 
 } // namespace constants
 

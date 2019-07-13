@@ -8,8 +8,10 @@
 
 namespace libchess {
 
+/// Represents a single castling right {White Kingside, Black Queenside, ...}.
 class CastlingRight : public MetaValueType<int> {
   public:
+    /// Set of possible CastlingRight values.
     class Value {
       public:
         enum CastlingRightValue : value_type {
@@ -22,6 +24,7 @@ class CastlingRight : public MetaValueType<int> {
     };
     constexpr explicit CastlingRight(value_type value) : MetaValueType<value_type>(value) {}
 
+    /// Parses CastlingRight from a character {'K', 'Q', 'k', 'q'}.
     constexpr static CastlingRight from(char c) {
         switch (c) {
         case 'K':
@@ -57,41 +60,53 @@ inline std::ostream& operator<<(std::ostream& ostream, CastlingRight castling_ri
     return ostream << c;
 }
 
+/// Represents a complete set of `CastlingRight`s allowed to a position.
 class CastlingRights {
   public:
     using value_type = int;
 
-    constexpr CastlingRights() : CastlingRights(CastlingRight::Value::CASTLING_RIGHT_NONE) {}
-    constexpr explicit CastlingRights(value_type value) : value_(value) {}
-    constexpr explicit CastlingRights(CastlingRight castling_right)
+    constexpr CastlingRights() noexcept
+        : CastlingRights(CastlingRight::Value::CASTLING_RIGHT_NONE) {}
+    constexpr explicit CastlingRights(value_type value) noexcept : value_(value) {}
+    constexpr explicit CastlingRights(CastlingRight castling_right) noexcept
         : value_(castling_right.value()) {}
-    constexpr CastlingRights(std::initializer_list<CastlingRight> castling_right_list) : value_(0) {
+    constexpr CastlingRights(std::initializer_list<CastlingRight> castling_right_list) noexcept
+        : value_(0) {
         for (auto castling_right : castling_right_list) {
             allow(castling_right);
         }
     }
 
-    constexpr bool operator==(CastlingRights rhs) const { return value() == rhs.value(); }
+    [[nodiscard]] constexpr bool operator==(CastlingRights rhs) const noexcept {
+        return value() == rhs.value();
+    }
 
+    /// Adds `castling_right` to the set of allowed `CastlingRight`s.
     constexpr void allow(CastlingRight castling_right) {
         value_ |= value_type(castling_right.value());
     }
+
+    /// Removes `castling_right` from the set of allowed `CastlingRight`s.
     constexpr void disallow(CastlingRight castling_right) {
         value_ &= ~value_type(castling_right.value());
     }
 
-    constexpr bool is_allowed(CastlingRight castling_right) const {
+    /// Checks if `castling_right` is in the set of allowed `CastlingRight`s.
+    [[nodiscard]] constexpr bool is_allowed(CastlingRight castling_right) const noexcept {
         return value_ & value_type(castling_right.value());
     }
 
-    static CastlingRights from(const std::string& str) {
+    /// Parses CastlingRights from a string.
+    [[nodiscard]] static CastlingRights from(const std::string& str) noexcept {
         CastlingRights castling_rights;
         for (char c : str) {
             castling_rights.allow(CastlingRight::from(c));
         }
         return castling_rights;
     }
-    std::string to_str() const {
+
+    /// The string representation of CastlingRights.
+    [[nodiscard]] std::string to_str() const noexcept {
         std::string cr_str;
         bool any = false;
         if (is_allowed(CastlingRight{CastlingRight::Value::WHITE_KINGSIDE})) {
@@ -116,7 +131,7 @@ class CastlingRights {
         return cr_str;
     }
 
-    constexpr value_type value() const { return value_; }
+    [[nodiscard]] constexpr value_type value() const noexcept { return value_; }
 
   private:
     value_type value_;

@@ -7,8 +7,10 @@
 
 namespace libchess {
 
+/// Represents a rank on the chess board (horizontal/row).
 class Rank : public MetaValueType<int> {
   public:
+    /// Set of possible Rank values.
     class Value {
       public:
         enum RankValue : value_type {
@@ -22,11 +24,13 @@ class Rank : public MetaValueType<int> {
             RANK_8
         };
     };
-    constexpr explicit Rank(value_type value) : MetaValueType<value_type>(value) {}
+    constexpr explicit Rank(value_type value) noexcept : MetaValueType<value_type>(value) {}
 
-    constexpr char to_char() const { return '1' + value(); }
+    /// The character representation of a Rank.
+    [[nodiscard]] constexpr char to_char() const noexcept { return '1' + value(); }
 
-    constexpr static std::optional<Rank> from(char c) {
+    /// Parses a Rank from a character.
+    [[nodiscard]] constexpr static std::optional<Rank> from(char c) noexcept {
         int offset = c - '1';
         if (offset < 0 || offset > 7) {
             return std::nullopt;
