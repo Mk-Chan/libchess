@@ -307,6 +307,15 @@ class UCIService {
         std::string word;
         std::string line;
         std::optional<std::thread> go_thread;
+
+        auto stop_search = [this, &go_thread]() {
+            if (go_thread) {
+                stop_handler_();
+                go_thread->join();
+                go_thread = {};
+            }
+        };
+
         keep_running_ = true;
         while (keep_running_) {
             std::getline(std::cin, line);
@@ -315,31 +324,25 @@ class UCIService {
             if (command_handlers_.find(word) != command_handlers_.end()) {
                 command_handlers_[word](line_stream);
             } else if (word == "position") {
+                stop_search();
                 auto position_parameters = parse_position_line(line_stream);
                 if (position_parameters) {
                     position_handler_(*position_parameters);
                 }
             } else if (word == "go") {
+                stop_search();
                 auto go_parameters = parse_go_line(line_stream);
                 if (go_parameters) {
                     go_thread = std::thread{go_handler_, *go_parameters};
                 }
             } else if (word == "stop") {
-                if (go_thread) {
-                    stop_handler_();
-                    go_thread->join();
-                    go_thread = {};
-                }
+                stop_search();
             } else if (word == "setoption") {
                 parse_and_run_setoption_line(line_stream);
             } else if (word == "isready") {
                 std::cout << "readyok\n";
             } else if (word == "quit" || word == "exit") {
-                if (go_thread) {
-                    stop_handler_();
-                    go_thread->join();
-                    go_thread = {};
-                }
+                stop_search();
                 break;
             }
         }
