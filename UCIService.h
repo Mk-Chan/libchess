@@ -238,6 +238,9 @@ class UCIInfoParameters {
 
 class UCIService {
   public:
+    UCIService(std::string name, std::string author) noexcept
+        : name_(std::move(name)), author_(std::move(author)) {}
+
     void register_option(const UCISpinOption& uci_option) noexcept {
         spin_options_[uci_option.name()] = uci_option;
     }
@@ -274,6 +277,9 @@ class UCIService {
         if (!(position_handler_ && go_handler_ && stop_handler_)) {
             throw std::invalid_argument{"Must register a position, go and stop handler!"};
         }
+
+        std::cout << "id name " << name_ << "\n";
+        std::cout << "id author " << author_ << "\n";
 
         for (auto& [name, option] : spin_options_) {
             std::cout << "option name " << name << " type spin default " << option.value()
@@ -580,6 +586,9 @@ class UCIService {
     std::function<void(UCIGoParameters)> go_handler_;
     std::function<void(void)> stop_handler_;
     std::unordered_map<std::string, std::function<void(std::istringstream&)>> command_handlers_;
+
+    std::string name_;
+    std::string author_;
 
     std::atomic<bool> keep_running_{true};
 };
