@@ -335,6 +335,11 @@ class UCIService {
             } else if (word == "isready") {
                 std::cout << "readyok\n";
             } else if (word == "quit" || word == "exit") {
+                if (go_thread) {
+                    stop_handler_();
+                    go_thread->join();
+                    go_thread = {};
+                }
                 break;
             }
         }
