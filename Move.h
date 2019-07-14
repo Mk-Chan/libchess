@@ -142,12 +142,17 @@ class MoveList {
             moves[j] = moving_move;
         }
     }
+    void append(const MoveList& move_list) noexcept {
+        values_.reserve(size() + move_list.size());
+        for (auto iter = move_list.cbegin(); iter != move_list.cend(); ++iter) {
+            add(*iter);
+        }
+    }
     int size() const { return values_.size(); }
     const value_type& values() const { return values_; }
+    void clear() noexcept { values_.clear(); }
 
-    bool contains(Move move) const {
-        return std::find(cbegin(), cend(), move) != cend();
-    }
+    bool contains(Move move) const { return std::find(cbegin(), cend(), move) != cend(); }
 
   protected:
     value_type& values_mut_ref() { return values_; }
