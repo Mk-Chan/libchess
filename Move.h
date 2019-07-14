@@ -119,6 +119,12 @@ class MoveList {
 
     void pop_back() { values_.pop_back(); }
     void add(Move move) { values_.push_back(move); }
+    void add(const MoveList& move_list) noexcept {
+        values_.reserve(size() + move_list.size());
+        for (auto iter = move_list.cbegin(); iter != move_list.cend(); ++iter) {
+            add(*iter);
+        }
+    }
     template <class F> void sort(F move_evaluator) {
         auto& moves = values_mut_ref();
         std::vector<int> scores;
@@ -142,16 +148,10 @@ class MoveList {
             moves[j] = moving_move;
         }
     }
-    void append(const MoveList& move_list) noexcept {
-        values_.reserve(size() + move_list.size());
-        for (auto iter = move_list.cbegin(); iter != move_list.cend(); ++iter) {
-            add(*iter);
-        }
-    }
+    void clear() noexcept { values_.clear(); }
+    bool empty() const noexcept { return values_.empty(); }
     int size() const { return values_.size(); }
     const value_type& values() const { return values_; }
-    void clear() noexcept { values_.clear(); }
-
     bool contains(Move move) const { return std::find(cbegin(), cend(), move) != cend(); }
 
   protected:
