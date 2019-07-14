@@ -403,9 +403,9 @@ class UCIService {
         if (info_parameters.score()) {
             auto score = *info_parameters.score();
             if (score.score_type() == UCIScore::ScoreType::CENTIPAWNS) {
-                std::cout << " cp " << score.value();
+                std::cout << " score cp " << score.value();
             } else if (score.score_type() == UCIScore::ScoreType::MATE) {
-                std::cout << " mate " << score.value();
+                std::cout << " score mate " << score.value();
             }
         }
         if (info_parameters.depth()) {
