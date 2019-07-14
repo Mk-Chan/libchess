@@ -143,7 +143,7 @@ class UCIInfoParameters {
             hashfull_ = std::any_cast<int>(values.at("hashfull"));
         }
         if (key_present("nps")) {
-            nps_ = std::any_cast<int>(values.at("nps"));
+            nps_ = std::any_cast<std::uint64_t>(values.at("nps"));
         }
         if (key_present("tbhits")) {
             tbhits_ = std::any_cast<int>(values.at("tbhits"));
@@ -176,7 +176,7 @@ class UCIInfoParameters {
         return currmovenumber_;
     }
     [[nodiscard]] const std::optional<int>& hashfull() const noexcept { return hashfull_; }
-    [[nodiscard]] const std::optional<int>& nps() const noexcept { return nps_; }
+    [[nodiscard]] const std::optional<std::uint64_t>& nps() const noexcept { return nps_; }
     [[nodiscard]] const std::optional<int>& tbhits() const noexcept { return tbhits_; }
     [[nodiscard]] const std::optional<int>& cpuload() const noexcept { return cpuload_; }
     [[nodiscard]] const std::optional<UCIMoveList>& refutation() const noexcept {
@@ -206,7 +206,7 @@ class UCIInfoParameters {
         currmovenumber_ = currmovenumber;
     }
     void set_hashfull(const std::optional<int> hashfull) noexcept { hashfull_ = hashfull; }
-    void set_nps(const std::optional<int> nps) noexcept { nps_ = nps; }
+    void set_nps(const std::optional<std::uint64_t> nps) noexcept { nps_ = nps; }
     void set_tbhits(const std::optional<int> tbhits) noexcept { tbhits_ = tbhits; }
     void set_cpuload(const std::optional<int> cpuload) noexcept { cpuload_ = cpuload; }
     void set_refutation(const std::optional<UCIMoveList>& refutation) noexcept {
@@ -228,7 +228,7 @@ class UCIInfoParameters {
     std::optional<std::string> currmove_;
     std::optional<int> currmovenumber_;
     std::optional<int> hashfull_;
-    std::optional<int> nps_;
+    std::optional<std::uint64_t> nps_;
     std::optional<int> tbhits_;
     std::optional<int> cpuload_;
     std::optional<UCIMoveList> refutation_;
