@@ -73,10 +73,10 @@ class UCIGoParameters {
     UCIGoParameters(const std::optional<uint64_t>& nodes, const std::optional<int>& movetime,
                     const std::optional<int>& depth, const std::optional<int>& wtime,
                     const std::optional<int>& winc, const std::optional<int>& btime,
-                    const std::optional<int>& binc, bool infinite, bool ponder,
-                    std::optional<std::vector<std::string>> searchmoves)
+                    const std::optional<int>& binc, const std::optional<int>& movestogo,
+                    bool infinite, bool ponder, std::optional<std::vector<std::string>> searchmoves)
         : nodes_(nodes), movetime_(movetime), depth_(depth), wtime_(wtime), winc_(winc),
-          btime_(btime), binc_(binc), infinite_(infinite), ponder_(ponder),
+          btime_(btime), binc_(binc), movestogo_(movestogo), infinite_(infinite), ponder_(ponder),
           searchmoves_(std::move(searchmoves)) {}
 
     [[nodiscard]] const std::optional<uint64_t>& nodes() const noexcept { return nodes_; }
@@ -86,6 +86,7 @@ class UCIGoParameters {
     [[nodiscard]] const std::optional<int>& winc() const noexcept { return winc_; }
     [[nodiscard]] const std::optional<int>& btime() const noexcept { return btime_; }
     [[nodiscard]] const std::optional<int>& binc() const noexcept { return binc_; }
+    [[nodiscard]] const std::optional<int>& movestogo() const noexcept { return movestogo_; }
     [[nodiscard]] bool infinite() const noexcept { return infinite_; }
     [[nodiscard]] bool ponder() const noexcept { return ponder_; }
     [[nodiscard]] const std::optional<UCIMoveList>& searchmoves() const noexcept {
@@ -100,6 +101,7 @@ class UCIGoParameters {
     std::optional<int> winc_;
     std::optional<int> btime_;
     std::optional<int> binc_;
+    std::optional<int> movestogo_;
     bool infinite_;
     bool ponder_;
     std::optional<UCIMoveList> searchmoves_;
@@ -517,6 +519,7 @@ class UCIService {
         std::optional<int> winc_opt;
         std::optional<int> btime_opt;
         std::optional<int> binc_opt;
+        std::optional<int> movestogo_opt;
         bool infinite = false;
         bool ponder = false;
         std::optional<std::vector<std::string>> searchmoves_opt;
@@ -560,6 +563,11 @@ class UCIService {
                 if (line_stream >> binc) {
                     binc_opt = binc;
                 }
+            } else if (tmp == "movestogo") {
+                int movestogo = 0;
+                if (line_stream >> movestogo) {
+                    movestogo_opt = movestogo;
+                }
             } else if (tmp == "infinite") {
                 infinite = true;
             } else if (tmp == "ponder") {
@@ -579,8 +587,9 @@ class UCIService {
             searchmoves_opt = searchmoves;
         }
 
-        return UCIGoParameters{nodes_opt, movetime_opt, depth_opt, wtime_opt, winc_opt,
-                               btime_opt, binc_opt,     infinite,  ponder,    searchmoves_opt};
+        return UCIGoParameters{nodes_opt, movetime_opt, depth_opt,      wtime_opt,
+                               winc_opt,  btime_opt,    binc_opt,       movestogo_opt,
+                               infinite,  ponder,       searchmoves_opt};
     }
 
   private:
