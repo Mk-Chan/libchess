@@ -389,6 +389,14 @@ class UCIService {
         }
 
         std::cout << "info";
+        if (info_parameters.score()) {
+            auto score = *info_parameters.score();
+            if (score.score_type() == UCIScore::ScoreType::CENTIPAWNS) {
+                std::cout << " cp " << score.value();
+            } else if (score.score_type() == UCIScore::ScoreType::MATE) {
+                std::cout << " mate " << score.value();
+            }
+        }
         if (info_parameters.depth()) {
             std::cout << " depth " << *info_parameters.depth();
         }
@@ -400,20 +408,6 @@ class UCIService {
         }
         if (info_parameters.nodes()) {
             std::cout << " nodes " << *info_parameters.nodes();
-        }
-        if (info_parameters.pv()) {
-            auto pv = *info_parameters.pv();
-            if (!pv.empty()) {
-                std::cout << " pv " << pv.to_str();
-            }
-        }
-        if (info_parameters.score()) {
-            auto score = *info_parameters.score();
-            if (score.score_type() == UCIScore::ScoreType::CENTIPAWNS) {
-                std::cout << " cp " << score.value();
-            } else if (score.score_type() == UCIScore::ScoreType::MATE) {
-                std::cout << " mate " << score.value();
-            }
         }
         if (info_parameters.currmove()) {
             std::cout << " currmove " << *info_parameters.currmove();
@@ -432,6 +426,12 @@ class UCIService {
         }
         if (info_parameters.cpuload()) {
             std::cout << " cpuload " << *info_parameters.cpuload();
+        }
+        if (info_parameters.pv()) {
+            auto pv = *info_parameters.pv();
+            if (!pv.empty()) {
+                std::cout << " pv " << pv.to_str();
+            }
         }
         if (info_parameters.refutation()) {
             auto refutation = *info_parameters.refutation();
