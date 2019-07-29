@@ -12,6 +12,15 @@ class TunableParameter {
     TunableParameter(std::string name, int value) noexcept
         : name_(std::move(name)), value_(value) {}
 
+    TunableParameter operator+(int rhs) const noexcept {
+        return TunableParameter{name(), value() + rhs};
+    }
+    TunableParameter operator-(int rhs) const noexcept {
+        return TunableParameter{name(), value_ - rhs};
+    }
+    void operator+=(int rhs) noexcept { value_ += rhs; }
+    void operator-=(int rhs) noexcept { value_ -= rhs; }
+
     [[nodiscard]] const std::string& name() const noexcept { return name_; }
     [[nodiscard]] int value() const noexcept { return value_; }
 
@@ -45,11 +54,11 @@ template <class Position> class NormalizedResult {
     }
 
     [[nodiscard]] Position& position() noexcept { return position_; }
-    [[nodiscard]] float value() const noexcept { return value_; }
+    [[nodiscard]] double value() const noexcept { return value_; }
 
   private:
     Position position_;
-    float value_;
+    double value_;
 };
 
 template <class Position> class Tuner {
@@ -65,49 +74,75 @@ template <class Position> class Tuner {
         return tunable_parameters_;
     }
 
-    [[nodiscard]] float error() noexcept {
-        float sum = 0.0;
+    [[nodiscard]] double error() noexcept {
+        double sum = 0.0;
 #pragma omp parallel for reduction(+ : sum)
         for (unsigned i = 0; i < normalized_results_.size(); ++i) {
-            auto& normalized_result = normalized_results_[i];
-            float normalized_eval = sigmoid(eval(normalized_result.position()));
-            float err = normalized_result.value() - normalized_eval;
+            auto& normalized_result = normalized_results_.at(i);
+            double normalized_eval = sigmoid(eval(normalized_result.position()));
+            double err = normalized_result.value() - normalized_eval;
             sum += err * err;
         }
-        return sum / float(normalized_results_.size());
+        return sum / double(normalized_results_.size());
     }
 
-    void step() noexcept {
-        float least_error = error();
-        int increment = 1;
-        for (TunableParameter& tunable_parameter : tunable_parameters_) {
-            int start_value = tunable_parameter.value();
-            tunable_parameter.set_value(start_value + increment);
-            float new_error = error();
-            if (new_error < least_error) {
-                least_error = new_error;
-            } else {
-                tunable_parameter.set_value(start_value - increment);
-                new_error = error();
+    void local_tune() noexcept {
+        double least_error = error();
+        std::vector<LocalParameterTuningData> parameter_tuning_data;
+        parameter_tuning_data.reserve(tunable_parameters_.size());
+        for (int i = 0; i < tunable_parameters_.size(); ++i) {
+            parameter_tuning_data.push_back(LocalParameterTuningData{});
+        }
+
+        while (!all_done(parameter_tuning_data)) {
+            auto param_iter = tunable_parameters_.begin();
+            auto tune_data_iter = parameter_tuning_data.begin();
+            for (; param_iter != tunable_parameters_.end() &&
+                   tune_data_iter != parameter_tuning_data.end();
+                 ++param_iter, ++tune_data_iter) {
+                if (tune_data_iter->done()) {
+                    continue;
+                }
+
+                *param_iter += tune_data_iter->increment();
+                double new_error = error();
                 if (new_error < least_error) {
                     least_error = new_error;
                 } else {
-                    tunable_parameter.set_value(start_value);
+                    tune_data_iter->reverse_direction();
+                    *param_iter += 2 * tune_data_iter->increment();
+                    new_error = error();
+                    if (new_error < least_error) {
+                        least_error = new_error;
+                    } else {
+                        *param_iter -= tune_data_iter->increment();
+                        tune_data_iter->set_direction(0);
+                    }
+                }
+            }
+
+            for (int i = 0; i < tunable_parameters_.size(); ++i) {
+                TunableParameter& parameter = tunable_parameters_[i];
+                LocalParameterTuningData& tuning_data = parameter_tuning_data[i];
+                std::cout << parameter.name() << ": " << parameter.value() << " improving "
+                          << tuning_data.improving() << "\n";
+            }
+            std::cout << "--\n";
+
+            for (LocalParameterTuningData& tune_data : parameter_tuning_data) {
+                if (!tune_data.improving()) {
+                    if (tune_data.can_reduce_increment()) {
+                        tune_data.reduce_increment();
+                        tune_data.set_direction(1);
+                    } else {
+                        tune_data.set_done(true);
+                    }
                 }
             }
         }
     }
 
-    void tune() noexcept {
-        while (true) {
-            float start_error = error();
-            step();
-            float end_error = error();
-            if (end_error >= start_error) {
-                break;
-            }
-        }
-    }
+    void tune() noexcept { local_tune(); }
 
     void display() const noexcept {
         for (auto& param : tunable_parameters_) {
@@ -116,13 +151,53 @@ template <class Position> class Tuner {
     }
 
   protected:
-    static float sigmoid(int score, float k = 1.13) noexcept {
+    [[nodiscard]] static double sigmoid(int score, double k = 1.13) noexcept {
         return 1.0 / (1.0 + std::pow(10.0, -k * score / 400.0));
     }
 
-    int eval(Position& position) noexcept { return eval_function_(position, tunable_parameters_); }
+    [[nodiscard]] int eval(Position& position) noexcept {
+        return eval_function_(position, tunable_parameters_);
+    }
 
   private:
+    struct LocalParameterTuningData {
+      public:
+        [[nodiscard]] bool improving() const noexcept { return direction_ != 0; }
+        [[nodiscard]] bool done() const noexcept { return done_; }
+        [[nodiscard]] int direction() const noexcept { return direction_; }
+        [[nodiscard]] int increment() const noexcept {
+            return direction_ * increment_values[increment_offset_];
+        }
+        [[nodiscard]] bool can_reduce_increment() const noexcept {
+            return increment_offset_ < increment_values.size() - 1;
+        }
+
+        void reduce_increment() noexcept {
+            if (can_reduce_increment()) {
+                ++increment_offset_;
+            }
+        }
+        void reverse_direction() noexcept { direction_ = -direction_; }
+        void set_done(bool value) noexcept { done_ = value; }
+        void set_direction(int value) noexcept { direction_ = value; }
+
+      private:
+        constexpr static std::array<int, 7> increment_values{100, 50, 25, 12, 6, 3, 1};
+
+        bool done_ = false;
+        int increment_offset_ = 0;
+        int direction_ = 1;
+    };
+    [[nodiscard]] static bool
+    all_done(const std::vector<LocalParameterTuningData>& tuning_data_list) noexcept {
+        for (auto& tuning_data : tuning_data_list) {
+            if (!tuning_data.done()) {
+                return false;
+            }
+        }
+        return true;
+    }
+
     std::vector<NormalizedResult<Position>> normalized_results_{};
     std::vector<TunableParameter> tunable_parameters_{};
     std::function<int(Position&, const std::vector<TunableParameter>&)> eval_function_{};
