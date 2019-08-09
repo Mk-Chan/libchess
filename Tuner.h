@@ -1,7 +1,11 @@
 #ifndef LIBCHESS_TUNER_H
 #define LIBCHESS_TUNER_H
 
+#include <fstream>
+#include <functional>
+#include <iomanip>
 #include <iostream>
+#include <sstream>
 #include <string>
 #include <vector>
 
@@ -55,6 +59,52 @@ template <class Position> class NormalizedResult {
 
     [[nodiscard]] Position& position() noexcept { return position_; }
     [[nodiscard]] double value() const noexcept { return value_; }
+
+    static std::vector<NormalizedResult<Position>>
+    parse_epd(const std::string& path, std::function<Position(const std::string&)> fen_parser,
+              const std::string& result_opcode = "c9") noexcept {
+        std::string line;
+        std::ifstream file_stream{path};
+        std::vector<NormalizedResult<Position>> normalized_results;
+        while (true) {
+            std::getline(file_stream, line);
+            if (line.empty()) {
+                break;
+            }
+            std::string_view line_view{line};
+            auto curr_pos = line_view.begin();
+            for (int i = 0; i < 4; ++i) {
+                curr_pos = std::find(curr_pos + 1, line_view.end(), ' ');
+            }
+            std::string fen{line_view.begin(), curr_pos};
+            std::string post_fen{curr_pos + 1, line_view.end()};
+            Result result = [&result_opcode, &post_fen] {
+                std::istringstream post_fen_stream{post_fen};
+                std::string opcode;
+                while (post_fen_stream >> opcode) {
+                    if (opcode == ";") {
+                        break;
+                    }
+                    std::string value;
+                    post_fen_stream >> std::quoted(value);
+                    if (opcode != result_opcode) {
+                        continue;
+                    }
+                    if (value == "1-0") {
+                        return Result::WHITE_WIN;
+                    } else if (value == "0-1") {
+                        return Result::BLACK_WIN;
+                    } else {
+                        return Result::DRAW;
+                    }
+                }
+                return Result::DRAW;
+            }();
+
+            normalized_results.push_back(NormalizedResult{fen_parser(fen), result});
+        }
+        return normalized_results;
+    }
 
   private:
     Position position_;
