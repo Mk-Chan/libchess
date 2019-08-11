@@ -6,6 +6,7 @@
 #include <functional>
 #include <iomanip>
 #include <iostream>
+#include <random>
 #include <sstream>
 #include <string>
 #include <vector>
@@ -74,7 +75,7 @@ template <class Position> class NormalizedResult {
             }
             std::string_view line_view{line};
             auto curr_pos = line_view.begin();
-            for (int i = 0; i < 4; ++i) {
+            for (unsigned i = 0; i < 4; ++i) {
                 curr_pos = std::find(curr_pos + 1, line_view.end(), ' ');
             }
             std::string fen{line_view.begin(), curr_pos};
@@ -141,7 +142,7 @@ template <class Position> class Tuner {
         double least_error = error();
         std::vector<LocalParameterTuningData> parameter_tuning_data;
         parameter_tuning_data.reserve(tunable_parameters_.size());
-        for (int i = 0; i < tunable_parameters_.size(); ++i) {
+        for (unsigned i = 0; i < tunable_parameters_.size(); ++i) {
             parameter_tuning_data.push_back(LocalParameterTuningData{});
         }
 
@@ -172,13 +173,13 @@ template <class Position> class Tuner {
                 }
             }
 
-            for (int i = 0; i < tunable_parameters_.size(); ++i) {
+            for (unsigned i = 0; i < tunable_parameters_.size(); ++i) {
                 TunableParameter& parameter = tunable_parameters_[i];
                 LocalParameterTuningData& tuning_data = parameter_tuning_data[i];
                 std::cout << parameter.name() << ": " << parameter.value() << " improving "
                           << tuning_data.improving() << "\n";
             }
-            std::cout << "--\n";
+            std::cout << "Least error: " << least_error << "\n";
 
             for (LocalParameterTuningData& tune_data : parameter_tuning_data) {
                 if (!tune_data.improving()) {
@@ -193,7 +194,50 @@ template <class Position> class Tuner {
         }
     }
 
-    void tune() noexcept { local_tune(); }
+    void simulated_annealing(int max_steps) noexcept {
+        std::random_device random_device;
+        std::mt19937 rng{random_device()};
+        std::uniform_int_distribution<> increment_distribution{0, increment_values.size() - 1};
+        std::uniform_int_distribution<> parameter_distribution{0, tunable_parameters_.size() - 1};
+
+        auto random_bool = [&](double probability) {
+            std::bernoulli_distribution bool_distribution{probability};
+            return bool_distribution(rng);
+        };
+        auto random_increment = [&]() {
+            return (random_bool(0.5) ? 1 : -1) * increment_values[increment_distribution(rng)];
+        };
+
+        double current_error = error();
+        for (int step = 0; step < max_steps; ++step) {
+            double temperature = 1.0 / (1.667 * (1.0 + double(step)));
+
+            int increment = random_increment();
+            TunableParameter& tunable_parameter = tunable_parameters_[parameter_distribution(rng)];
+            tunable_parameter += increment;
+
+            double new_error = error();
+
+            double acceptance_probability =
+                new_error < current_error
+                    ? 1.0
+                    : std::exp(-(new_error - current_error) / double(temperature));
+            if (random_bool(acceptance_probability)) {
+                current_error = new_error;
+            } else {
+                tunable_parameter -= increment;
+            }
+
+            display();
+            std::cout << "acceptance prob: " << acceptance_probability << " step: " << step
+                      << " temperature: " << temperature << " error: " << current_error << "\n";
+        }
+    }
+
+    void tune() noexcept {
+        simulated_annealing(1000);
+        local_tune();
+    }
 
     void display() const noexcept {
         for (auto& param : tunable_parameters_) {
@@ -211,6 +255,8 @@ template <class Position> class Tuner {
     }
 
   private:
+    constexpr static std::array<int, 7> increment_values{100, 50, 25, 12, 6, 3, 1};
+
     struct LocalParameterTuningData {
       public:
         [[nodiscard]] bool improving() const noexcept { return direction_ != 0; }
@@ -233,12 +279,11 @@ template <class Position> class Tuner {
         void set_direction(int value) noexcept { direction_ = value; }
 
       private:
-        constexpr static std::array<int, 7> increment_values{100, 50, 25, 12, 6, 3, 1};
-
         bool done_ = false;
-        int increment_offset_ = 0;
+        unsigned increment_offset_ = 0;
         int direction_ = 1;
     };
+
     [[nodiscard]] static bool
     all_done(const std::vector<LocalParameterTuningData>& tuning_data_list) noexcept {
         for (auto& tuning_data : tuning_data_list) {
