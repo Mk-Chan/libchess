@@ -50,6 +50,7 @@ class Position {
     std::optional<Color> color_of(Square square) const;
     std::optional<Piece> piece_on(Square square) const;
     hash_type hash() const;
+    hash_type pawn_hash() const;
     Square king_square(Color color) const;
     int halfmoves() const;
     int fullmoves() const;
@@ -157,6 +158,7 @@ class Position {
         pos.fullmoves_ = std::strtol(fen_part_cstr, &end, 10);
 
         pos.state_mut_ref().hash_ = pos.calculate_hash();
+        pos.state_mut_ref().pawn_hash_ = pos.calculate_pawn_hash();
         pos.start_fen_ = fen;
         return pos;
     }
@@ -236,6 +238,7 @@ class Position {
         std::optional<PieceType> captured_pt_;
         Move::Type move_type_ = Move::Type::NONE;
         hash_type hash_ = 0;
+        hash_type pawn_hash_ = 0;
         int halfmoves_ = 0;
     };
 
@@ -262,6 +265,17 @@ class Position {
         }
         hash_value ^= zobrist::castling_rights_key(castling_rights());
         hash_value ^= zobrist::side_to_move_key(side_to_move());
+        return hash_value;
+    }
+    hash_type calculate_pawn_hash() const {
+        hash_type hash_value = 0;
+        for (Color c : constants::COLORS) {
+            Bitboard bb = piece_type_bb(constants::PAWN, c);
+            while (bb) {
+                hash_value ^= zobrist::piece_square_key(bb.forward_bitscan(), constants::PAWN, c);
+                bb.forward_popbit();
+            }
+        }
         return hash_value;
     }
 
