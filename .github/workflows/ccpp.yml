@@ -1,0 +1,13 @@
+name: Libchess Test Action
+
+on: [push]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v1
+    - name: build
+      run: mkdir build && cd build && cmake ..
+    - name: test
+      run: cd build && make test
