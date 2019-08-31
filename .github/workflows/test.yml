@@ -1,0 +1,21 @@
+name: Libchess Test Action
+
+on:
+  push:
+    branches:
+    - master
+  pull_request:
+    branches:
+    - master
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v1
+    - name: init-submodules
+      run: git submodule update --init
+    - name: build
+      run: mkdir build && cd build && cmake ..
+    - name: test
+      run: cd build && make test
