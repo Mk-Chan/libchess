@@ -208,6 +208,7 @@ inline void Position::make_move(Move move) {
     next_state.move_type_ = move_type;
     reverse_side_to_move();
     next_state.hash_ = calculate_hash();
+    next_state.pawn_hash_ = calculate_pawn_hash();
 }
 
 inline void Position::make_null_move() {
@@ -224,6 +225,7 @@ inline void Position::make_null_move() {
     next.enpassant_square_ = {};
     next.castling_rights_ = prev.castling_rights_;
     next.hash_ = calculate_hash();
+    next.pawn_hash_ = calculate_pawn_hash();
 }
 
 } // namespace libchess

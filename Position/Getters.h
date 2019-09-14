@@ -37,6 +37,8 @@ inline std::optional<PieceType> Position::previously_captured_piece() const {
 
 inline Position::hash_type Position::hash() const { return history_[ply_].hash_; }
 
+inline Position::hash_type Position::pawn_hash() const { return history_[ply_].pawn_hash_; }
+
 inline Square Position::king_square(Color color) const {
     return piece_type_bb(constants::KING, color).forward_bitscan();
 }
