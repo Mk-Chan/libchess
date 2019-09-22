@@ -96,7 +96,7 @@ inline int Position::repeat_count() const {
 
 inline const std::string& Position::start_fen() const { return start_fen_; }
 
-inline const Position::GameState Position::game_state() const {
+inline Position::GameState Position::game_state() const {
     if (is_repeat(2)) {
         return GameState::THREEFOLD_REPETITION;
     } else if (halfmoves() >= 100) {
