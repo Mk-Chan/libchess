@@ -36,6 +36,8 @@ class Position {
     }
     using hash_type = std::uint64_t;
 
+    enum class GameState { IN_PROGRESS, CHECKMATE, STALEMATE, THREEFOLD_REPETITION, FIFTY_MOVES };
+
     // Getters
     Bitboard piece_type_bb(PieceType piece_type) const;
     Bitboard piece_type_bb(PieceType piece_type, Color color) const;
@@ -58,6 +60,7 @@ class Position {
     bool is_repeat(int times = 1) const;
     int repeat_count() const;
     const std::string& start_fen() const;
+    GameState game_state() const;
 
     // Move Integration
     Move::Type move_type_of(Move move) const;

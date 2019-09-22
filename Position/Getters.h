@@ -96,6 +96,22 @@ inline int Position::repeat_count() const {
 
 inline const std::string& Position::start_fen() const { return start_fen_; }
 
+inline const Position::GameState Position::game_state() const {
+    if (is_repeat(2)) {
+        return GameState::THREEFOLD_REPETITION;
+    } else if (halfmoves() >= 100) {
+        return GameState::FIFTY_MOVES;
+    } else {
+        MoveList move_list = legal_move_list();
+
+        if (move_list.empty()) {
+            return in_check() ? GameState::CHECKMATE : GameState::STALEMATE;
+        }
+
+        return GameState::IN_PROGRESS;
+    }
+}
+
 inline bool Position::is_legal_generated_move(Move move) const {
     Color c = side_to_move();
     Square from = move.from_square();
