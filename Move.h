@@ -35,6 +35,7 @@ class Move {
 
     using value_type = int;
 
+    constexpr Move() : value_(0) {}
     constexpr explicit Move(std::uint32_t value) : value_(value) {}
     constexpr Move(Square from_square, Square to_square, Move::Type type = Move::Type::NONE)
         : value_(from_square.value() | (to_square.value() << TO_SQUARE_SHIFT) |

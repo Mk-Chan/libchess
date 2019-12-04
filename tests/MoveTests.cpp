@@ -45,7 +45,7 @@ TEST_CASE("Capture Promotion Move Test", "[Move]") {
     REQUIRE(e7d8n.promotion_piece_type() == KNIGHT);
 }
 
-TEST_CASE("Move parsing test", "[Move]") {
+TEST_CASE("Move Parsing test", "[Move]") {
     REQUIRE(*Move::from("e2e4") == Move{E2, E4});
     REQUIRE(*Move::from("e2e3") == Move{E2, E3});
     REQUIRE(*Move::from("g1f3") == Move{G1, F3});
@@ -53,4 +53,11 @@ TEST_CASE("Move parsing test", "[Move]") {
     REQUIRE(*Move::from("e2d1n") == Move{E2, D1, KNIGHT});
     REQUIRE(!Move::from("abcde"));
     REQUIRE(!Move::from("b1c3e"));
+}
+
+TEST_CASE("Default Initialization test", "[Move]") {
+    REQUIRE(Move() == Move(0));
+    Move moves[2];
+    REQUIRE(moves[0] == Move(0));
+    REQUIRE(moves[1] == Move(0));
 }
