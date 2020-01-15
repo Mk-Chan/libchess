@@ -117,6 +117,7 @@ class CastlingRights {
     }
 
     constexpr value_type value() const { return value_; }
+    constexpr value_type& value_mut_ref() { return value_; }
 
   private:
     value_type value_;

@@ -112,6 +112,34 @@ class Position {
     void display(std::ostream& ostream = std::cout) const;
     std::string fen() const;
     std::string uci_line() const;
+    void vflip() {
+        for (auto& pt : constants::PIECE_TYPES) {
+            Bitboard* bb = piece_type_bb_ + pt;
+            *bb = Bitboard{__builtin_bswap64(*bb)};
+        }
+        for (auto& c : constants::COLORS) {
+            Bitboard* bb = color_bb_ + c;
+            *bb = Bitboard{__builtin_bswap64(*bb)};
+        }
+
+        Bitboard tmp = color_bb_[0];
+        color_bb_[0] = color_bb_[1];
+        color_bb_[1] = tmp;
+
+        State& curr_state = state_mut_ref();
+        if (curr_state.enpassant_square_) {
+            *curr_state.enpassant_square_ = curr_state.enpassant_square_->flipped();
+        }
+
+        CastlingRights tmp_cr = CastlingRights{(curr_state.castling_rights_.value() & 3) << 2};
+        curr_state.castling_rights_.value_mut_ref() >>= 2;
+        curr_state.castling_rights_.value_mut_ref() ^= tmp_cr.value();
+
+        side_to_move_ = !side_to_move_;
+
+        state_mut_ref().hash_ = calculate_hash();
+        state_mut_ref().pawn_hash_ = calculate_pawn_hash();
+    }
     static std::optional<Position> from_fen(const std::string& fen) {
         Position pos;
         pos.history_.push_back(State{});
