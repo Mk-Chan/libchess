@@ -100,6 +100,16 @@ TEST_CASE("FEN Test", "[Position]") {
     REQUIRE(pos.fen() == kiwipete_fen);
 }
 
+TEST_CASE("Flip Test", "[Position]") {
+    Position pos{"rnbqkbnr/ppppppp1/8/7p/8/8/PPPPPPPP/RNBQKBN1 w Qkq h7 0 1"};
+
+    pos.vflip();
+    REQUIRE(pos.fen() == "rnbqkbn1/pppppppp/8/8/7P/8/PPPPPPP1/RNBQKBNR b KQq h2 0 1");
+
+    pos.vflip();
+    REQUIRE(pos.fen() == "rnbqkbnr/ppppppp1/8/7p/8/8/PPPPPPPP/RNBQKBN1 w Qkq h7 0 1");
+}
+
 TEST_CASE("UCI Position Line Test", "[Position]") {
     std::string fen = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1";
     std::string moves = "e2e4 e7e5 g1f3 b8c6";
