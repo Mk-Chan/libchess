@@ -66,7 +66,7 @@ class PieceType : public MetaValueType<int> {
 };
 
 inline std::ostream& operator<<(std::ostream& ostream, PieceType piece_type) {
-    return ostream << piece_type.to_char();
+    return ostream << std::string{1, piece_type.to_char()};
 }
 
 namespace constants {
