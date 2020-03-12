@@ -240,8 +240,9 @@ class UCIInfoParameters {
 
 class UCIService {
   public:
-    UCIService(std::string name, std::string author) noexcept
-        : name_(std::move(name)), author_(std::move(author)) {}
+    UCIService(std::string name, std::string author, std::ostream& out = std::cout,
+               std::istream& in = std::cin) noexcept
+        : name_(std::move(name)), author_(std::move(author)), out_(out), in_(in) {}
 
     void register_option(const UCISpinOption& uci_option) noexcept {
         spin_options_[uci_option.name()] = uci_option;
@@ -280,31 +281,30 @@ class UCIService {
             throw std::invalid_argument{"Must register a position, go and stop handler!"};
         }
 
-        std::cout << "id name " << name_ << "\n";
-        std::cout << "id author " << author_ << "\n";
+        out_ << "id name " << name_ << "\n";
+        out_ << "id author " << author_ << "\n";
 
         for (auto& [name, option] : spin_options_) {
-            std::cout << "option name " << name << " type spin default " << option.value()
-                      << " min " << option.min_value() << " max " << option.max_value() << "\n";
+            out_ << "option name " << name << " type spin default " << option.value() << " min "
+                 << option.min_value() << " max " << option.max_value() << "\n";
         }
         for (auto& [name, option] : combo_options_) {
-            std::cout << "option name " << name << " type combo default " << option.value();
+            out_ << "option name " << name << " type combo default " << option.value();
             for (const auto& candidate : option.allowed_values()) {
-                std::cout << " var " << candidate;
+                out_ << " var " << candidate;
             }
-            std::cout << "\n";
+            out_ << "\n";
         }
         for (auto& [name, option] : string_options_) {
-            std::cout << "option name " << name << " type string default " << option.value()
-                      << "\n";
+            out_ << "option name " << name << " type string default " << option.value() << "\n";
         }
         for (auto& [name, option] : check_options_) {
-            std::cout << "option name " << name << " type check default " << option.value() << "\n";
+            out_ << "option name " << name << " type check default " << option.value() << "\n";
         }
         for (auto& [name, option] : button_options_) {
-            std::cout << "option name " << name << " type button\n";
+            out_ << "option name " << name << " type button\n";
         }
-        std::cout << "uciok\n";
+        out_ << "uciok\n";
 
         std::string word;
         std::string line;
@@ -320,7 +320,7 @@ class UCIService {
 
         keep_running_ = true;
         while (keep_running_) {
-            std::getline(std::cin, line);
+            std::getline(in_, line);
             std::istringstream line_stream{line};
             line_stream >> word;
             if (command_handlers_.find(word) != command_handlers_.end()) {
@@ -342,7 +342,7 @@ class UCIService {
             } else if (word == "setoption") {
                 parse_and_run_setoption_line(line_stream);
             } else if (word == "isready") {
-                std::cout << "readyok\n";
+                out_ << "readyok\n";
             } else if (word == "quit" || word == "exit") {
                 stop_search();
                 break;
@@ -392,80 +392,82 @@ class UCIService {
     }
 
     static void bestmove(const std::string& move,
-                         const std::optional<std::string>& ponder_move = {}) noexcept {
-        std::cout << "bestmove " << move;
+                         const std::optional<std::string>& ponder_move = {},
+                         std::ostream& out = std::cout) noexcept {
+        out << "bestmove " << move;
         if (ponder_move) {
-            std::cout << " ponder " << *ponder_move;
+            out << " ponder " << *ponder_move;
         }
-        std::cout << "\n";
+        out << "\n";
     }
-    static void info(const UCIInfoParameters& info_parameters) noexcept {
+    static void info(const UCIInfoParameters& info_parameters,
+                     std::ostream& out = std::cout) noexcept {
         if (info_parameters.empty()) {
             return;
         }
 
-        std::cout << "info";
+        out << "info";
         if (info_parameters.score()) {
             auto score = *info_parameters.score();
             if (score.score_type() == UCIScore::ScoreType::CENTIPAWNS) {
-                std::cout << " score cp " << score.value();
+                out << " score cp " << score.value();
             } else if (score.score_type() == UCIScore::ScoreType::MATE) {
-                std::cout << " score mate " << score.value();
+                out << " score mate " << score.value();
             }
         }
         if (info_parameters.depth()) {
-            std::cout << " depth " << *info_parameters.depth();
+            out << " depth " << *info_parameters.depth();
         }
         if (info_parameters.seldepth()) {
-            std::cout << " seldepth " << *info_parameters.seldepth();
+            out << " seldepth " << *info_parameters.seldepth();
         }
         if (info_parameters.time()) {
-            std::cout << " time " << *info_parameters.time();
+            out << " time " << *info_parameters.time();
         }
         if (info_parameters.nodes()) {
-            std::cout << " nodes " << *info_parameters.nodes();
+            out << " nodes " << *info_parameters.nodes();
         }
         if (info_parameters.currmove()) {
-            std::cout << " currmove " << *info_parameters.currmove();
+            out << " currmove " << *info_parameters.currmove();
         }
         if (info_parameters.currmovenumber()) {
-            std::cout << " currmovenumber " << *info_parameters.currmovenumber();
+            out << " currmovenumber " << *info_parameters.currmovenumber();
         }
         if (info_parameters.hashfull()) {
-            std::cout << " hashfull " << *info_parameters.hashfull();
+            out << " hashfull " << *info_parameters.hashfull();
         }
         if (info_parameters.nps()) {
-            std::cout << " nps " << *info_parameters.nps();
+            out << " nps " << *info_parameters.nps();
         }
         if (info_parameters.tbhits()) {
-            std::cout << " tbhits " << *info_parameters.tbhits();
+            out << " tbhits " << *info_parameters.tbhits();
         }
         if (info_parameters.cpuload()) {
-            std::cout << " cpuload " << *info_parameters.cpuload();
+            out << " cpuload " << *info_parameters.cpuload();
         }
         if (info_parameters.pv()) {
             auto pv = *info_parameters.pv();
             if (!pv.empty()) {
-                std::cout << " pv " << pv.to_str();
+                out << " pv " << pv.to_str();
             }
         }
         if (info_parameters.refutation()) {
             auto refutation = *info_parameters.refutation();
             if (!refutation.empty()) {
-                std::cout << " refutation " << refutation.to_str();
+                out << " refutation " << refutation.to_str();
             }
         }
         if (info_parameters.string()) {
-            std::cout << " string " << *info_parameters.string();
+            out << " string " << *info_parameters.string();
         }
-        std::cout << "\n";
+        out << "\n";
         if (info_parameters.multipv()) {
             auto multipv = *info_parameters.multipv();
             for (unsigned long i = 0; i < multipv.size(); ++i) {
                 if (multipv.empty()) {
                     continue;
                 }
-                std::cout << "info multipv " << (i + 1) << " " << multipv[i].to_str() << "\n";
+                out << "info multipv " << (i + 1) << " " << multipv[i].to_str() << "\n";
             }
         }
         if (info_parameters.currline()) {
@@ -474,7 +476,7 @@ class UCIService {
                 if (currline.empty()) {
                     continue;
                 }
-                std::cout << "info currline " << (i + 1) << " " << currline[i].to_str() << "\n";
+                out << "info currline " << (i + 1) << " " << currline[i].to_str() << "\n";
             }
         }
     }
@@ -606,6 +608,9 @@ class UCIService {
 
     std::string name_;
     std::string author_;
+
+    std::ostream& out_;
+    std::istream& in_;
 
     std::atomic<bool> keep_running_{true};
 };
