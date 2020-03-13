@@ -281,28 +281,41 @@ class UCIService {
             throw std::invalid_argument{"Must register a position, go and stop handler!"};
         }
 
-        out_ << "id name " << name_ << "\n";
-        out_ << "id author " << author_ << "\n";
+        std::string id_name = "id name " + name_ + "\n";
+        out_ << id_name;
+
+        std::string id_author = "id author " + author_ + "\n";
+        out_ << id_author;
 
         for (auto& [name, option] : spin_options_) {
-            out_ << "option name " << name << " type spin default " << option.value() << " min "
-                 << option.min_value() << " max " << option.max_value() << "\n";
+            std::string option_str = "option name " + name + " type spin default " +
+                                     std::to_string(option.value()) + " min " +
+                                     std::to_string(option.min_value()) + " max " +
+                                     std::to_string(option.max_value()) + "\n";
+            out_ << option_str;
         }
         for (auto& [name, option] : combo_options_) {
-            out_ << "option name " << name << " type combo default " << option.value();
+            std::string option_str =
+                "option name " + name + " type combo default " + option.value();
             for (const auto& candidate : option.allowed_values()) {
-                out_ << " var " << candidate;
+                option_str += " var " + candidate;
             }
-            out_ << "\n";
+            option_str += "\n";
+            out_ << option_str;
         }
         for (auto& [name, option] : string_options_) {
-            out_ << "option name " << name << " type string default " << option.value() << "\n";
+            std::string option_str =
+                "option name " + name + " type string default " + option.value() + "\n";
+            out_ << option_str;
         }
         for (auto& [name, option] : check_options_) {
-            out_ << "option name " << name << " type check default " << option.value() << "\n";
+            std::string option_str = "option name " + name + " type check default " +
+                                     std::to_string(option.value()) + "\n";
+            out_ << option_str;
         }
         for (auto& [name, option] : button_options_) {
-            out_ << "option name " << name << " type button\n";
+            std::string option_str = "option name " + name + " type button\n";
+            out_ << option_str;
         }
         out_ << "uciok\n";
 
@@ -394,11 +407,12 @@ class UCIService {
     static void bestmove(const std::string& move,
                          const std::optional<std::string>& ponder_move = {},
                          std::ostream& out = std::cout) noexcept {
-        out << "bestmove " << move;
+        std::string bestmove_str = "bestmove " + move;
         if (ponder_move) {
-            out << " ponder " << *ponder_move;
+            bestmove_str += " ponder " + *ponder_move;
         }
-        out << "\n";
+        bestmove_str += "\n";
+        out << bestmove_str;
     }
     static void info(const UCIInfoParameters& info_parameters,
                      std::ostream& out = std::cout) noexcept {
@@ -406,68 +420,71 @@ class UCIService {
             return;
         }
 
-        out << "info";
+        std::string info_str = "info";
         if (info_parameters.score()) {
             auto score = *info_parameters.score();
             if (score.score_type() == UCIScore::ScoreType::CENTIPAWNS) {
-                out << " score cp " << score.value();
+                info_str += " score cp " + std::to_string(score.value());
             } else if (score.score_type() == UCIScore::ScoreType::MATE) {
-                out << " score mate " << score.value();
+                info_str += " score mate " + std::to_string(score.value());
             }
         }
         if (info_parameters.depth()) {
-            out << " depth " << *info_parameters.depth();
+            info_str += " depth " + std::to_string(*info_parameters.depth());
         }
         if (info_parameters.seldepth()) {
-            out << " seldepth " << *info_parameters.seldepth();
+            info_str += " seldepth " + std::to_string(*info_parameters.seldepth());
         }
         if (info_parameters.time()) {
-            out << " time " << *info_parameters.time();
+            info_str += " time " + std::to_string(*info_parameters.time());
         }
         if (info_parameters.nodes()) {
-            out << " nodes " << *info_parameters.nodes();
+            info_str += " nodes " + std::to_string(*info_parameters.nodes());
         }
         if (info_parameters.currmove()) {
-            out << " currmove " << *info_parameters.currmove();
+            info_str += " currmove " + *info_parameters.currmove();
         }
         if (info_parameters.currmovenumber()) {
-            out << " currmovenumber " << *info_parameters.currmovenumber();
+            info_str += " currmovenumber " + std::to_string(*info_parameters.currmovenumber());
         }
         if (info_parameters.hashfull()) {
-            out << " hashfull " << *info_parameters.hashfull();
+            info_str += " hashfull " + std::to_string(*info_parameters.hashfull());
         }
         if (info_parameters.nps()) {
-            out << " nps " << *info_parameters.nps();
+            info_str += " nps " + std::to_string(*info_parameters.nps());
         }
         if (info_parameters.tbhits()) {
-            out << " tbhits " << *info_parameters.tbhits();
+            info_str += " tbhits " + std::to_string(*info_parameters.tbhits());
         }
         if (info_parameters.cpuload()) {
-            out << " cpuload " << *info_parameters.cpuload();
+            info_str += " cpuload " + std::to_string(*info_parameters.cpuload());
         }
         if (info_parameters.pv()) {
             auto pv = *info_parameters.pv();
             if (!pv.empty()) {
-                out << " pv " << pv.to_str();
+                info_str += " pv " + pv.to_str();
             }
         }
         if (info_parameters.refutation()) {
             auto refutation = *info_parameters.refutation();
             if (!refutation.empty()) {
-                out << " refutation " << refutation.to_str();
+                info_str += " refutation " + refutation.to_str();
             }
         }
         if (info_parameters.string()) {
-            out << " string " << *info_parameters.string();
+            info_str += " string " + *info_parameters.string();
         }
-        out << "\n";
+        info_str += "\n";
+        out << info_str;
         if (info_parameters.multipv()) {
             auto multipv = *info_parameters.multipv();
             for (unsigned long i = 0; i < multipv.size(); ++i) {
                 if (multipv.empty()) {
                     continue;
                 }
-                out << "info multipv " << (i + 1) << " " << multipv[i].to_str() << "\n";
+                std::string info_multipv =
+                    "info multipv " + std::to_string(i + 1) + " " + multipv[i].to_str() + "\n";
+                out << info_multipv;
             }
         }
         if (info_parameters.currline()) {
@@ -476,7 +493,9 @@ class UCIService {
                 if (currline.empty()) {
                     continue;
                 }
-                out << "info currline " << (i + 1) << " " << currline[i].to_str() << "\n";
+                std::string info_currline =
+                    "info currline " + std::to_string(i + 1) + " " + currline[i].to_str() + "\n";
+                out << info_currline;
             }
         }
     }
