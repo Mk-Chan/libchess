@@ -333,7 +333,10 @@ class UCIService {
 
         keep_running_ = true;
         while (keep_running_) {
-            std::getline(in_, line);
+            if (!std::getline(in_, line)) {
+                keep_running_ = false;
+                break;
+            }
             std::istringstream line_stream{line};
             line_stream >> word;
             if (command_handlers_.find(word) != command_handlers_.end()) {
