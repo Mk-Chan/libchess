@@ -281,43 +281,7 @@ class UCIService {
             throw std::invalid_argument{"Must register a position, go and stop handler!"};
         }
 
-        std::string id_name = "id name " + name_ + "\n";
-        out_ << id_name;
-
-        std::string id_author = "id author " + author_ + "\n";
-        out_ << id_author;
-
-        for (auto& [name, option] : spin_options_) {
-            std::string option_str = "option name " + name + " type spin default " +
-                                     std::to_string(option.value()) + " min " +
-                                     std::to_string(option.min_value()) + " max " +
-                                     std::to_string(option.max_value()) + "\n";
-            out_ << option_str;
-        }
-        for (auto& [name, option] : combo_options_) {
-            std::string option_str =
-                "option name " + name + " type combo default " + option.value();
-            for (const auto& candidate : option.allowed_values()) {
-                option_str += " var " + candidate;
-            }
-            option_str += "\n";
-            out_ << option_str;
-        }
-        for (auto& [name, option] : string_options_) {
-            std::string option_str =
-                "option name " + name + " type string default " + option.value() + "\n";
-            out_ << option_str;
-        }
-        for (auto& [name, option] : check_options_) {
-            std::string option_str = "option name " + name + " type check default " +
-                                     std::to_string(option.value()) + "\n";
-            out_ << option_str;
-        }
-        for (auto& [name, option] : button_options_) {
-            std::string option_str = "option name " + name + " type button\n";
-            out_ << option_str;
-        }
-        out_ << "uciok\n";
+        uci_handler();
 
         std::string word;
         std::string line;
@@ -341,6 +305,8 @@ class UCIService {
             line_stream >> word;
             if (command_handlers_.find(word) != command_handlers_.end()) {
                 command_handlers_[word](line_stream);
+            } else if (word == "uci") {
+                uci_handler();
             } else if (word == "position") {
                 stop_search();
                 auto position_parameters = parse_position_line(line_stream);
@@ -617,6 +583,46 @@ class UCIService {
     }
 
   private:
+    void uci_handler() {
+        std::string id_name = "id name " + name_ + "\n";
+        out_ << id_name;
+
+        std::string id_author = "id author " + author_ + "\n";
+        out_ << id_author;
+
+        for (auto& [name, option] : spin_options_) {
+            std::string option_str = "option name " + name + " type spin default " +
+                                     std::to_string(option.value()) + " min " +
+                                     std::to_string(option.min_value()) + " max " +
+                                     std::to_string(option.max_value()) + "\n";
+            out_ << option_str;
+        }
+        for (auto& [name, option] : combo_options_) {
+            std::string option_str =
+                "option name " + name + " type combo default " + option.value();
+            for (const auto& candidate : option.allowed_values()) {
+                option_str += " var " + candidate;
+            }
+            option_str += "\n";
+            out_ << option_str;
+        }
+        for (auto& [name, option] : string_options_) {
+            std::string option_str =
+                "option name " + name + " type string default " + option.value() + "\n";
+            out_ << option_str;
+        }
+        for (auto& [name, option] : check_options_) {
+            std::string option_str = "option name " + name + " type check default " +
+                                     std::to_string(option.value()) + "\n";
+            out_ << option_str;
+        }
+        for (auto& [name, option] : button_options_) {
+            std::string option_str = "option name " + name + " type button\n";
+            out_ << option_str;
+        }
+        out_ << "uciok\n";
+    }
+
     std::unordered_map<std::string, UCISpinOption> spin_options_;
     std::unordered_map<std::string, UCIComboOption> combo_options_;
     std::unordered_map<std::string, UCIStringOption> string_options_;
