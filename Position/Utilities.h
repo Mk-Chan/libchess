@@ -152,6 +152,7 @@ std::optional<Move> Position::smallest_capture_move_to(Square square) const {
             return Move{attackers_bb.forward_bitscan(), square, Move::Type::CAPTURE};
         }
     }
+
     return std::nullopt;
 }
 
@@ -168,8 +169,9 @@ int Position::see_to(Square square, std::array<int, 6> piece_values) const {
     }
 
     int piece_val = piece_values.at(square_pt->type().value());
-    if (smallest_capture_move->promotion_piece_type()) {
-        piece_val += piece_values.at(smallest_capture_move->promotion_piece_type()->value());
+    auto smallest_capture_move_prom_piece_type = smallest_capture_move->promotion_piece_type();
+    if (smallest_capture_move_prom_piece_type) {
+        piece_val += piece_values.at(smallest_capture_move_prom_piece_type->value());
     }
     pos.make_move(*smallest_capture_move);
     return std::max(0, piece_val - pos.see_to(square, piece_values));
