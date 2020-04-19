@@ -1,7 +1,6 @@
 #include <catch2/catch.hpp>
 
 #include "../Position.h"
-#include "../internal/Zobrist.h"
 
 using namespace libchess;
 using namespace constants;
@@ -262,4 +261,60 @@ TEST_CASE("Smallest Capture Move Test Promotion Black", "[Position]") {
 
     Move expected_move = Move{F2, E1, QUEEN, Move::Type::CAPTURE_PROMOTION};
     REQUIRE(*actual_move == expected_move);
+}
+
+TEST_CASE("SEE Test KNKP", "[Position]") {
+    std::string fen = "7k/8/4p3/8/5N2/8/8/K7 w - - 0 1";
+
+    auto pos = Position::from_fen(fen);
+    if (!pos) {
+        FAIL("Invalid Position from FEN: " + fen);
+    }
+
+    int actual_value = pos->see_to(E6, {100, 300, 300, 500, 900, 0});
+    int expected_value = 100;
+
+    REQUIRE(actual_value == expected_value);
+}
+
+TEST_CASE("SEE Test KNKNP", "[Position]") {
+    std::string fen = "7k/2n5/4p3/8/5N2/8/8/K7 w - - 0 1";
+
+    auto pos = Position::from_fen(fen);
+    if (!pos) {
+        FAIL("Invalid Position from FEN: " + fen);
+    }
+
+    int actual_value = pos->see_to(E6, {100, 300, 300, 500, 900, 0});
+    int expected_value = 0;
+
+    REQUIRE(actual_value == expected_value);
+}
+
+TEST_CASE("SEE Test KBNKNP", "[Position]") {
+    std::string fen = "7k/2n5/4p3/8/5N2/1B6/8/K7 w - - 0 1";
+
+    auto pos = Position::from_fen(fen);
+    if (!pos) {
+        FAIL("Invalid Position from FEN: " + fen);
+    }
+
+    int actual_value = pos->see_to(E6, {100, 300, 300, 500, 900, 0});
+    int expected_value = 100;
+
+    REQUIRE(actual_value == expected_value);
+}
+
+TEST_CASE("SEE Test KBNKQNP", "[Position]") {
+    std::string fen = "4q2k/2n5/4p3/8/5N2/1B6/8/K7 w - - 0 1";
+
+    auto pos = Position::from_fen(fen);
+    if (!pos) {
+        FAIL("Invalid Position from FEN: " + fen);
+    }
+
+    int actual_value = pos->see_to(E6, {100, 300, 300, 500, 900, 0});
+    int expected_value = 0;
+
+    REQUIRE(actual_value == expected_value);
 }
