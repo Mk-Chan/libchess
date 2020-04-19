@@ -123,3 +123,143 @@ TEST_CASE("UCI Position Line Test", "[Position]") {
     REQUIRE(pos->start_fen() == fen);
     REQUIRE(pos->uci_line() == line);
 }
+
+TEST_CASE("Smallest Capture Move Test Pawn", "[Position]") {
+    std::string fen = "7k/4K3/1Q2p1R1/5P2/2BN4/8/4R3/8 w - - 0 1";
+    auto pos = Position::from_fen(fen);
+    if (!pos) {
+        FAIL("Invalid Position from FEN: " + fen);
+    }
+
+    auto actual_move = pos->smallest_capture_move_to(E6);
+    REQUIRE(actual_move);
+
+    Move expected_move = Move{F5, E6, Move::Type::CAPTURE};
+    REQUIRE(*actual_move == expected_move);
+}
+
+TEST_CASE("Smallest Capture Move Test Knight", "[Position]") {
+    std::string fen = "7k/4K3/1Q2p1R1/8/2BN1N2/8/4R3/8 w - - 0 1";
+    auto pos = Position::from_fen(fen);
+    if (!pos) {
+        FAIL("Invalid Position from FEN: " + fen);
+    }
+
+    auto actual_move = pos->smallest_capture_move_to(E6);
+    REQUIRE(actual_move);
+
+    Move expected_move = Move{D4, E6, Move::Type::CAPTURE};
+    REQUIRE(*actual_move == expected_move);
+}
+
+TEST_CASE("Smallest Capture Move Test Bishop", "[Position]") {
+    std::string fen = "7k/4K3/1Q2p1R1/8/2B5/8/4R3/8 w - - 0 1";
+    auto pos = Position::from_fen(fen);
+    if (!pos) {
+        FAIL("Invalid Position from FEN: " + fen);
+    }
+
+    auto actual_move = pos->smallest_capture_move_to(E6);
+    REQUIRE(actual_move);
+
+    Move expected_move = Move{C4, E6, Move::Type::CAPTURE};
+    REQUIRE(*actual_move == expected_move);
+}
+
+TEST_CASE("Smallest Capture Move Test Rook 1", "[Position]") {
+    std::string fen = "7k/4K3/1Q2p1R1/8/8/8/4R3/8 w - - 0 1";
+    auto pos = Position::from_fen(fen);
+    if (!pos) {
+        FAIL("Invalid Position from FEN: " + fen);
+    }
+
+    auto actual_move = pos->smallest_capture_move_to(E6);
+    REQUIRE(actual_move);
+
+    Move expected_move = Move{E2, E6, Move::Type::CAPTURE};
+    REQUIRE(*actual_move == expected_move);
+}
+
+TEST_CASE("Smallest Capture Move Test Rook 2", "[Position]") {
+    std::string fen = "7k/4K3/1Q2p1R1/8/8/8/8/8 w - - 0 1";
+    auto pos = Position::from_fen(fen);
+    if (!pos) {
+        FAIL("Invalid Position from FEN: " + fen);
+    }
+
+    auto actual_move = pos->smallest_capture_move_to(E6);
+    REQUIRE(actual_move);
+
+    Move expected_move = Move{G6, E6, Move::Type::CAPTURE};
+    REQUIRE(*actual_move == expected_move);
+}
+
+TEST_CASE("Smallest Capture Move Test Queen", "[Position]") {
+    std::string fen = "7k/4K3/1Q2p3/8/8/8/8/8 w - - 0 1";
+    auto pos = Position::from_fen(fen);
+    if (!pos) {
+        FAIL("Invalid Position from FEN: " + fen);
+    }
+
+    auto actual_move = pos->smallest_capture_move_to(E6);
+    REQUIRE(actual_move);
+
+    Move expected_move = Move{B6, E6, Move::Type::CAPTURE};
+    REQUIRE(*actual_move == expected_move);
+}
+
+TEST_CASE("Smallest Capture Move Test King", "[Position]") {
+    std::string fen = "7k/4K3/4p3/8/8/8/8/8 w - - 0 1";
+    auto pos = Position::from_fen(fen);
+    if (!pos) {
+        FAIL("Invalid Position from FEN: " + fen);
+    }
+
+    auto actual_move = pos->smallest_capture_move_to(E6);
+    REQUIRE(actual_move);
+
+    Move expected_move = Move{E7, E6, Move::Type::CAPTURE};
+    REQUIRE(*actual_move == expected_move);
+}
+
+TEST_CASE("Smallest Capture Move Test Enpassant", "[Position]") {
+    std::string fen = "7k/8/3K4/3Pp3/8/8/8/8 w e6 - 0 1";
+    auto pos = Position::from_fen(fen);
+    if (!pos) {
+        FAIL("Invalid Position from FEN: " + fen);
+    }
+
+    auto actual_move = pos->smallest_capture_move_to(E6);
+    REQUIRE(actual_move);
+
+    Move expected_move = Move{D5, E6, Move::Type::ENPASSANT};
+    REQUIRE(*actual_move == expected_move);
+}
+
+TEST_CASE("Smallest Capture Move Test Promotion White", "[Position]") {
+    std::string fen = "4n2k/3K1P2/8/8/8/8/8/8 w - - 0 1";
+    auto pos = Position::from_fen(fen);
+    if (!pos) {
+        FAIL("Invalid Position from FEN: " + fen);
+    }
+
+    auto actual_move = pos->smallest_capture_move_to(E8);
+    REQUIRE(actual_move);
+
+    Move expected_move = Move{F7, E8, QUEEN, Move::Type::CAPTURE_PROMOTION};
+    REQUIRE(*actual_move == expected_move);
+}
+
+TEST_CASE("Smallest Capture Move Test Promotion Black", "[Position]") {
+    std::string fen = "7K/8/8/8/8/8/3k1p2/4N3 b - - 0 1";
+    auto pos = Position::from_fen(fen);
+    if (!pos) {
+        FAIL("Invalid Position from FEN: " + fen);
+    }
+
+    auto actual_move = pos->smallest_capture_move_to(E1);
+    REQUIRE(actual_move);
+
+    Move expected_move = Move{F2, E1, QUEEN, Move::Type::CAPTURE_PROMOTION};
+    REQUIRE(*actual_move == expected_move);
+}
