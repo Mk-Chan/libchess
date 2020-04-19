@@ -98,6 +98,192 @@ inline std::string Position::uci_line() const {
     return result;
 }
 
+inline void Position::vflip() {
+    for (auto& pt : constants::PIECE_TYPES) {
+        Bitboard* bb = piece_type_bb_ + pt;
+        *bb = Bitboard{__builtin_bswap64(*bb)};
+    }
+    for (auto& c : constants::COLORS) {
+        Bitboard* bb = color_bb_ + c;
+        *bb = Bitboard{__builtin_bswap64(*bb)};
+    }
+
+    Bitboard tmp = color_bb_[0];
+    color_bb_[0] = color_bb_[1];
+    color_bb_[1] = tmp;
+
+    State& curr_state = state_mut_ref();
+    if (curr_state.enpassant_square_) {
+        *curr_state.enpassant_square_ = curr_state.enpassant_square_->flipped();
+    }
+
+    CastlingRights tmp_cr = CastlingRights{(curr_state.castling_rights_.value() & 3) << 2};
+    curr_state.castling_rights_.value_mut_ref() >>= 2;
+    curr_state.castling_rights_.value_mut_ref() ^= tmp_cr.value();
+
+    side_to_move_ = !side_to_move_;
+
+    state_mut_ref().hash_ = calculate_hash();
+    state_mut_ref().pawn_hash_ = calculate_pawn_hash();
+}
+
+std::optional<Move> Position::smallest_capture_move_to(Square square) const {
+    Bitboard pawn_attackers_bb = lookups::pawn_attacks(square, !side_to_move()) &
+                                 piece_type_bb(constants::PAWN, side_to_move());
+    if (pawn_attackers_bb) {
+        Square from_square = pawn_attackers_bb.forward_bitscan();
+        auto enpassant_sq = enpassant_square();
+        if (enpassant_sq && *enpassant_sq == square) {
+            return Move{from_square, square, Move::Type::ENPASSANT};
+        }
+        if (lookups::relative_rank(square.rank(), side_to_move()) == constants::RANK_8) {
+            return Move{from_square, square, constants::QUEEN, Move::Type::CAPTURE_PROMOTION};
+        }
+        return Move{from_square, square, Move::Type::CAPTURE};
+    }
+
+    auto piece_types_iter = constants::PIECE_TYPES + 1;
+    auto piece_types_end = constants::PIECE_TYPES + 6;
+    for (; piece_types_iter != piece_types_end; ++piece_types_iter) {
+        Bitboard attackers_bb =
+            lookups::non_pawn_piece_type_attacks(*piece_types_iter, square, occupancy_bb()) &
+            piece_type_bb(*piece_types_iter, side_to_move());
+        if (attackers_bb) {
+            return Move{attackers_bb.forward_bitscan(), square, Move::Type::CAPTURE};
+        }
+    }
+    return std::nullopt;
+}
+
+int Position::see_to(Square square, std::array<int, 6> piece_values) const {
+    Position pos = *this;
+    auto smallest_capture_move = smallest_capture_move_to(square);
+    if (!smallest_capture_move) {
+        return 0;
+    }
+
+    auto square_pt = piece_on(square);
+    if (!square_pt) {
+        return 0;
+    }
+
+    int piece_val = piece_values.at(square_pt->type().value());
+    if (smallest_capture_move->promotion_piece_type()) {
+        piece_val += piece_values.at(smallest_capture_move->promotion_piece_type()->value());
+    }
+    pos.make_move(*smallest_capture_move);
+    return std::max(0, piece_val - pos.see_to(square, piece_values));
+}
+
+inline std::optional<Position> Position::from_fen(const std::string& fen) {
+    Position pos;
+    pos.history_.push_back(State{});
+    State& curr_state = pos.state_mut_ref();
+
+    std::istringstream fen_stream{fen};
+    std::string fen_part;
+
+    // Piece list
+    fen_stream >> fen_part;
+    Square current_square = constants::A8;
+    for (char c : fen_part) {
+        if (c >= '1' && c <= '9') {
+            current_square += (c - '0');
+        } else if (c == '/') {
+            current_square -= 16;
+        } else {
+            auto piece = Piece::from(c);
+            if (piece) {
+                pos.put_piece(current_square, piece->type(), piece->color());
+            }
+            ++current_square;
+        }
+    }
+
+    // Side to move
+    fen_stream >> fen_part;
+    pos.side_to_move_ = Color::from(fen_part[0]).value_or(constants::WHITE);
+
+    // Castling rights
+    fen_stream >> fen_part;
+    curr_state.castling_rights_ = CastlingRights::from(fen_part);
+
+    // Enpassant square
+    fen_stream >> fen_part;
+    curr_state.enpassant_square_ = Square::from(fen_part);
+
+    // Halfmoves
+    fen_stream >> fen_part;
+    const char* fen_part_cstr = fen_part.c_str();
+    char* end;
+    curr_state.halfmoves_ = std::strtol(fen_part_cstr, &end, 10);
+
+    // Fullmoves
+    fen_stream >> fen_part;
+    fen_part_cstr = fen_part.c_str();
+    pos.fullmoves_ = std::strtol(fen_part_cstr, &end, 10);
+
+    pos.state_mut_ref().hash_ = pos.calculate_hash();
+    pos.state_mut_ref().pawn_hash_ = pos.calculate_pawn_hash();
+    pos.start_fen_ = fen;
+    return pos;
+}
+
+inline std::optional<Position> Position::from_uci_position_line(const std::string& line) {
+    /// This function expects a string as a parameter in one of the following formats:
+    /// * `"position <fen> moves <move-list>"`.
+    std::istringstream line_stream{line};
+    std::string tmp;
+
+    // "position"
+    line_stream >> tmp;
+    if (tmp != "position") {
+        return {};
+    }
+
+    std::string fen;
+    // Piece list
+    line_stream >> tmp;
+    fen += tmp + " ";
+    // Side to move
+    line_stream >> tmp;
+    fen += tmp + " ";
+    // Castling rights
+    line_stream >> tmp;
+    fen += tmp + " ";
+    // Enpassant square
+    line_stream >> tmp;
+    fen += tmp + " ";
+    // Halfmoves
+    line_stream >> tmp;
+    fen += tmp + " ";
+    // Fullmoves
+    line_stream >> tmp;
+    fen += tmp;
+
+    // "moves"
+    line_stream >> tmp;
+    if (tmp != "moves") {
+        return {};
+    }
+
+    // Moves
+    auto pos = Position::from_fen(fen);
+    if (!pos) {
+        return {};
+    }
+    std::string move_str;
+    while (line_stream >> move_str) {
+        auto move = Move::from(move_str);
+        if (!move) {
+            return {};
+        }
+        pos->make_move(*move);
+    }
+
+    return pos;
+}
+
 } // namespace libchess
 
 #endif // LIBCHESS_UTILITIES_H
