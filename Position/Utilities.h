@@ -127,7 +127,7 @@ inline void Position::vflip() {
     state_mut_ref().pawn_hash_ = calculate_pawn_hash();
 }
 
-std::optional<Move> Position::smallest_capture_move_to(Square square) const {
+inline std::optional<Move> Position::smallest_capture_move_to(Square square) const {
     Bitboard pawn_attackers_bb = lookups::pawn_attacks(square, !side_to_move()) &
                                  piece_type_bb(constants::PAWN, side_to_move());
     if (pawn_attackers_bb) {
@@ -156,7 +156,7 @@ std::optional<Move> Position::smallest_capture_move_to(Square square) const {
     return std::nullopt;
 }
 
-int Position::see_to(Square square, std::array<int, 6> piece_values) const {
+inline int Position::see_to(Square square, std::array<int, 6> piece_values) const {
     Position pos = *this;
     auto smallest_capture_move = smallest_capture_move_to(square);
     if (!smallest_capture_move) {
