@@ -157,14 +157,13 @@ inline std::optional<Move> Position::smallest_capture_move_to(Square square) con
 }
 
 inline int Position::see_to(Square square, std::array<int, 6> piece_values) const {
-    Position pos = *this;
-    auto smallest_capture_move = smallest_capture_move_to(square);
-    if (!smallest_capture_move) {
+    auto square_pt = piece_on(square);
+    if (!square_pt) {
         return 0;
     }
 
-    auto square_pt = piece_on(square);
-    if (!square_pt) {
+    auto smallest_capture_move = smallest_capture_move_to(square);
+    if (!smallest_capture_move) {
         return 0;
     }
 
@@ -173,8 +172,25 @@ inline int Position::see_to(Square square, std::array<int, 6> piece_values) cons
     if (smallest_capture_move_prom_piece_type) {
         piece_val += piece_values.at(smallest_capture_move_prom_piece_type->value());
     }
+    Position pos = *this;
     pos.make_move(*smallest_capture_move);
     return std::max(0, piece_val - pos.see_to(square, piece_values));
+}
+
+inline int Position::see_for(Move move, std::array<int, 6> piece_values) const {
+    auto square_pt = piece_on(move.to_square());
+    if (!square_pt) {
+        return 0;
+    }
+
+    int piece_val = piece_values.at(square_pt->type().value());
+    auto smallest_capture_move_prom_piece_type = move.promotion_piece_type();
+    if (smallest_capture_move_prom_piece_type) {
+        piece_val += piece_values.at(smallest_capture_move_prom_piece_type->value());
+    }
+    Position pos = *this;
+    pos.make_move(move);
+    return std::max(0, piece_val - pos.see_to(move.to_square(), piece_values));
 }
 
 inline std::optional<Position> Position::from_fen(const std::string& fen) {

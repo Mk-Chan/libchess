@@ -115,6 +115,7 @@ class Position {
     void vflip();
     std::optional<Move> smallest_capture_move_to(Square square) const;
     int see_to(Square square, std::array<int, 6> piece_values) const;
+    int see_for(Move move, std::array<int, 6> piece_values) const;
     static std::optional<Position> from_fen(const std::string& fen);
     static std::optional<Position> from_uci_position_line(const std::string& line);
 
