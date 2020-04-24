@@ -184,9 +184,9 @@ inline int Position::see_for(Move move, std::array<int, 6> piece_values) const {
     }
 
     int piece_val = piece_values.at(square_pt->type().value());
-    auto smallest_capture_move_prom_piece_type = move.promotion_piece_type();
-    if (smallest_capture_move_prom_piece_type) {
-        piece_val += piece_values.at(smallest_capture_move_prom_piece_type->value());
+    auto move_prom_piece_type = move.promotion_piece_type();
+    if (move_prom_piece_type) {
+        piece_val += piece_values.at(move_prom_piece_type->value());
     }
     Position pos = *this;
     pos.make_move(move);
