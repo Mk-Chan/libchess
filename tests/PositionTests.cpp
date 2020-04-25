@@ -374,3 +374,31 @@ TEST_CASE("SEE Move Test KBNPKNPP Knight Capture", "[Position]") {
 
     REQUIRE(actual_value == expected_value);
 }
+
+TEST_CASE("SEE Move Test Enpassant", "[Position]") {
+    std::string fen = "7k/2np4/8/4pP2/5N2/1B6/8/K7 w - e6 0 1";
+
+    auto pos = Position::from_fen(fen);
+    if (!pos) {
+        FAIL("Invalid Position from FEN: " + fen);
+    }
+
+    int actual_value = pos->see_for(Move{F5, E6}, {100, 300, 300, 500, 900, 0});
+    int expected_value = 100;
+
+    REQUIRE(actual_value == expected_value);
+}
+
+TEST_CASE("SEE Move Test Promotion Capture", "[Position]") {
+    std::string fen = "4n2k/5P2/3N4/4p3/8/1B6/8/K7 w - e6 0 1";
+
+    auto pos = Position::from_fen(fen);
+    if (!pos) {
+        FAIL("Invalid Position from FEN: " + fen);
+    }
+
+    int actual_value = pos->see_for(Move{F7, E8, QUEEN}, {100, 300, 300, 500, 900, 0});
+    int expected_value = 1100;
+
+    REQUIRE(actual_value == expected_value);
+}

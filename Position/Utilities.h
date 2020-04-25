@@ -156,37 +156,41 @@ inline std::optional<Move> Position::smallest_capture_move_to(Square square) con
     return std::nullopt;
 }
 
-inline int Position::see_to(Square square, std::array<int, 6> piece_values) const {
-    auto square_pt = piece_on(square);
-    if (!square_pt) {
-        return 0;
-    }
-
+inline int Position::see_to(Square square, std::array<int, 6> piece_values) {
     auto smallest_capture_move = smallest_capture_move_to(square);
     if (!smallest_capture_move) {
         return 0;
     }
+    bool is_enpassant = smallest_capture_move->type() == Move::Type::ENPASSANT;
 
-    int piece_val = piece_values.at(square_pt->type().value());
+    auto square_pt = piece_on(square);
+    if (!square_pt && !is_enpassant) {
+        return 0;
+    }
+
+    int piece_val = is_enpassant ? piece_values.at(0) : piece_values.at(square_pt->type().value());
     auto smallest_capture_move_prom_piece_type = smallest_capture_move->promotion_piece_type();
     if (smallest_capture_move_prom_piece_type) {
-        piece_val += piece_values.at(smallest_capture_move_prom_piece_type->value());
+        piece_val +=
+            piece_values.at(smallest_capture_move_prom_piece_type->value()) - piece_values.at(0);
     }
     Position pos = *this;
     pos.make_move(*smallest_capture_move);
     return std::max(0, piece_val - pos.see_to(square, piece_values));
 }
 
-inline int Position::see_for(Move move, std::array<int, 6> piece_values) const {
+inline int Position::see_for(Move move, std::array<int, 6> piece_values) {
+    bool is_enpassant = move_type_of(move) == Move::Type::ENPASSANT;
+
     auto square_pt = piece_on(move.to_square());
-    if (!square_pt) {
+    if (!square_pt && !is_enpassant) {
         return 0;
     }
 
-    int piece_val = piece_values.at(square_pt->type().value());
+    int piece_val = is_enpassant ? piece_values.at(0) : piece_values.at(square_pt->type().value());
     auto move_prom_piece_type = move.promotion_piece_type();
     if (move_prom_piece_type) {
-        piece_val += piece_values.at(move_prom_piece_type->value());
+        piece_val += piece_values.at(move_prom_piece_type->value()) - piece_values.at(0);
     }
     Position pos = *this;
     pos.make_move(move);
