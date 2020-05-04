@@ -14,6 +14,7 @@
 #include <thread>
 #include <unordered_map>
 #include <utility>
+#include <vector>
 
 namespace libchess {
 

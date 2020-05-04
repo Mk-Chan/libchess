@@ -2,6 +2,7 @@
 #define LIBCHESS_UCIOPTION_H
 
 #include <functional>
+#include <string>
 #include <unordered_map>
 #include <unordered_set>
 
