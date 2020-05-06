@@ -2,6 +2,7 @@
 #define LIBCHESS_COLOR_H
 
 #include <iostream>
+#include <optional>
 
 #include "internal/MetaValueType.h"
 

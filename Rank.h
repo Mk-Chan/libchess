@@ -2,6 +2,7 @@
 #define LIBCHESS_RANK_H
 
 #include <cstdint>
+#include <optional>
 
 #include "internal/MetaValueType.h"
 

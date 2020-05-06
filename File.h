@@ -2,6 +2,7 @@
 #define LIBCHESS_FILE_H
 
 #include <cstdint>
+#include <optional>
 
 #include "internal/MetaValueType.h"
 

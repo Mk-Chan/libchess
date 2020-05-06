@@ -1,6 +1,7 @@
 #ifndef LIBCHESS_TUNER_H
 #define LIBCHESS_TUNER_H
 
+#include <array>
 #include <cmath>
 #include <fstream>
 #include <functional>

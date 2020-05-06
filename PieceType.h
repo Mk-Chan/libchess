@@ -1,6 +1,9 @@
 #ifndef LIBCHESS_PIECETYPE_H
 #define LIBCHESS_PIECETYPE_H
 
+#include <optional>
+#include <ostream>
+
 #include "internal/MetaValueType.h"
 
 namespace libchess {
