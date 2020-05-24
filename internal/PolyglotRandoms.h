@@ -396,9 +396,8 @@ constexpr static std::uint64_t random_u64[782] = {
     std::uint64_t(0x003A93D8B2806962), std::uint64_t(0x1C99DED33CB890A1),
     std::uint64_t(0xCF3145DE0ADD4289), std::uint64_t(0xD0E4427A5514FB72),
     std::uint64_t(0x77C621CC9FB3A483), std::uint64_t(0x67A34DAC4356550B),
-    std::uint64_t(0xF8D626AAAF278509), std::uint64_t(0)
-};
+    std::uint64_t(0xF8D626AAAF278509), std::uint64_t(0)};
 
 }
 
-#endif // LIBCHESS_POLYGLOTRANDOMS_H
+#endif  // LIBCHESS_POLYGLOTRANDOMS_H

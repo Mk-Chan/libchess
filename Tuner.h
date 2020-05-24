@@ -15,9 +15,9 @@
 namespace libchess {
 
 class TunableParameter {
-  public:
-    TunableParameter(std::string name, int value) noexcept
-        : name_(std::move(name)), value_(value) {}
+   public:
+    TunableParameter(std::string name, int value) noexcept : name_(std::move(name)), value_(value) {
+    }
 
     TunableParameter operator+(int rhs) const noexcept {
         return TunableParameter{name(), value() + rhs};
@@ -25,47 +25,68 @@ class TunableParameter {
     TunableParameter operator-(int rhs) const noexcept {
         return TunableParameter{name(), value_ - rhs};
     }
-    void operator+=(int rhs) noexcept { value_ += rhs; }
-    void operator-=(int rhs) noexcept { value_ -= rhs; }
+    void operator+=(int rhs) noexcept {
+        value_ += rhs;
+    }
+    void operator-=(int rhs) noexcept {
+        value_ -= rhs;
+    }
 
-    [[nodiscard]] const std::string& name() const noexcept { return name_; }
-    [[nodiscard]] int value() const noexcept { return value_; }
+    [[nodiscard]] const std::string& name() const noexcept {
+        return name_;
+    }
+    [[nodiscard]] int value() const noexcept {
+        return value_;
+    }
 
-    void set_value(int value) noexcept { value_ = value; }
+    void set_value(int value) noexcept {
+        value_ = value;
+    }
 
     [[nodiscard]] std::string to_str() const noexcept {
         return name_ + ": " + std::to_string(value_);
     }
 
-  private:
+   private:
     std::string name_;
     int value_;
 };
 
-enum class Result { BLACK_WIN, DRAW, WHITE_WIN };
+enum class Result
+{
+    BLACK_WIN,
+    DRAW,
+    WHITE_WIN
+};
 
-template <class Position> class NormalizedResult {
-  public:
+template <class Position>
+class NormalizedResult {
+   public:
     NormalizedResult(Position position, Result result) noexcept : position_(std::move(position)) {
         switch (result) {
-        case Result::BLACK_WIN:
-            value_ = 0.0;
-            break;
-        case Result::DRAW:
-            value_ = 0.5;
-            break;
-        case Result::WHITE_WIN:
-            value_ = 1.0;
-            break;
+            case Result::BLACK_WIN:
+                value_ = 0.0;
+                break;
+            case Result::DRAW:
+                value_ = 0.5;
+                break;
+            case Result::WHITE_WIN:
+                value_ = 1.0;
+                break;
         }
     }
 
-    [[nodiscard]] Position& position() noexcept { return position_; }
-    [[nodiscard]] double value() const noexcept { return value_; }
+    [[nodiscard]] Position& position() noexcept {
+        return position_;
+    }
+    [[nodiscard]] double value() const noexcept {
+        return value_;
+    }
 
-    static std::vector<NormalizedResult<Position>>
-    parse_epd(const std::string& path, std::function<Position(const std::string&)> fen_parser,
-              const std::string& result_opcode = "c9") noexcept {
+    static std::vector<NormalizedResult<Position>> parse_epd(
+        const std::string& path,
+        std::function<Position(const std::string&)> fen_parser,
+        const std::string& result_opcode = "c9") noexcept {
         std::string line;
         std::ifstream file_stream{path};
         std::vector<NormalizedResult<Position>> normalized_results;
@@ -109,19 +130,21 @@ template <class Position> class NormalizedResult {
         return normalized_results;
     }
 
-  private:
+   private:
     Position position_;
     double value_;
 };
 
-template <class Position> class Tuner {
-  public:
+template <class Position>
+class Tuner {
+   public:
     Tuner(std::vector<NormalizedResult<Position>> normalized_results,
           std::vector<TunableParameter> tunable_parameters,
           std::function<int(Position&, const std::vector<TunableParameter>&)> eval_function)
         : normalized_results_(std::move(normalized_results)),
           tunable_parameters_(std::move(tunable_parameters)),
-          eval_function_(std::move(eval_function)) {}
+          eval_function_(std::move(eval_function)) {
+    }
 
     [[nodiscard]] const std::vector<TunableParameter>& tunable_parameters() const noexcept {
         return tunable_parameters_;
@@ -246,7 +269,7 @@ template <class Position> class Tuner {
         }
     }
 
-  protected:
+   protected:
     [[nodiscard]] static double sigmoid(int score, double k = 1.13) noexcept {
         return 1.0 / (1.0 + std::pow(10.0, -k * score / 400.0));
     }
@@ -255,14 +278,20 @@ template <class Position> class Tuner {
         return eval_function_(position, tunable_parameters_);
     }
 
-  private:
+   private:
     constexpr static std::array<int, 7> increment_values{100, 50, 25, 12, 6, 3, 1};
 
     struct LocalParameterTuningData {
-      public:
-        [[nodiscard]] bool improving() const noexcept { return direction_ != 0; }
-        [[nodiscard]] bool done() const noexcept { return done_; }
-        [[nodiscard]] int direction() const noexcept { return direction_; }
+       public:
+        [[nodiscard]] bool improving() const noexcept {
+            return direction_ != 0;
+        }
+        [[nodiscard]] bool done() const noexcept {
+            return done_;
+        }
+        [[nodiscard]] int direction() const noexcept {
+            return direction_;
+        }
         [[nodiscard]] int increment() const noexcept {
             return direction_ * increment_values[increment_offset_];
         }
@@ -275,18 +304,24 @@ template <class Position> class Tuner {
                 ++increment_offset_;
             }
         }
-        void reverse_direction() noexcept { direction_ = -direction_; }
-        void set_done(bool value) noexcept { done_ = value; }
-        void set_direction(int value) noexcept { direction_ = value; }
+        void reverse_direction() noexcept {
+            direction_ = -direction_;
+        }
+        void set_done(bool value) noexcept {
+            done_ = value;
+        }
+        void set_direction(int value) noexcept {
+            direction_ = value;
+        }
 
-      private:
+       private:
         bool done_ = false;
         unsigned increment_offset_ = 0;
         int direction_ = 1;
     };
 
-    [[nodiscard]] static bool
-    all_done(const std::vector<LocalParameterTuningData>& tuning_data_list) noexcept {
+    [[nodiscard]] static bool all_done(
+        const std::vector<LocalParameterTuningData>& tuning_data_list) noexcept {
         for (auto& tuning_data : tuning_data_list) {
             if (!tuning_data.done()) {
                 return false;
@@ -300,6 +335,6 @@ template <class Position> class Tuner {
     std::function<int(Position&, const std::vector<TunableParameter>&)> eval_function_{};
 };
 
-} // namespace libchess
+}  // namespace libchess
 
-#endif // LIBCHESS_TUNER_H
+#endif  // LIBCHESS_TUNER_H

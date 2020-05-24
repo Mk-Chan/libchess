@@ -26,13 +26,29 @@ static Bitboard FILE_F_MASK{std::uint64_t(0x2020202020202020)};
 static Bitboard FILE_G_MASK{std::uint64_t(0x4040404040404040)};
 static Bitboard FILE_H_MASK{std::uint64_t(0x8080808080808080)};
 
-static std::array<Bitboard, 8> RANK_MASK = {RANK_1_MASK, RANK_2_MASK, RANK_3_MASK, RANK_4_MASK,
-                                            RANK_5_MASK, RANK_6_MASK, RANK_7_MASK, RANK_8_MASK};
-static std::array<Bitboard, 8> FILE_MASK = {FILE_A_MASK, FILE_B_MASK, FILE_C_MASK, FILE_D_MASK,
-                                            FILE_E_MASK, FILE_F_MASK, FILE_G_MASK, FILE_H_MASK};
+static std::array<Bitboard, 8> RANK_MASK = {RANK_1_MASK,
+                                            RANK_2_MASK,
+                                            RANK_3_MASK,
+                                            RANK_4_MASK,
+                                            RANK_5_MASK,
+                                            RANK_6_MASK,
+                                            RANK_7_MASK,
+                                            RANK_8_MASK};
+static std::array<Bitboard, 8> FILE_MASK = {FILE_A_MASK,
+                                            FILE_B_MASK,
+                                            FILE_C_MASK,
+                                            FILE_D_MASK,
+                                            FILE_E_MASK,
+                                            FILE_F_MASK,
+                                            FILE_G_MASK,
+                                            FILE_H_MASK};
 
-inline Bitboard rank_mask(Rank rank) { return RANK_MASK[rank.value()]; }
-inline Bitboard file_mask(File file) { return FILE_MASK[file.value()]; }
+inline Bitboard rank_mask(Rank rank) {
+    return RANK_MASK[rank.value()];
+}
+inline Bitboard file_mask(File file) {
+    return FILE_MASK[file.value()];
+}
 
 namespace init {
 
@@ -188,7 +204,7 @@ inline std::array<std::array<Bitboard, 64>, 64> intervening() {
     return intervening_bb;
 }
 
-} // namespace init
+}  // namespace init
 
 // Direction bitboards
 static std::array<Bitboard, 64> NORTH = init::north();
@@ -201,15 +217,33 @@ static std::array<Bitboard, 64> NORTHEAST = init::northeast();
 static std::array<Bitboard, 64> SOUTHEAST = init::southeast();
 static std::array<std::array<Bitboard, 64>, 64> INTERVENING = init::intervening();
 
-static Bitboard north(Square square) { return NORTH[square]; }
-static Bitboard south(Square square) { return SOUTH[square]; }
-static Bitboard east(Square square) { return EAST[square]; }
-static Bitboard west(Square square) { return WEST[square]; }
-static Bitboard northwest(Square square) { return NORTHWEST[square]; }
-static Bitboard southwest(Square square) { return SOUTHWEST[square]; }
-static Bitboard northeast(Square square) { return NORTHEAST[square]; }
-static Bitboard southeast(Square square) { return SOUTHEAST[square]; }
-static Bitboard intervening(Square from, Square to) { return INTERVENING[from][to]; }
+static Bitboard north(Square square) {
+    return NORTH[square];
+}
+static Bitboard south(Square square) {
+    return SOUTH[square];
+}
+static Bitboard east(Square square) {
+    return EAST[square];
+}
+static Bitboard west(Square square) {
+    return WEST[square];
+}
+static Bitboard northwest(Square square) {
+    return NORTHWEST[square];
+}
+static Bitboard southwest(Square square) {
+    return SOUTHWEST[square];
+}
+static Bitboard northeast(Square square) {
+    return NORTHEAST[square];
+}
+static Bitboard southeast(Square square) {
+    return SOUTHEAST[square];
+}
+static Bitboard intervening(Square from, Square to) {
+    return INTERVENING[from][to];
+}
 
 namespace init {
 
@@ -318,7 +352,7 @@ inline std::array<Bitboard, 64> queen_attacks() {
     return attacks;
 }
 
-} // namespace init
+}  // namespace init
 
 // Piece attack bitboards
 static std::array<std::array<Bitboard, 64>, 2> PAWN_ATTACKS = init::pawn_attacks();
@@ -328,14 +362,24 @@ static std::array<Bitboard, 64> BISHOP_ATTACKS = init::bishop_attacks();
 static std::array<Bitboard, 64> ROOK_ATTACKS = init::rook_attacks();
 static std::array<Bitboard, 64> QUEEN_ATTACKS = init::queen_attacks();
 
-inline Bitboard pawn_attacks(Square square, Color color) { return PAWN_ATTACKS[color][square]; }
+inline Bitboard pawn_attacks(Square square, Color color) {
+    return PAWN_ATTACKS[color][square];
+}
 inline Bitboard knight_attacks(Square square, Bitboard = Bitboard{0}) {
     return KNIGHT_ATTACKS[square];
 }
-inline Bitboard king_attacks(Square square, Bitboard = Bitboard{0}) { return KING_ATTACKS[square]; }
-inline Bitboard bishop_attacks(Square square) { return BISHOP_ATTACKS[square]; }
-inline Bitboard rook_attacks(Square square) { return ROOK_ATTACKS[square]; }
-inline Bitboard queen_attacks(Square square) { return QUEEN_ATTACKS[square]; }
+inline Bitboard king_attacks(Square square, Bitboard = Bitboard{0}) {
+    return KING_ATTACKS[square];
+}
+inline Bitboard bishop_attacks(Square square) {
+    return BISHOP_ATTACKS[square];
+}
+inline Bitboard rook_attacks(Square square) {
+    return ROOK_ATTACKS[square];
+}
+inline Bitboard queen_attacks(Square square) {
+    return QUEEN_ATTACKS[square];
+}
 inline Bitboard bishop_attacks(Square square, Bitboard occupancy) {
     Bitboard attacks = bishop_attacks(square);
     Bitboard nw_blockers = (northwest(square) & occupancy) | Bitboard{constants::A8};
@@ -394,22 +438,25 @@ inline Rank relative_rank(Rank rank, Color c) {
                ? rank
                : Rank{static_cast<Rank::value_type>(constants::RANK_8.value() - rank.value())};
 }
-inline Bitboard relative_rank_mask(Rank rank, Color c) { return rank_mask(relative_rank(rank, c)); }
-inline Bitboard non_pawn_piece_type_attacks(PieceType piece_type, Square square,
+inline Bitboard relative_rank_mask(Rank rank, Color c) {
+    return rank_mask(relative_rank(rank, c));
+}
+inline Bitboard non_pawn_piece_type_attacks(PieceType piece_type,
+                                            Square square,
                                             Bitboard occupancies = Bitboard{0}) {
     switch (piece_type) {
-    case constants::KNIGHT:
-        return knight_attacks(square);
-    case constants::BISHOP:
-        return bishop_attacks(square, occupancies);
-    case constants::ROOK:
-        return rook_attacks(square, occupancies);
-    case constants::QUEEN:
-        return queen_attacks(square, occupancies);
-    case constants::KING:
-        return king_attacks(square);
-    default:
-        return Bitboard{0};
+        case constants::KNIGHT:
+            return knight_attacks(square);
+        case constants::BISHOP:
+            return bishop_attacks(square, occupancies);
+        case constants::ROOK:
+            return rook_attacks(square, occupancies);
+        case constants::QUEEN:
+            return queen_attacks(square, occupancies);
+        case constants::KING:
+            return king_attacks(square);
+        default:
+            return Bitboard{0};
     }
 }
 
@@ -447,12 +494,14 @@ inline std::array<std::array<Bitboard, 64>, 64> direction_xray() {
     return direction_bb;
 }
 
-} // namespace init
+}  // namespace init
 
 static std::array<std::array<Bitboard, 64>, 64> DIRECTION_XRAY = init::direction_xray();
 
-inline Bitboard direction_xray(Square from, Square to) { return DIRECTION_XRAY[from][to]; }
+inline Bitboard direction_xray(Square from, Square to) {
+    return DIRECTION_XRAY[from][to];
+}
 
-} // namespace libchess::lookups
+}  // namespace libchess::lookups
 
-#endif // LIBCHESS_LOOKUPS_H
+#endif  // LIBCHESS_LOOKUPS_H

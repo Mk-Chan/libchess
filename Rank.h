@@ -9,10 +9,11 @@
 namespace libchess {
 
 class Rank : public MetaValueType<int> {
-  public:
+   public:
     class Value {
-      public:
-        enum RankValue : value_type {
+       public:
+        enum RankValue : value_type
+        {
             RANK_1,
             RANK_2,
             RANK_3,
@@ -23,9 +24,12 @@ class Rank : public MetaValueType<int> {
             RANK_8
         };
     };
-    constexpr explicit Rank(value_type value) : MetaValueType<value_type>(value) {}
+    constexpr explicit Rank(value_type value) : MetaValueType<value_type>(value) {
+    }
 
-    constexpr char to_char() const { return '1' + value(); }
+    constexpr char to_char() const {
+        return '1' + value();
+    }
 
     constexpr static std::optional<Rank> from(char c) {
         int offset = c - '1';
@@ -47,14 +51,15 @@ constexpr static Rank RANK_6 = Rank{Rank::Value::RANK_6};
 constexpr static Rank RANK_7 = Rank{Rank::Value::RANK_7};
 constexpr static Rank RANK_8 = Rank{Rank::Value::RANK_8};
 
-} // namespace constants
+}  // namespace constants
 
-} // namespace libchess
+}  // namespace libchess
 
 namespace std {
 
-template <> struct hash<libchess::Rank> : public hash<libchess::Rank::value_type> {};
+template <>
+struct hash<libchess::Rank> : public hash<libchess::Rank::value_type> {};
 
-} // namespace std
+}  // namespace std
 
-#endif // LIBCHESS_RANK_H
+#endif  // LIBCHESS_RANK_H

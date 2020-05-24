@@ -42,6 +42,6 @@ constexpr inline std::uint64_t side_to_move_key(Color stm) {
     return polyglot::random_u64[780 + stm.value()];
 }
 
-} // namespace libchess::zobrist
+}  // namespace libchess::zobrist
 
-#endif // LIBCHESS_ZOBRIST_H
+#endif  // LIBCHESS_ZOBRIST_H

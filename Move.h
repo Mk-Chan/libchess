@@ -11,8 +11,9 @@
 namespace libchess {
 
 class Move {
-  private:
-    enum BitOpLookup : std::uint32_t {
+   private:
+    enum BitOpLookup : std::uint32_t
+    {
         TO_SQUARE_SHIFT = 6,
         PROMOTION_TYPE_SHIFT = 12,
         MOVE_TYPE_SHIFT = 15,
@@ -21,8 +22,9 @@ class Move {
         MOVE_TYPE_MASK = 7 << MOVE_TYPE_SHIFT
     };
 
-  public:
-    enum class Type : std::uint8_t {
+   public:
+    enum class Type : std::uint8_t
+    {
         NONE,
         NORMAL,
         CASTLING,
@@ -35,17 +37,23 @@ class Move {
 
     using value_type = int;
 
-    constexpr Move() : value_(0) {}
-    constexpr explicit Move(std::uint32_t value) : value_(value) {}
+    constexpr Move() : value_(0) {
+    }
+    constexpr explicit Move(std::uint32_t value) : value_(value) {
+    }
     constexpr Move(Square from_square, Square to_square, Move::Type type = Move::Type::NONE)
         : value_(from_square.value() | (to_square.value() << TO_SQUARE_SHIFT) |
                  (constants::PAWN.value() << PROMOTION_TYPE_SHIFT) |
-                 (std::uint32_t(type) << MOVE_TYPE_SHIFT)) {}
-    constexpr Move(Square from_square, Square to_square, PieceType promotion_pt,
+                 (std::uint32_t(type) << MOVE_TYPE_SHIFT)) {
+    }
+    constexpr Move(Square from_square,
+                   Square to_square,
+                   PieceType promotion_pt,
                    Move::Type type = Move::Type::NONE)
         : value_(from_square.value() | (to_square.value() << TO_SQUARE_SHIFT) |
                  (promotion_pt.value() << PROMOTION_TYPE_SHIFT) |
-                 (std::uint32_t(type) << MOVE_TYPE_SHIFT)) {}
+                 (std::uint32_t(type) << MOVE_TYPE_SHIFT)) {
+    }
 
     static std::optional<Move> from(const std::string& str) {
         auto strlen = str.length();
@@ -84,8 +92,12 @@ class Move {
         return value_sans_type() != rhs.value_sans_type();
     }
 
-    constexpr Square from_square() const { return Square{value() & 0x3f}; }
-    constexpr Square to_square() const { return Square{(value() & 0xfc0) >> 6}; }
+    constexpr Square from_square() const {
+        return Square{value() & 0x3f};
+    }
+    constexpr Square to_square() const {
+        return Square{(value() & 0xfc0) >> 6};
+    }
     constexpr Move::Type type() const {
         return static_cast<Move::Type>((value() & MOVE_TYPE_MASK) >> MOVE_TYPE_SHIFT);
     }
@@ -98,35 +110,54 @@ class Move {
         return promotion_pt;
     }
 
-    constexpr value_type value_sans_type() const { return value_ & ~MOVE_TYPE_MASK; }
-    constexpr value_type value() const { return value_; }
+    constexpr value_type value_sans_type() const {
+        return value_ & ~MOVE_TYPE_MASK;
+    }
+    constexpr value_type value() const {
+        return value_;
+    }
 
-  private:
+   private:
     value_type value_;
 };
 
 class MoveList {
-  public:
+   public:
     using value_type = std::vector<Move>;
     using iterator = value_type::iterator;
     using const_iterator = value_type::const_iterator;
 
-    MoveList() { values_.reserve(32); }
+    MoveList() {
+        values_.reserve(32);
+    }
 
-    iterator begin() { return values_.begin(); }
-    iterator end() { return values_.end(); }
-    const_iterator cbegin() const { return values_.cbegin(); }
-    const_iterator cend() const { return values_.cend(); }
+    iterator begin() {
+        return values_.begin();
+    }
+    iterator end() {
+        return values_.end();
+    }
+    const_iterator cbegin() const {
+        return values_.cbegin();
+    }
+    const_iterator cend() const {
+        return values_.cend();
+    }
 
-    void pop_back() { values_.pop_back(); }
-    void add(Move move) { values_.push_back(move); }
+    void pop_back() {
+        values_.pop_back();
+    }
+    void add(Move move) {
+        values_.push_back(move);
+    }
     void add(const MoveList& move_list) noexcept {
         values_.reserve(size() + move_list.size());
         for (auto iter = move_list.cbegin(); iter != move_list.cend(); ++iter) {
             add(*iter);
         }
     }
-    template <class F> void sort(F move_evaluator) {
+    template <class F>
+    void sort(F move_evaluator) {
         auto& moves = values_mut_ref();
         std::vector<int> scores;
         scores.reserve(values_.size());
@@ -149,16 +180,28 @@ class MoveList {
             moves[j] = moving_move;
         }
     }
-    void clear() noexcept { values_.clear(); }
-    bool empty() const noexcept { return values_.empty(); }
-    int size() const { return values_.size(); }
-    const value_type& values() const { return values_; }
-    bool contains(Move move) const { return std::find(cbegin(), cend(), move) != cend(); }
+    void clear() noexcept {
+        values_.clear();
+    }
+    bool empty() const noexcept {
+        return values_.empty();
+    }
+    int size() const {
+        return values_.size();
+    }
+    const value_type& values() const {
+        return values_;
+    }
+    bool contains(Move move) const {
+        return std::find(cbegin(), cend(), move) != cend();
+    }
 
-  protected:
-    value_type& values_mut_ref() { return values_; }
+   protected:
+    value_type& values_mut_ref() {
+        return values_;
+    }
 
-  private:
+   private:
     value_type values_;
 };
 
@@ -166,12 +209,13 @@ inline std::ostream& operator<<(std::ostream& ostream, Move move) {
     return ostream << move.to_str();
 }
 
-} // namespace libchess
+}  // namespace libchess
 
 namespace std {
 
-template <> struct hash<libchess::Move> : public hash<libchess::Move::value_type> {};
+template <>
+struct hash<libchess::Move> : public hash<libchess::Move::value_type> {};
 
-} // namespace std
+}  // namespace std
 
-#endif // LIBCHESS_MOVE_H
+#endif  // LIBCHESS_MOVE_H

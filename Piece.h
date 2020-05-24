@@ -7,14 +7,19 @@
 namespace libchess {
 
 class Piece {
-  public:
+   public:
     using value_type = int;
 
     constexpr Piece(PieceType piece_type, Color piece_color)
-        : value_(piece_type.value() | (piece_color.value() << 3)) {}
+        : value_(piece_type.value() | (piece_color.value() << 3)) {
+    }
 
-    constexpr PieceType type() const { return PieceType{value_ & 7}; }
-    constexpr Color color() const { return Color{value_ >> 3}; }
+    constexpr PieceType type() const {
+        return PieceType{value_ & 7};
+    }
+    constexpr Color color() const {
+        return Color{value_ >> 3};
+    }
 
     constexpr bool operator==(const Piece rhs) const {
         return type() == rhs.type() && color() == rhs.color();
@@ -50,7 +55,7 @@ class Piece {
         return Piece::from(*piece_type, piece_color);
     }
 
-  private:
+   private:
     value_type value_;
 };
 
@@ -77,18 +82,28 @@ constexpr static Piece BLACK_BISHOP = *Piece::from(BISHOP, BLACK);
 constexpr static Piece BLACK_ROOK = *Piece::from(ROOK, BLACK);
 constexpr static Piece BLACK_QUEEN = *Piece::from(QUEEN, BLACK);
 constexpr static Piece BLACK_KING = *Piece::from(KING, BLACK);
-constexpr static Piece PIECES[]{BLACK_PAWN,   WHITE_PAWN,   BLACK_KNIGHT, WHITE_KNIGHT,
-                                BLACK_BISHOP, WHITE_BISHOP, BLACK_ROOK,   WHITE_ROOK,
-                                BLACK_QUEEN,  WHITE_QUEEN,  BLACK_KING,   WHITE_KING};
+constexpr static Piece PIECES[]{BLACK_PAWN,
+                                WHITE_PAWN,
+                                BLACK_KNIGHT,
+                                WHITE_KNIGHT,
+                                BLACK_BISHOP,
+                                WHITE_BISHOP,
+                                BLACK_ROOK,
+                                WHITE_ROOK,
+                                BLACK_QUEEN,
+                                WHITE_QUEEN,
+                                BLACK_KING,
+                                WHITE_KING};
 
-} // namespace constants
+}  // namespace constants
 
-} // namespace libchess
+}  // namespace libchess
 
 namespace std {
 
-template <> struct hash<libchess::Piece> : public hash<libchess::Piece::value_type> {};
+template <>
+struct hash<libchess::Piece> : public hash<libchess::Piece::value_type> {};
 
-} // namespace std
+}  // namespace std
 
-#endif // LIBCHESS_PIECE_H
+#endif  // LIBCHESS_PIECE_H

@@ -9,10 +9,11 @@
 namespace libchess {
 
 class File : public MetaValueType<int> {
-  public:
+   public:
     class Value {
-      public:
-        enum FileValue : value_type {
+       public:
+        enum FileValue : value_type
+        {
             FILE_A,
             FILE_B,
             FILE_C,
@@ -23,9 +24,12 @@ class File : public MetaValueType<int> {
             FILE_H
         };
     };
-    constexpr explicit File(value_type value) : MetaValueType<value_type>(value) {}
+    constexpr explicit File(value_type value) : MetaValueType<value_type>(value) {
+    }
 
-    constexpr char to_char() const { return 'a' + value(); }
+    constexpr char to_char() const {
+        return 'a' + value();
+    }
 
     constexpr static std::optional<File> from(char c) {
         int offset = c >= 'a' ? (c - 'a') : (c - 'A');
@@ -47,14 +51,15 @@ constexpr static File FILE_F = File{File::Value::FILE_F};
 constexpr static File FILE_G = File{File::Value::FILE_G};
 constexpr static File FILE_H = File{File::Value::FILE_H};
 
-} // namespace constants
+}  // namespace constants
 
-} // namespace libchess
+}  // namespace libchess
 
 namespace std {
 
-template <> struct hash<libchess::File> : public hash<libchess::File::value_type> {};
+template <>
+struct hash<libchess::File> : public hash<libchess::File::value_type> {};
 
-} // namespace std
+}  // namespace std
 
-#endif // LIBCHESS_FILE_H
+#endif  // LIBCHESS_FILE_H

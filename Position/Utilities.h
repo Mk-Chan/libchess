@@ -306,6 +306,6 @@ inline std::optional<Position> Position::from_uci_position_line(const std::strin
     return pos;
 }
 
-} // namespace libchess
+}  // namespace libchess
 
-#endif // LIBCHESS_UTILITIES_H
+#endif  // LIBCHESS_UTILITIES_H

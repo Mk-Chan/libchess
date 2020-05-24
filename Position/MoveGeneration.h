@@ -14,12 +14,12 @@ inline void Position::generate_quiet_promotions(MoveList& move_list, Color stm) 
         promotion_candidates.forward_popbit();
         move_list.add(
             Move{lookups::pawn_shift(to_sq, !stm), to_sq, constants::QUEEN, Move::Type::PROMOTION});
-        move_list.add(Move{lookups::pawn_shift(to_sq, !stm), to_sq, constants::KNIGHT,
-                           Move::Type::PROMOTION});
+        move_list.add(Move{
+            lookups::pawn_shift(to_sq, !stm), to_sq, constants::KNIGHT, Move::Type::PROMOTION});
         move_list.add(
             Move{lookups::pawn_shift(to_sq, !stm), to_sq, constants::ROOK, Move::Type::PROMOTION});
-        move_list.add(Move{lookups::pawn_shift(to_sq, !stm), to_sq, constants::BISHOP,
-                           Move::Type::PROMOTION});
+        move_list.add(Move{
+            lookups::pawn_shift(to_sq, !stm), to_sq, constants::BISHOP, Move::Type::PROMOTION});
     }
 }
 
@@ -116,7 +116,8 @@ inline void Position::generate_non_pawn_quiets(PieceType pt, MoveList& move_list
     }
 }
 
-inline void Position::generate_non_pawn_captures(PieceType pt, MoveList& move_list,
+inline void Position::generate_non_pawn_captures(PieceType pt,
+                                                 MoveList& move_list,
                                                  Color stm) const {
     Bitboard piece_bb = piece_type_bb(pt, stm);
     Bitboard occupancy = occupancy_bb();
@@ -363,8 +364,10 @@ inline MoveList Position::legal_move_list(Color stm) const {
     return move_list;
 }
 
-inline MoveList Position::legal_move_list() const { return legal_move_list(side_to_move()); }
+inline MoveList Position::legal_move_list() const {
+    return legal_move_list(side_to_move());
+}
 
-} // namespace libchess
+}  // namespace libchess
 
-#endif // LIBCHESS_MOVEGENERATION_H
+#endif  // LIBCHESS_MOVEGENERATION_H

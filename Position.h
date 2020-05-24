@@ -24,19 +24,27 @@ namespace constants {
 
 static std::string STARTPOS_FEN = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1";
 
-} // namespace constants
+}  // namespace constants
 
 class Position {
-  private:
-    Position() : side_to_move_(constants::WHITE), ply_(0) {}
+   private:
+    Position() : side_to_move_(constants::WHITE), ply_(0) {
+    }
 
-  public:
+   public:
     explicit Position(const std::string& fen_str) : Position() {
         *this = *Position::from_fen(fen_str);
     }
     using hash_type = std::uint64_t;
 
-    enum class GameState { IN_PROGRESS, CHECKMATE, STALEMATE, THREEFOLD_REPETITION, FIFTY_MOVES };
+    enum class GameState
+    {
+        IN_PROGRESS,
+        CHECKMATE,
+        STALEMATE,
+        THREEFOLD_REPETITION,
+        FIFTY_MOVES
+    };
 
     // Getters
     Bitboard piece_type_bb(PieceType piece_type) const;
@@ -119,7 +127,7 @@ class Position {
     static std::optional<Position> from_fen(const std::string& fen);
     static std::optional<Position> from_uci_position_line(const std::string& line);
 
-  protected:
+   protected:
     // clang-format off
     constexpr static int castling_spoilers[64] = {
         13, 15, 15, 15, 12, 15, 15, 14,
@@ -144,12 +152,24 @@ class Position {
         int halfmoves_ = 0;
     };
 
-    int ply() const { return ply_; }
-    const std::vector<State>& history() const { return history_; }
-    State& state_mut_ref() { return history_[ply()]; }
-    State& state_mut_ref(int ply) { return history_[ply]; }
-    const State& state() const { return history_[ply()]; }
-    const State& state(int ply) const { return history_[ply]; }
+    int ply() const {
+        return ply_;
+    }
+    const std::vector<State>& history() const {
+        return history_;
+    }
+    State& state_mut_ref() {
+        return history_[ply()];
+    }
+    State& state_mut_ref(int ply) {
+        return history_[ply];
+    }
+    const State& state() const {
+        return history_[ply()];
+    }
+    const State& state(int ply) const {
+        return history_[ply];
+    }
     hash_type calculate_hash() const {
         hash_type hash_value = 0;
         for (Color c : constants::COLORS) {
@@ -196,9 +216,11 @@ class Position {
         piece_type_bb_[piece_type.value()] ^= from_to_sqs_bb;
         color_bb_[color.value()] ^= from_to_sqs_bb;
     }
-    void reverse_side_to_move() { side_to_move_ = !side_to_move_; }
+    void reverse_side_to_move() {
+        side_to_move_ = !side_to_move_;
+    }
 
-  private:
+   private:
     Bitboard piece_type_bb_[6];
     Bitboard color_bb_[2];
     Color side_to_move_;
@@ -209,7 +231,7 @@ class Position {
     std::string start_fen_;
 };
 
-} // namespace libchess
+}  // namespace libchess
 
 #include "Position/Attacks.h"
 #include "Position/Getters.h"
@@ -217,4 +239,4 @@ class Position {
 #include "Position/MoveIntegration.h"
 #include "Position/Utilities.h"
 
-#endif // LIBCHESS_POSITION_H
+#endif  // LIBCHESS_POSITION_H

@@ -3,7 +3,9 @@
 
 namespace libchess {
 
-inline Bitboard Position::checkers_to(Color c) const { return attackers_to(king_square(c), !c); }
+inline Bitboard Position::checkers_to(Color c) const {
+    return attackers_to(king_square(c), !c);
+}
 
 inline Bitboard Position::attackers_to(Square square, Bitboard occupancy) const {
     Bitboard attackers;
@@ -61,6 +63,6 @@ inline Bitboard Position::pinned_pieces_of(Color c) const {
     return pinned_bb;
 }
 
-} // namespace libchess
+}  // namespace libchess
 
-#endif // LIBCHESS_ATTACKS_H
+#endif  // LIBCHESS_ATTACKS_H

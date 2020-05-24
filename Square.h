@@ -12,9 +12,9 @@
 namespace libchess {
 
 class Square : public MetaValueType<int> {
-  public:
+   public:
     class Value {
-      public:
+       public:
         // clang-format off
         enum SquareValue : value_type {
             A1, B1, C1, D1, E1, F1, G1, H1,
@@ -151,14 +151,15 @@ constexpr static Square SQUARES[]{
 };
 // clang-format on
 
-} // namespace constants
+}  // namespace constants
 
-} // namespace libchess
+}  // namespace libchess
 
 namespace std {
 
-template <> struct hash<libchess::Square> : public hash<libchess::Square::value_type> {};
+template <>
+struct hash<libchess::Square> : public hash<libchess::Square::value_type> {};
 
-} // namespace std
+}  // namespace std
 
-#endif // LIBCHESS_SQUARE_H
+#endif  // LIBCHESS_SQUARE_H

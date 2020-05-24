@@ -10,10 +10,11 @@
 namespace libchess {
 
 class CastlingRight : public MetaValueType<int> {
-  public:
+   public:
     class Value {
-      public:
-        enum CastlingRightValue : value_type {
+       public:
+        enum CastlingRightValue : value_type
+        {
             CASTLING_RIGHT_NONE = 0,
             WHITE_KINGSIDE = 1,
             WHITE_QUEENSIDE = 2,
@@ -21,20 +22,21 @@ class CastlingRight : public MetaValueType<int> {
             BLACK_QUEENSIDE = 8
         };
     };
-    constexpr explicit CastlingRight(value_type value) : MetaValueType<value_type>(value) {}
+    constexpr explicit CastlingRight(value_type value) : MetaValueType<value_type>(value) {
+    }
 
     constexpr static CastlingRight from(char c) {
         switch (c) {
-        case 'K':
-            return CastlingRight{Value::WHITE_KINGSIDE};
-        case 'Q':
-            return CastlingRight{Value::WHITE_QUEENSIDE};
-        case 'k':
-            return CastlingRight{Value::BLACK_KINGSIDE};
-        case 'q':
-            return CastlingRight{Value::BLACK_QUEENSIDE};
-        default:
-            return CastlingRight{Value::CASTLING_RIGHT_NONE};
+            case 'K':
+                return CastlingRight{Value::WHITE_KINGSIDE};
+            case 'Q':
+                return CastlingRight{Value::WHITE_QUEENSIDE};
+            case 'k':
+                return CastlingRight{Value::BLACK_KINGSIDE};
+            case 'q':
+                return CastlingRight{Value::BLACK_QUEENSIDE};
+            default:
+                return CastlingRight{Value::CASTLING_RIGHT_NONE};
         }
     }
 };
@@ -42,37 +44,42 @@ class CastlingRight : public MetaValueType<int> {
 inline std::ostream& operator<<(std::ostream& ostream, CastlingRight castling_right) {
     char c = '-';
     switch (castling_right.value()) {
-    case CastlingRight::Value::WHITE_KINGSIDE:
-        c = 'K';
-        break;
-    case CastlingRight::Value::WHITE_QUEENSIDE:
-        c = 'Q';
-        break;
-    case CastlingRight::Value::BLACK_KINGSIDE:
-        c = 'k';
-        break;
-    case CastlingRight::Value::BLACK_QUEENSIDE:
-        c = 'q';
-        break;
+        case CastlingRight::Value::WHITE_KINGSIDE:
+            c = 'K';
+            break;
+        case CastlingRight::Value::WHITE_QUEENSIDE:
+            c = 'Q';
+            break;
+        case CastlingRight::Value::BLACK_KINGSIDE:
+            c = 'k';
+            break;
+        case CastlingRight::Value::BLACK_QUEENSIDE:
+            c = 'q';
+            break;
     }
     return ostream << c;
 }
 
 class CastlingRights {
-  public:
+   public:
     using value_type = int;
 
-    constexpr CastlingRights() : CastlingRights(CastlingRight::Value::CASTLING_RIGHT_NONE) {}
-    constexpr explicit CastlingRights(value_type value) : value_(value) {}
+    constexpr CastlingRights() : CastlingRights(CastlingRight::Value::CASTLING_RIGHT_NONE) {
+    }
+    constexpr explicit CastlingRights(value_type value) : value_(value) {
+    }
     constexpr explicit CastlingRights(CastlingRight castling_right)
-        : value_(castling_right.value()) {}
+        : value_(castling_right.value()) {
+    }
     constexpr CastlingRights(std::initializer_list<CastlingRight> castling_right_list) : value_(0) {
         for (auto castling_right : castling_right_list) {
             allow(castling_right);
         }
     }
 
-    constexpr bool operator==(CastlingRights rhs) const { return value() == rhs.value(); }
+    constexpr bool operator==(CastlingRights rhs) const {
+        return value() == rhs.value();
+    }
 
     constexpr void allow(CastlingRight castling_right) {
         value_ |= value_type(castling_right.value());
@@ -117,10 +124,14 @@ class CastlingRights {
         return cr_str;
     }
 
-    constexpr value_type value() const { return value_; }
-    constexpr value_type& value_mut_ref() { return value_; }
+    constexpr value_type value() const {
+        return value_;
+    }
+    constexpr value_type& value_mut_ref() {
+        return value_;
+    }
 
-  private:
+   private:
     value_type value_;
 };
 
@@ -137,12 +148,14 @@ constexpr static CastlingRight BLACK_KINGSIDE{CastlingRight::Value::BLACK_KINGSI
 constexpr static CastlingRight BLACK_QUEENSIDE{CastlingRight::Value::BLACK_QUEENSIDE};
 
 constexpr static CastlingRights CASTLING_RIGHTS_NONE{};
-constexpr static CastlingRights CASTLING_RIGHTS_ALL{WHITE_KINGSIDE, WHITE_QUEENSIDE, BLACK_KINGSIDE,
+constexpr static CastlingRights CASTLING_RIGHTS_ALL{WHITE_KINGSIDE,
+                                                    WHITE_QUEENSIDE,
+                                                    BLACK_KINGSIDE,
                                                     BLACK_QUEENSIDE};
 
-} // namespace constants
+}  // namespace constants
 
-} // namespace libchess
+}  // namespace libchess
 
 namespace std {
 
@@ -151,6 +164,6 @@ struct hash<libchess::CastlingRight> : public hash<libchess::CastlingRight::valu
 template <>
 struct hash<libchess::CastlingRights> : public hash<libchess::CastlingRights::value_type> {};
 
-} // namespace std
+}  // namespace std
 
-#endif // LIBCHESS_CASTLINGRIGHTS_H
+#endif  // LIBCHESS_CASTLINGRIGHTS_H

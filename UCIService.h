@@ -19,28 +19,44 @@
 namespace libchess {
 
 class UCIScore {
-  public:
-    enum class ScoreType { CENTIPAWNS, MATE };
+   public:
+    enum class ScoreType
+    {
+        CENTIPAWNS,
+        MATE
+    };
 
-    UCIScore(int value, ScoreType score_type) noexcept : value_(value), score_type_(score_type) {}
+    UCIScore(int value, ScoreType score_type) noexcept : value_(value), score_type_(score_type) {
+    }
 
-    [[nodiscard]] int value() const noexcept { return value_; }
-    [[nodiscard]] ScoreType score_type() const noexcept { return score_type_; }
+    [[nodiscard]] int value() const noexcept {
+        return value_;
+    }
+    [[nodiscard]] ScoreType score_type() const noexcept {
+        return score_type_;
+    }
 
-  private:
+   private:
     int value_;
     ScoreType score_type_;
 };
 
 class UCIMoveList {
-  public:
+   public:
     explicit UCIMoveList(std::vector<std::string> move_list) noexcept
-        : move_list_(std::move(move_list)) {}
+        : move_list_(std::move(move_list)) {
+    }
 
-    [[nodiscard]] const std::string& operator[](int i) const noexcept { return move_list_[i]; }
+    [[nodiscard]] const std::string& operator[](int i) const noexcept {
+        return move_list_[i];
+    }
 
-    [[nodiscard]] const std::vector<std::string>& move_list() const { return move_list_; }
-    [[nodiscard]] bool empty() const { return move_list_.empty(); }
+    [[nodiscard]] const std::vector<std::string>& move_list() const {
+        return move_list_;
+    }
+    [[nodiscard]] bool empty() const {
+        return move_list_.empty();
+    }
 
     [[nodiscard]] std::string to_str() const noexcept {
         std::string pv_line = move_list_[0];
@@ -50,51 +66,89 @@ class UCIMoveList {
         return pv_line;
     }
 
-  private:
+   private:
     std::vector<std::string> move_list_;
 };
 
 class UCIPositionParameters {
-  public:
+   public:
     UCIPositionParameters(std::string fen, std::optional<UCIMoveList> move_list) noexcept
-        : fen_(std::move(fen)), move_list_(std::move(move_list)) {}
+        : fen_(std::move(fen)), move_list_(std::move(move_list)) {
+    }
 
-    [[nodiscard]] const std::string& fen() const noexcept { return fen_; }
+    [[nodiscard]] const std::string& fen() const noexcept {
+        return fen_;
+    }
     [[nodiscard]] const std::optional<UCIMoveList>& move_list() const noexcept {
         return move_list_;
     }
 
-  private:
+   private:
     std::string fen_;
     std::optional<UCIMoveList> move_list_;
 };
 
 class UCIGoParameters {
-  public:
-    UCIGoParameters(const std::optional<uint64_t>& nodes, const std::optional<int>& movetime,
-                    const std::optional<int>& depth, const std::optional<int>& wtime,
-                    const std::optional<int>& winc, const std::optional<int>& btime,
-                    const std::optional<int>& binc, const std::optional<int>& movestogo,
-                    bool infinite, bool ponder, std::optional<std::vector<std::string>> searchmoves)
-        : nodes_(nodes), movetime_(movetime), depth_(depth), wtime_(wtime), winc_(winc),
-          btime_(btime), binc_(binc), movestogo_(movestogo), infinite_(infinite), ponder_(ponder),
-          searchmoves_(std::move(searchmoves)) {}
+   public:
+    UCIGoParameters(const std::optional<uint64_t>& nodes,
+                    const std::optional<int>& movetime,
+                    const std::optional<int>& depth,
+                    const std::optional<int>& wtime,
+                    const std::optional<int>& winc,
+                    const std::optional<int>& btime,
+                    const std::optional<int>& binc,
+                    const std::optional<int>& movestogo,
+                    bool infinite,
+                    bool ponder,
+                    std::optional<std::vector<std::string>> searchmoves)
+        : nodes_(nodes),
+          movetime_(movetime),
+          depth_(depth),
+          wtime_(wtime),
+          winc_(winc),
+          btime_(btime),
+          binc_(binc),
+          movestogo_(movestogo),
+          infinite_(infinite),
+          ponder_(ponder),
+          searchmoves_(std::move(searchmoves)) {
+    }
 
-    [[nodiscard]] const std::optional<uint64_t>& nodes() const noexcept { return nodes_; }
-    [[nodiscard]] const std::optional<int>& movetime() const noexcept { return movetime_; }
-    [[nodiscard]] const std::optional<int>& depth() const noexcept { return depth_; }
-    [[nodiscard]] const std::optional<int>& wtime() const noexcept { return wtime_; }
-    [[nodiscard]] const std::optional<int>& winc() const noexcept { return winc_; }
-    [[nodiscard]] const std::optional<int>& btime() const noexcept { return btime_; }
-    [[nodiscard]] const std::optional<int>& binc() const noexcept { return binc_; }
-    [[nodiscard]] const std::optional<int>& movestogo() const noexcept { return movestogo_; }
-    [[nodiscard]] bool infinite() const noexcept { return infinite_; }
-    [[nodiscard]] bool ponder() const noexcept { return ponder_; }
+    [[nodiscard]] const std::optional<uint64_t>& nodes() const noexcept {
+        return nodes_;
+    }
+    [[nodiscard]] const std::optional<int>& movetime() const noexcept {
+        return movetime_;
+    }
+    [[nodiscard]] const std::optional<int>& depth() const noexcept {
+        return depth_;
+    }
+    [[nodiscard]] const std::optional<int>& wtime() const noexcept {
+        return wtime_;
+    }
+    [[nodiscard]] const std::optional<int>& winc() const noexcept {
+        return winc_;
+    }
+    [[nodiscard]] const std::optional<int>& btime() const noexcept {
+        return btime_;
+    }
+    [[nodiscard]] const std::optional<int>& binc() const noexcept {
+        return binc_;
+    }
+    [[nodiscard]] const std::optional<int>& movestogo() const noexcept {
+        return movestogo_;
+    }
+    [[nodiscard]] bool infinite() const noexcept {
+        return infinite_;
+    }
+    [[nodiscard]] bool ponder() const noexcept {
+        return ponder_;
+    }
     [[nodiscard]] const std::optional<UCIMoveList>& searchmoves() const noexcept {
         return searchmoves_;
     }
 
-  private:
+   private:
     std::optional<std::uint64_t> nodes_;
     std::optional<int> movetime_;
     std::optional<int> depth_;
@@ -109,7 +163,7 @@ class UCIGoParameters {
 };
 
 class UCIInfoParameters {
-  public:
+   public:
     UCIInfoParameters() = default;
     explicit UCIInfoParameters(const std::unordered_map<std::string, std::any>& values) noexcept {
         auto key_present = [values](const std::string& key) {
@@ -165,62 +219,110 @@ class UCIInfoParameters {
         }
     }
 
-    [[nodiscard]] const std::optional<int>& depth() const noexcept { return depth_; }
-    [[nodiscard]] const std::optional<int>& seldepth() const noexcept { return seldepth_; }
-    [[nodiscard]] const std::optional<int>& time() const noexcept { return time_; }
-    [[nodiscard]] const std::optional<uint64_t>& nodes() const noexcept { return nodes_; }
-    [[nodiscard]] const std::optional<UCIMoveList>& pv() const noexcept { return pv_; }
+    [[nodiscard]] const std::optional<int>& depth() const noexcept {
+        return depth_;
+    }
+    [[nodiscard]] const std::optional<int>& seldepth() const noexcept {
+        return seldepth_;
+    }
+    [[nodiscard]] const std::optional<int>& time() const noexcept {
+        return time_;
+    }
+    [[nodiscard]] const std::optional<uint64_t>& nodes() const noexcept {
+        return nodes_;
+    }
+    [[nodiscard]] const std::optional<UCIMoveList>& pv() const noexcept {
+        return pv_;
+    }
     [[nodiscard]] const std::optional<std::vector<UCIMoveList>>& multipv() const noexcept {
         return multipv_;
     }
-    [[nodiscard]] const std::optional<UCIScore>& score() const noexcept { return score_; }
-    [[nodiscard]] const std::optional<std::string>& currmove() const noexcept { return currmove_; }
+    [[nodiscard]] const std::optional<UCIScore>& score() const noexcept {
+        return score_;
+    }
+    [[nodiscard]] const std::optional<std::string>& currmove() const noexcept {
+        return currmove_;
+    }
     [[nodiscard]] const std::optional<int>& currmovenumber() const noexcept {
         return currmovenumber_;
     }
-    [[nodiscard]] const std::optional<int>& hashfull() const noexcept { return hashfull_; }
-    [[nodiscard]] const std::optional<std::uint64_t>& nps() const noexcept { return nps_; }
-    [[nodiscard]] const std::optional<int>& tbhits() const noexcept { return tbhits_; }
-    [[nodiscard]] const std::optional<int>& cpuload() const noexcept { return cpuload_; }
+    [[nodiscard]] const std::optional<int>& hashfull() const noexcept {
+        return hashfull_;
+    }
+    [[nodiscard]] const std::optional<std::uint64_t>& nps() const noexcept {
+        return nps_;
+    }
+    [[nodiscard]] const std::optional<int>& tbhits() const noexcept {
+        return tbhits_;
+    }
+    [[nodiscard]] const std::optional<int>& cpuload() const noexcept {
+        return cpuload_;
+    }
     [[nodiscard]] const std::optional<UCIMoveList>& refutation() const noexcept {
         return refutation_;
     }
     [[nodiscard]] const std::optional<std::vector<UCIMoveList>>& currline() const noexcept {
         return currline_;
     }
-    [[nodiscard]] const std::optional<std::string>& string() const noexcept { return string_; }
+    [[nodiscard]] const std::optional<std::string>& string() const noexcept {
+        return string_;
+    }
     [[nodiscard]] bool empty() const noexcept {
         return !(depth_ || seldepth_ || time_ || nodes_ || pv_ || multipv_ || score_ || currmove_ ||
                  currmovenumber_ || hashfull_ || nps_ || tbhits_ || cpuload_ || refutation_ ||
                  currline_ || string_);
     }
 
-    void set_depth(const std::optional<int> depth) noexcept { depth_ = depth; }
-    void set_seldepth(const std::optional<int> seldepth) noexcept { seldepth_ = seldepth; }
-    void set_time(const std::optional<int> time) noexcept { time_ = time; }
-    void set_nodes(const std::optional<uint64_t> nodes) noexcept { nodes_ = nodes; }
-    void set_pv(const std::optional<UCIMoveList>& pv) noexcept { pv_ = pv; }
+    void set_depth(const std::optional<int> depth) noexcept {
+        depth_ = depth;
+    }
+    void set_seldepth(const std::optional<int> seldepth) noexcept {
+        seldepth_ = seldepth;
+    }
+    void set_time(const std::optional<int> time) noexcept {
+        time_ = time;
+    }
+    void set_nodes(const std::optional<uint64_t> nodes) noexcept {
+        nodes_ = nodes;
+    }
+    void set_pv(const std::optional<UCIMoveList>& pv) noexcept {
+        pv_ = pv;
+    }
     void set_multipv(const std::optional<std::vector<UCIMoveList>>& multipv) noexcept {
         multipv_ = multipv;
     }
-    void set_score(const std::optional<UCIScore> score) noexcept { score_ = score; }
-    void set_currmove(const std::optional<std::string>& currmove) noexcept { currmove_ = currmove; }
+    void set_score(const std::optional<UCIScore> score) noexcept {
+        score_ = score;
+    }
+    void set_currmove(const std::optional<std::string>& currmove) noexcept {
+        currmove_ = currmove;
+    }
     void set_currmovenumber(const std::optional<int> currmovenumber) noexcept {
         currmovenumber_ = currmovenumber;
     }
-    void set_hashfull(const std::optional<int> hashfull) noexcept { hashfull_ = hashfull; }
-    void set_nps(const std::optional<std::uint64_t> nps) noexcept { nps_ = nps; }
-    void set_tbhits(const std::optional<int> tbhits) noexcept { tbhits_ = tbhits; }
-    void set_cpuload(const std::optional<int> cpuload) noexcept { cpuload_ = cpuload; }
+    void set_hashfull(const std::optional<int> hashfull) noexcept {
+        hashfull_ = hashfull;
+    }
+    void set_nps(const std::optional<std::uint64_t> nps) noexcept {
+        nps_ = nps;
+    }
+    void set_tbhits(const std::optional<int> tbhits) noexcept {
+        tbhits_ = tbhits;
+    }
+    void set_cpuload(const std::optional<int> cpuload) noexcept {
+        cpuload_ = cpuload;
+    }
     void set_refutation(const std::optional<UCIMoveList>& refutation) noexcept {
         refutation_ = refutation;
     }
     void set_currline(const std::optional<std::vector<UCIMoveList>>& currline) noexcept {
         currline_ = currline;
     }
-    void set_string(const std::optional<std::string>& string) noexcept { string_ = string; }
+    void set_string(const std::optional<std::string>& string) noexcept {
+        string_ = string;
+    }
 
-  private:
+   private:
     std::optional<int> depth_;
     std::optional<int> seldepth_;
     std::optional<int> time_;
@@ -240,10 +342,13 @@ class UCIInfoParameters {
 };
 
 class UCIService {
-  public:
-    UCIService(std::string name, std::string author, std::ostream& out = std::cout,
+   public:
+    UCIService(std::string name,
+               std::string author,
+               std::ostream& out = std::cout,
                std::istream& in = std::cin) noexcept
-        : name_(std::move(name)), author_(std::move(author)), out_(out), in_(in) {}
+        : name_(std::move(name)), author_(std::move(author)), out_(out), in_(in) {
+    }
 
     void register_option(const UCISpinOption& uci_option) noexcept {
         spin_options_[uci_option.name()] = uci_option;
@@ -261,8 +366,8 @@ class UCIService {
         button_options_[uci_option.name()] = uci_option;
     }
 
-    void
-    register_position_handler(std::function<void(const UCIPositionParameters&)> handler) noexcept {
+    void register_position_handler(
+        std::function<void(const UCIPositionParameters&)> handler) noexcept {
         position_handler_ = std::move(handler);
     }
     void register_go_handler(std::function<void(const UCIGoParameters&)> handler) noexcept {
@@ -276,7 +381,9 @@ class UCIService {
         command_handlers_[command] = std::move(handler);
     }
 
-    void stop() { keep_running_ = false; }
+    void stop() {
+        keep_running_ = false;
+    }
     void run() {
         if (!(position_handler_ && go_handler_ && stop_handler_)) {
             throw std::invalid_argument{"Must register a position, go and stop handler!"};
@@ -470,8 +577,8 @@ class UCIService {
         }
     }
 
-    static std::optional<UCIPositionParameters>
-    parse_position_line(std::istringstream& line_stream) noexcept {
+    static std::optional<UCIPositionParameters> parse_position_line(
+        std::istringstream& line_stream) noexcept {
         std::string fen;
         std::string tmp;
         line_stream >> tmp;
@@ -578,12 +685,20 @@ class UCIService {
             searchmoves_opt = searchmoves;
         }
 
-        return UCIGoParameters{nodes_opt, movetime_opt, depth_opt,      wtime_opt,
-                               winc_opt,  btime_opt,    binc_opt,       movestogo_opt,
-                               infinite,  ponder,       searchmoves_opt};
+        return UCIGoParameters{nodes_opt,
+                               movetime_opt,
+                               depth_opt,
+                               wtime_opt,
+                               winc_opt,
+                               btime_opt,
+                               binc_opt,
+                               movestogo_opt,
+                               infinite,
+                               ponder,
+                               searchmoves_opt};
     }
 
-  private:
+   private:
     void uci_handler() {
         std::string id_name = "id name " + name_ + "\n";
         out_ << id_name;
@@ -644,6 +759,6 @@ class UCIService {
     std::atomic<bool> keep_running_{true};
 };
 
-} // namespace libchess
+}  // namespace libchess
 
-#endif // LIBCHESS_UCISERVICE_H
+#endif  // LIBCHESS_UCISERVICE_H

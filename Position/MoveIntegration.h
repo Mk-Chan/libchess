@@ -37,23 +37,23 @@ inline Move::Type Position::move_type_of(Move move) const {
 inline bool Position::is_capture_move(Move move) const {
     Move::Type move_type = move.type();
     switch (move_type) {
-    case Move::Type::CAPTURE:
-    case Move::Type::CAPTURE_PROMOTION:
-    case Move::Type::ENPASSANT:
-        return true;
-    default:
-        return false;
+        case Move::Type::CAPTURE:
+        case Move::Type::CAPTURE_PROMOTION:
+        case Move::Type::ENPASSANT:
+            return true;
+        default:
+            return false;
     }
 }
 
 inline bool Position::is_promotion_move(Move move) const {
     Move::Type move_type = move.type();
     switch (move_type) {
-    case Move::Type::PROMOTION:
-    case Move::Type::CAPTURE_PROMOTION:
-        return true;
-    default:
-        return false;
+        case Move::Type::PROMOTION:
+        case Move::Type::CAPTURE_PROMOTION:
+            return true;
+        default:
+            return false;
     }
 }
 
@@ -77,51 +77,52 @@ inline void Position::unmake_move() {
 
     auto moving_pt = piece_type_on(to_square);
     switch (move_type) {
-    case Move::Type::NORMAL:
-        move_piece(to_square, from_square, *moving_pt, stm);
-        break;
-    case Move::Type::CAPTURE:
-        move_piece(to_square, from_square, *moving_pt, stm);
-        put_piece(to_square, *captured_pt, !stm);
-        break;
-    case Move::Type::DOUBLE_PUSH:
-        move_piece(to_square, from_square, constants::PAWN, stm);
-        break;
-    case Move::Type::ENPASSANT:
-        put_piece(stm == constants::WHITE ? Square{to_square - 8} : Square(to_square + 8),
-                  constants::PAWN, !stm);
-        move_piece(to_square, from_square, constants::PAWN, stm);
-        break;
-    case Move::Type::CASTLING:
-        move_piece(to_square, from_square, constants::KING, stm);
-        switch (to_square) {
-        case constants::C1:
-            move_piece(constants::D1, constants::A1, constants::ROOK, stm);
+        case Move::Type::NORMAL:
+            move_piece(to_square, from_square, *moving_pt, stm);
             break;
-        case constants::G1:
-            move_piece(constants::F1, constants::H1, constants::ROOK, stm);
+        case Move::Type::CAPTURE:
+            move_piece(to_square, from_square, *moving_pt, stm);
+            put_piece(to_square, *captured_pt, !stm);
             break;
-        case constants::C8:
-            move_piece(constants::D8, constants::A8, constants::ROOK, stm);
+        case Move::Type::DOUBLE_PUSH:
+            move_piece(to_square, from_square, constants::PAWN, stm);
             break;
-        case constants::G8:
-            move_piece(constants::F8, constants::H8, constants::ROOK, stm);
+        case Move::Type::ENPASSANT:
+            put_piece(stm == constants::WHITE ? Square{to_square - 8} : Square(to_square + 8),
+                      constants::PAWN,
+                      !stm);
+            move_piece(to_square, from_square, constants::PAWN, stm);
             break;
-        default:
+        case Move::Type::CASTLING:
+            move_piece(to_square, from_square, constants::KING, stm);
+            switch (to_square) {
+                case constants::C1:
+                    move_piece(constants::D1, constants::A1, constants::ROOK, stm);
+                    break;
+                case constants::G1:
+                    move_piece(constants::F1, constants::H1, constants::ROOK, stm);
+                    break;
+                case constants::C8:
+                    move_piece(constants::D8, constants::A8, constants::ROOK, stm);
+                    break;
+                case constants::G8:
+                    move_piece(constants::F8, constants::H8, constants::ROOK, stm);
+                    break;
+                default:
+                    break;
+            }
             break;
-        }
-        break;
-    case Move::Type::PROMOTION:
-        remove_piece(to_square, *move->promotion_piece_type(), stm);
-        put_piece(from_square, constants::PAWN, stm);
-        break;
-    case Move::Type::CAPTURE_PROMOTION:
-        remove_piece(to_square, *move->promotion_piece_type(), stm);
-        put_piece(from_square, constants::PAWN, stm);
-        put_piece(to_square, *captured_pt, !stm);
-        break;
-    case Move::Type::NONE:
-        break;
+        case Move::Type::PROMOTION:
+            remove_piece(to_square, *move->promotion_piece_type(), stm);
+            put_piece(from_square, constants::PAWN, stm);
+            break;
+        case Move::Type::CAPTURE_PROMOTION:
+            remove_piece(to_square, *move->promotion_piece_type(), stm);
+            put_piece(from_square, constants::PAWN, stm);
+            put_piece(to_square, *captured_pt, !stm);
+            break;
+        case Move::Type::NONE:
+            break;
     }
 }
 
@@ -156,53 +157,54 @@ inline void Position::make_move(Move move) {
     }
 
     switch (move_type) {
-    case Move::Type::NORMAL:
-        move_piece(from_square, to_square, *moving_pt, stm);
-        break;
-    case Move::Type::CAPTURE:
-        remove_piece(to_square, *captured_pt, !stm);
-        move_piece(from_square, to_square, *moving_pt, stm);
-        break;
-    case Move::Type::DOUBLE_PUSH:
-        move_piece(from_square, to_square, constants::PAWN, stm);
-        next_state.enpassant_square_ =
-            stm == constants::WHITE ? Square(from_square + 8) : Square(from_square - 8);
-        break;
-    case Move::Type::ENPASSANT:
-        move_piece(from_square, to_square, constants::PAWN, stm);
-        remove_piece(stm == constants::WHITE ? Square(to_square - 8) : Square(to_square + 8),
-                     constants::PAWN, !stm);
-        break;
-    case Move::Type::CASTLING:
-        move_piece(from_square, to_square, constants::KING, stm);
-        switch (to_square) {
-        case constants::C1:
-            move_piece(constants::A1, constants::D1, constants::ROOK, stm);
+        case Move::Type::NORMAL:
+            move_piece(from_square, to_square, *moving_pt, stm);
             break;
-        case constants::G1:
-            move_piece(constants::H1, constants::F1, constants::ROOK, stm);
+        case Move::Type::CAPTURE:
+            remove_piece(to_square, *captured_pt, !stm);
+            move_piece(from_square, to_square, *moving_pt, stm);
             break;
-        case constants::C8:
-            move_piece(constants::A8, constants::D8, constants::ROOK, stm);
+        case Move::Type::DOUBLE_PUSH:
+            move_piece(from_square, to_square, constants::PAWN, stm);
+            next_state.enpassant_square_ =
+                stm == constants::WHITE ? Square(from_square + 8) : Square(from_square - 8);
             break;
-        case constants::G8:
-            move_piece(constants::H8, constants::F8, constants::ROOK, stm);
+        case Move::Type::ENPASSANT:
+            move_piece(from_square, to_square, constants::PAWN, stm);
+            remove_piece(stm == constants::WHITE ? Square(to_square - 8) : Square(to_square + 8),
+                         constants::PAWN,
+                         !stm);
             break;
-        default:
+        case Move::Type::CASTLING:
+            move_piece(from_square, to_square, constants::KING, stm);
+            switch (to_square) {
+                case constants::C1:
+                    move_piece(constants::A1, constants::D1, constants::ROOK, stm);
+                    break;
+                case constants::G1:
+                    move_piece(constants::H1, constants::F1, constants::ROOK, stm);
+                    break;
+                case constants::C8:
+                    move_piece(constants::A8, constants::D8, constants::ROOK, stm);
+                    break;
+                case constants::G8:
+                    move_piece(constants::H8, constants::F8, constants::ROOK, stm);
+                    break;
+                default:
+                    break;
+            }
             break;
-        }
-        break;
-    case Move::Type::PROMOTION:
-        remove_piece(from_square, constants::PAWN, stm);
-        put_piece(to_square, *promotion_pt, stm);
-        break;
-    case Move::Type::CAPTURE_PROMOTION:
-        remove_piece(to_square, *captured_pt, !stm);
-        remove_piece(from_square, constants::PAWN, stm);
-        put_piece(to_square, *promotion_pt, stm);
-        break;
-    case Move::Type::NONE:
-        break;
+        case Move::Type::PROMOTION:
+            remove_piece(from_square, constants::PAWN, stm);
+            put_piece(to_square, *promotion_pt, stm);
+            break;
+        case Move::Type::CAPTURE_PROMOTION:
+            remove_piece(to_square, *captured_pt, !stm);
+            remove_piece(from_square, constants::PAWN, stm);
+            put_piece(to_square, *promotion_pt, stm);
+            break;
+        case Move::Type::NONE:
+            break;
     }
     next_state.captured_pt_ = captured_pt;
     next_state.move_type_ = move_type;
@@ -228,6 +230,6 @@ inline void Position::make_null_move() {
     next.pawn_hash_ = calculate_pawn_hash();
 }
 
-} // namespace libchess
+}  // namespace libchess
 
-#endif // LIBCHESS_MOVEINTEGRATION_H
+#endif  // LIBCHESS_MOVEINTEGRATION_H
