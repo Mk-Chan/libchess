@@ -365,6 +365,9 @@ inline MoveList Position::legal_move_list(Color stm) const {
 }
 
 inline MoveList Position::legal_move_list() const {
+    if (halfmoves() >= 150 || is_repeat(4)) {
+        return MoveList{};
+    }
     return legal_move_list(side_to_move());
 }
 

@@ -402,3 +402,17 @@ TEST_CASE("SEE Move Test Promotion Capture", "[Position]") {
 
     REQUIRE(actual_value == expected_value);
 }
+
+TEST_CASE("Fivefold Repetition Legal Movegen Test", "[Position]") {
+    Position pos{constants::STARTPOS_FEN};
+    for (int i = 0; i < 4; ++i) {
+        pos.make_move(Move{G1, F3});
+        pos.make_move(Move{G8, F6});
+        pos.make_move(Move{F3, G1});
+        pos.make_move(Move{F6, G8});
+    }
+
+    REQUIRE(pos.is_repeat(4));
+    REQUIRE(pos.repeat_count() == 4);
+    REQUIRE(pos.legal_move_list().empty());
+}
