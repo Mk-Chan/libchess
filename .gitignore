@@ -13,3 +13,6 @@ x64/*
 
 # Object files
 *.o
+
+# Miscellaneous
+misc/*
