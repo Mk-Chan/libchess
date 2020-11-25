@@ -614,8 +614,8 @@ inline Bitboard non_pawn_piece_type_attacks(PieceType piece_type,
 
 namespace init {
 
-inline std::array<std::array<Bitboard, 64>, 64> direction_xray() {
-    std::array<std::array<Bitboard, 64>, 64> direction_bb{};
+inline std::array<std::array<Bitboard, 64>, 64> full_ray() {
+    std::array<std::array<Bitboard, 64>, 64> full_ray_bb{};
     for (Square from = constants::A1; from <= constants::H8; ++from) {
         for (Square to = constants::A1; to <= constants::H8; ++to) {
             if (from == to) {
@@ -628,30 +628,34 @@ inline std::array<std::array<Bitboard, 64>, 64> direction_xray() {
                 low = to;
             }
             if (high.file() == low.file()) {
-                direction_bb[from][to] = lookups::rook_attacks(high) & lookups::rook_attacks(low);
+                full_ray_bb[from][to] = (lookups::rook_attacks(high) & lookups::rook_attacks(low)) |
+                                        Bitboard{from} | Bitboard{to};
             }
             if (high.rank() == low.rank()) {
-                direction_bb[from][to] = lookups::rook_attacks(high) & lookups::rook_attacks(low);
+                full_ray_bb[from][to] = (lookups::rook_attacks(high) & lookups::rook_attacks(low)) |
+                                        Bitboard{from} | Bitboard{to};
             }
             if (high.file() - low.file() == high.rank() - low.rank()) {
-                direction_bb[from][to] =
-                    lookups::bishop_attacks(high) & lookups::bishop_attacks(low);
+                full_ray_bb[from][to] =
+                    (lookups::bishop_attacks(high) & lookups::bishop_attacks(low)) |
+                    Bitboard{from} | Bitboard{to};
             }
             if (low.file() - high.file() == high.rank() - low.rank()) {
-                direction_bb[from][to] =
-                    lookups::bishop_attacks(high) & lookups::bishop_attacks(low);
+                full_ray_bb[from][to] =
+                    (lookups::bishop_attacks(high) & lookups::bishop_attacks(low)) |
+                    Bitboard{from} | Bitboard{to};
             }
         }
     }
-    return direction_bb;
+    return full_ray_bb;
 }
 
 }  // namespace init
 
-static std::array<std::array<Bitboard, 64>, 64> DIRECTION_XRAY = init::direction_xray();
+static std::array<std::array<Bitboard, 64>, 64> FULL_RAY = init::full_ray();
 
-inline Bitboard direction_xray(Square from, Square to) {
-    return DIRECTION_XRAY[from][to];
+inline Bitboard full_ray(Square from, Square to) {
+    return FULL_RAY[from][to];
 }
 
 }  // namespace libchess::lookups

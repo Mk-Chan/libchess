@@ -150,7 +150,7 @@ inline bool Position::is_legal_generated_move(Move move) const {
                !(attackers_to(move.to_square()) & color_bb(!c));
     } else {
         return !(pinned_pieces_of(c) & Bitboard{from}) ||
-               (Bitboard{move.to_square()} & lookups::direction_xray(king_sq, from));
+               (Bitboard{move.to_square()} & lookups::full_ray(king_sq, from));
     }
 }
 
