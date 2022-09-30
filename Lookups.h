@@ -2,7 +2,6 @@
 #define LIBCHESS_LOOKUPS_H
 
 #include <array>
-#include <random>
 
 #include "Bitboard.h"
 #include "Color.h"
@@ -381,6 +380,53 @@ inline Bitboard rook_attacks(Square square) {
 inline Bitboard queen_attacks(Square square) {
     return QUEEN_ATTACKS[square];
 }
+inline Bitboard bishop_attacks(Square square, Bitboard occupancy) {
+    Bitboard attacks = bishop_attacks(square);
+    Bitboard nw_blockers = (northwest(square) & occupancy) | Bitboard{constants::A8};
+    Bitboard ne_blockers = (northeast(square) & occupancy) | Bitboard{constants::H8};
+    Bitboard sw_blockers = (southwest(square) & occupancy) | Bitboard{constants::A1};
+    Bitboard se_blockers = (southeast(square) & occupancy) | Bitboard{constants::H1};
+
+    attacks ^= northwest(nw_blockers.forward_bitscan());
+    attacks ^= northeast(ne_blockers.forward_bitscan());
+    attacks ^= southwest(sw_blockers.reverse_bitscan());
+    attacks ^= southeast(se_blockers.reverse_bitscan());
+    return attacks;
+}
+inline Bitboard rook_attacks(Square square, Bitboard occupancy) {
+    Bitboard attacks = rook_attacks(square);
+    Bitboard n_blockers = (north(square) & occupancy) | Bitboard{constants::H8};
+    Bitboard s_blockers = (south(square) & occupancy) | Bitboard{constants::A1};
+    Bitboard w_blockers = (west(square) & occupancy) | Bitboard{constants::A1};
+    Bitboard e_blockers = (east(square) & occupancy) | Bitboard{constants::H8};
+
+    attacks ^= north(n_blockers.forward_bitscan());
+    attacks ^= south(s_blockers.reverse_bitscan());
+    attacks ^= west(w_blockers.reverse_bitscan());
+    attacks ^= east(e_blockers.forward_bitscan());
+    return attacks;
+}
+inline Bitboard queen_attacks(Square square, Bitboard occupancy) {
+    Bitboard attacks = queen_attacks(square);
+    Bitboard nw_blockers = (northwest(square) & occupancy) | Bitboard{constants::A8};
+    Bitboard ne_blockers = (northeast(square) & occupancy) | Bitboard{constants::H8};
+    Bitboard sw_blockers = (southwest(square) & occupancy) | Bitboard{constants::A1};
+    Bitboard se_blockers = (southeast(square) & occupancy) | Bitboard{constants::H1};
+    Bitboard n_blockers = (north(square) & occupancy) | Bitboard{constants::H8};
+    Bitboard s_blockers = (south(square) & occupancy) | Bitboard{constants::A1};
+    Bitboard w_blockers = (west(square) & occupancy) | Bitboard{constants::A1};
+    Bitboard e_blockers = (east(square) & occupancy) | Bitboard{constants::H8};
+
+    attacks ^= northwest(nw_blockers.forward_bitscan());
+    attacks ^= northeast(ne_blockers.forward_bitscan());
+    attacks ^= southwest(sw_blockers.reverse_bitscan());
+    attacks ^= southeast(se_blockers.reverse_bitscan());
+    attacks ^= north(n_blockers.forward_bitscan());
+    attacks ^= south(s_blockers.reverse_bitscan());
+    attacks ^= west(w_blockers.reverse_bitscan());
+    attacks ^= east(e_blockers.forward_bitscan());
+    return attacks;
+}
 inline Bitboard pawn_shift(Bitboard bb, Color c, int times = 1) {
     return c == constants::WHITE ? bb << (8 * times) : bb >> (8 * times);
 }
@@ -394,204 +440,6 @@ inline Rank relative_rank(Rank rank, Color c) {
 }
 inline Bitboard relative_rank_mask(Rank rank, Color c) {
     return rank_mask(relative_rank(rank, c));
-}
-
-inline Bitboard bishop_attacks_classical(Square square, Bitboard occupancy) {
-    Bitboard attacks = bishop_attacks(square);
-    Bitboard nw_blockers = (northwest(square) & occupancy) | Bitboard{constants::A8};
-    Bitboard ne_blockers = (northeast(square) & occupancy) | Bitboard{constants::H8};
-    Bitboard sw_blockers = (southwest(square) & occupancy) | Bitboard{constants::A1};
-    Bitboard se_blockers = (southeast(square) & occupancy) | Bitboard{constants::H1};
-
-    attacks ^= northwest(nw_blockers.forward_bitscan());
-    attacks ^= northeast(ne_blockers.forward_bitscan());
-    attacks ^= southwest(sw_blockers.reverse_bitscan());
-    attacks ^= southeast(se_blockers.reverse_bitscan());
-    return attacks;
-}
-inline Bitboard rook_attacks_classical(Square square, Bitboard occupancy) {
-    Bitboard attacks = rook_attacks(square);
-    Bitboard n_blockers = (north(square) & occupancy) | Bitboard{constants::H8};
-    Bitboard s_blockers = (south(square) & occupancy) | Bitboard{constants::A1};
-    Bitboard w_blockers = (west(square) & occupancy) | Bitboard{constants::A1};
-    Bitboard e_blockers = (east(square) & occupancy) | Bitboard{constants::H8};
-
-    attacks ^= north(n_blockers.forward_bitscan());
-    attacks ^= south(s_blockers.reverse_bitscan());
-    attacks ^= west(w_blockers.reverse_bitscan());
-    attacks ^= east(e_blockers.forward_bitscan());
-    return attacks;
-}
-
-class PlainMagicLookup {
-   public:
-    PlainMagicLookup() : mask_(0), magic_(0) {
-    }
-
-    const Bitboard& mask() const {
-        return mask_;
-    }
-    constexpr void mask(const Bitboard& mask) {
-        mask_ = mask;
-    }
-    constexpr const Bitboard& magic() const {
-        return magic_;
-    }
-    constexpr void magic(const Bitboard& magic) {
-        magic_ = magic;
-    }
-
-    constexpr int magic_rook_attack_index(Bitboard occupancy) const {
-        return ((occupancy & mask_) * magic_) >> 52;
-    }
-    constexpr int magic_bishop_attack_index(Bitboard occupancy) const {
-        return ((occupancy & mask_) * magic_) >> 55;
-    }
-
-   private:
-    Bitboard mask_;
-    Bitboard magic_;
-};
-
-enum class SlidingPieceType : bool
-{
-    BISHOP = false,
-    ROOK = true
-};
-
-template <SlidingPieceType slidingPieceType>
-struct MagicAttacksLookup {
-    std::array<PlainMagicLookup, 64> magic_lookup;
-    std::array<std::array<Bitboard, (slidingPieceType == SlidingPieceType::ROOK ? 4096 : 512)>, 64>
-        attacks;
-};
-
-namespace init {
-
-inline MagicAttacksLookup<SlidingPieceType::ROOK> rook_magic_attacks_lookup() {
-    std::array<PlainMagicLookup, 64> magic_lookup;
-    std::array<std::array<Bitboard, 4096>, 64> attacks;
-    std::array<Bitboard, 4096> occupancy_combinations;
-    std::array<Bitboard, 4096> legal_sliding_attacks;
-
-    std::mt19937_64 rng(std::uint64_t(6254242335641602973));
-    for (Square square = constants::A1; square <= constants::H8; ++square) {
-        PlainMagicLookup& square_magic = magic_lookup[square];
-        Bitboard edges = ((FILE_A_MASK | FILE_H_MASK) & ~file_mask(square.file())) |
-                         ((RANK_1_MASK | RANK_8_MASK) & ~rank_mask(square.rank()));
-        square_magic.mask(lookups::rook_attacks(square) & ~edges);
-
-        Bitboard mask = square_magic.mask();
-        Bitboard current_occupancy{0};
-        int occupancy_combination_iterator = 0;
-        do {
-            occupancy_combinations[occupancy_combination_iterator] = current_occupancy;
-            legal_sliding_attacks[occupancy_combination_iterator] =
-                rook_attacks_classical(square, current_occupancy);
-
-            ++occupancy_combination_iterator;
-            current_occupancy = Bitboard{(current_occupancy - mask) & mask};
-        } while (current_occupancy);
-        int occupancy_combinations_count = occupancy_combination_iterator;
-
-        std::array<bool, 4096> used_index_set;
-        std::fill(used_index_set.begin(), used_index_set.end(), false);
-        occupancy_combination_iterator = 0;
-        while (occupancy_combination_iterator < occupancy_combinations_count) {
-            square_magic.magic(Bitboard{rng() & rng() & rng()});
-
-            occupancy_combination_iterator = 0;
-            while (occupancy_combination_iterator < occupancy_combinations_count) {
-                int attack_table_index = square_magic.magic_rook_attack_index(
-                    occupancy_combinations[occupancy_combination_iterator]);
-                if (used_index_set[attack_table_index] &&
-                    attacks[square][attack_table_index] !=
-                        legal_sliding_attacks[occupancy_combination_iterator]) {
-                    std::fill(used_index_set.begin(), used_index_set.end(), false);
-                    break;
-                }
-                attacks[square][attack_table_index] =
-                    legal_sliding_attacks[occupancy_combination_iterator];
-                used_index_set[attack_table_index] = true;
-                ++occupancy_combination_iterator;
-            }
-        }
-    }
-
-    return MagicAttacksLookup<SlidingPieceType::ROOK>{magic_lookup, attacks};
-}
-
-inline MagicAttacksLookup<SlidingPieceType::BISHOP> bishop_magic_attacks_lookup() {
-    std::array<PlainMagicLookup, 64> magic_lookup;
-    std::array<std::array<Bitboard, 512>, 64> attacks;
-    std::array<Bitboard, 512> occupancy_combinations;
-    std::array<Bitboard, 512> legal_sliding_attacks;
-
-    std::mt19937_64 rng(std::uint64_t(6254242335641602973));
-    Bitboard edges = lookups::rook_attacks(constants::A1) | lookups::rook_attacks(constants::H8) |
-                     Bitboard{constants::A1} | Bitboard{constants::H8};
-    for (Square square = constants::A1; square <= constants::H8; ++square) {
-        PlainMagicLookup& square_magic = magic_lookup[square];
-        square_magic.mask(lookups::bishop_attacks(square) & ~edges);
-
-        Bitboard mask = square_magic.mask();
-        Bitboard current_occupancy{0};
-        int occupancy_combination_iterator = 0;
-        do {
-            occupancy_combinations[occupancy_combination_iterator] = current_occupancy;
-            legal_sliding_attacks[occupancy_combination_iterator] =
-                bishop_attacks_classical(square, current_occupancy);
-
-            ++occupancy_combination_iterator;
-            current_occupancy = Bitboard{(current_occupancy - mask) & mask};
-        } while (current_occupancy);
-        int occupancy_combinations_count = occupancy_combination_iterator;
-
-        std::array<bool, 512> used_index_set;
-        std::fill(used_index_set.begin(), used_index_set.end(), false);
-        occupancy_combination_iterator = 0;
-        while (occupancy_combination_iterator < occupancy_combinations_count) {
-            square_magic.magic(Bitboard{rng() & rng() & rng()});
-
-            occupancy_combination_iterator = 0;
-            while (occupancy_combination_iterator < occupancy_combinations_count) {
-                int attack_table_index = square_magic.magic_bishop_attack_index(
-                    occupancy_combinations[occupancy_combination_iterator]);
-                if (used_index_set[attack_table_index] &&
-                    attacks[square][attack_table_index] !=
-                        legal_sliding_attacks[occupancy_combination_iterator]) {
-                    std::fill(used_index_set.begin(), used_index_set.end(), false);
-                    break;
-                }
-                attacks[square][attack_table_index] =
-                    legal_sliding_attacks[occupancy_combination_iterator];
-                used_index_set[attack_table_index] = true;
-                ++occupancy_combination_iterator;
-            }
-        }
-    }
-
-    return MagicAttacksLookup<SlidingPieceType::BISHOP>{magic_lookup, attacks};
-}
-
-}  // namespace init
-
-static MagicAttacksLookup<SlidingPieceType::ROOK> rook_magic_attacks_lookup =
-    init::rook_magic_attacks_lookup();
-static MagicAttacksLookup<SlidingPieceType::BISHOP> bishop_magic_attacks_lookup =
-    init::bishop_magic_attacks_lookup();
-
-inline Bitboard rook_attacks(Square square, Bitboard occupancy) {
-    return rook_magic_attacks_lookup.attacks[square][rook_magic_attacks_lookup.magic_lookup[square]
-                                                         .magic_rook_attack_index(occupancy)];
-}
-inline Bitboard bishop_attacks(Square square, Bitboard occupancy) {
-    return bishop_magic_attacks_lookup
-        .attacks[square][bishop_magic_attacks_lookup.magic_lookup[square].magic_bishop_attack_index(
-            occupancy)];
-}
-inline Bitboard queen_attacks(Square square, Bitboard occupancy) {
-    return rook_attacks(square, occupancy) | bishop_attacks(square, occupancy);
 }
 inline Bitboard non_pawn_piece_type_attacks(PieceType piece_type,
                                             Square square,
