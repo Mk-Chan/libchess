@@ -474,9 +474,9 @@ class UCIService {
                 string_options_[name].set_option(value);
             }
         } else if (check_options_.find(name) != check_options_.end()) {
-            bool value = false;
+            std::string value_temp;
             if (line_stream >> value) {
-                check_options_[name].set_option(value);
+                check_options_[name].set_option(value_temp == "true" || value_temp == "1");
             }
         }
     }
