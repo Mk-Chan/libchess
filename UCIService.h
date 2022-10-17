@@ -475,7 +475,7 @@ class UCIService {
             }
         } else if (check_options_.find(name) != check_options_.end()) {
             std::string value_temp;
-            if (line_stream >> value) {
+            if (line_stream >> value_temp) {
                 check_options_[name].set_option(value_temp == "true" || value_temp == "1");
             }
         }
@@ -729,7 +729,7 @@ class UCIService {
         }
         for (auto& [name, option] : check_options_) {
             std::string option_str = "option name " + name + " type check default " +
-                                     std::to_string(option.value()) + "\n";
+                                     (option.value() ? "true" : "false") + "\n";
             out_ << option_str;
         }
         for (auto& [name, option] : button_options_) {
