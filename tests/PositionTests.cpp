@@ -35,11 +35,21 @@ TEST_CASE("Null Move Test", "[Position]") {
 
 TEST_CASE("Hash Test", "[Position]") {
     Position pos{STARTPOS_FEN};
+
     Position::hash_type old_hash = pos.hash();
 
     pos.make_move({E2, E4});
     REQUIRE(pos.hash() != old_hash);
     pos.unmake_move();
+    REQUIRE(pos.hash() == old_hash);
+
+    pos.make_move({B1, C3});
+    REQUIRE(pos.hash() != old_hash);
+    pos.make_move({B8, C6});
+    REQUIRE(pos.hash() != old_hash);
+    pos.make_move({C3, B1});
+    REQUIRE(pos.hash() != old_hash);
+    pos.make_move({C6, B8});
     REQUIRE(pos.hash() == old_hash);
 }
 
