@@ -22,6 +22,7 @@ TEST_CASE("Null Move Test", "[Position]") {
     REQUIRE(!pos.previous_move());
     REQUIRE(pos.halfmoves() == old_halfmoves + 1);
     REQUIRE(pos.hash() != old_hash);
+    REQUIRE(pos.hash() == pos.calculate_hash());
 
     pos.unmake_move();
 

@@ -230,7 +230,8 @@ inline void Position::make_move(Move move) {
 }
 
 inline void Position::make_null_move() {
-    if (side_to_move() == constants::BLACK) {
+    Color stm = side_to_move();
+    if (stm == constants::BLACK) {
         ++fullmoves_;
     }
     ++ply_;
@@ -240,9 +241,13 @@ inline void Position::make_null_move() {
     reverse_side_to_move();
     next.previous_move_ = {};
     next.halfmoves_ = prev.halfmoves_ + 1;
-    next.enpassant_square_ = {};
     next.castling_rights_ = prev.castling_rights_;
-    next.hash_ = calculate_hash();
+    next.hash_ = prev.hash_;
+    if (prev.enpassant_square_.has_value())
+        next.hash_ ^= zobrist::enpassant_key(prev.enpassant_square_.value());
+    next.hash_ ^= zobrist::side_to_move_key(!stm);
+    next.hash_ ^= zobrist::side_to_move_key(stm);
+    next.enpassant_square_ = {};
     next.pawn_hash_ = calculate_pawn_hash();
 }
 
