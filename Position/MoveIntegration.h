@@ -165,6 +165,7 @@ inline void Position::make_move(Move move) {
             next_state.hash_ = prev_state.hash_;
             next_state.hash_ ^= zobrist::piece_square_key(from_square, *moving_pt, stm);
             next_state.hash_ ^= zobrist::piece_square_key(to_square, *moving_pt, stm);
+            next_state.hash_ ^= zobrist::side_to_move_key(!stm);
             next_state.hash_ ^= zobrist::side_to_move_key(stm);
             break;
         case Move::Type::CAPTURE:
@@ -175,6 +176,7 @@ inline void Position::make_move(Move move) {
             next_state.hash_ ^= zobrist::piece_square_key(to_square, *captured_pt, !stm);
             next_state.hash_ ^= zobrist::piece_square_key(from_square, *moving_pt, stm);
             next_state.hash_ ^= zobrist::piece_square_key(to_square, *moving_pt, stm);
+            next_state.hash_ ^= zobrist::side_to_move_key(!stm);
             next_state.hash_ ^= zobrist::side_to_move_key(stm);
             break;
         case Move::Type::DOUBLE_PUSH:

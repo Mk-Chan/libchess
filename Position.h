@@ -127,6 +127,26 @@ class Position {
     static std::optional<Position> from_fen(const std::string& fen);
     static std::optional<Position> from_uci_position_line(const std::string& line);
 
+    hash_type calculate_hash() const {
+        hash_type hash_value = 0;
+        for (Color c : constants::COLORS) {
+            for (PieceType pt : constants::PIECE_TYPES) {
+                Bitboard bb = piece_type_bb(pt, c);
+                while (bb) {
+                    hash_value ^= zobrist::piece_square_key(bb.forward_bitscan(), pt, c);
+                    bb.forward_popbit();
+                }
+            }
+        }
+        auto ep_sq = enpassant_square();
+        if (ep_sq) {
+            hash_value ^= zobrist::enpassant_key(*ep_sq);
+        }
+        hash_value ^= zobrist::castling_rights_key(castling_rights());
+        hash_value ^= zobrist::side_to_move_key(side_to_move());
+        return hash_value;
+    }
+
    protected:
     // clang-format off
     constexpr static int castling_spoilers[64] = {
@@ -169,25 +189,6 @@ class Position {
     }
     const State& state(int ply) const {
         return history_[ply];
-    }
-    hash_type calculate_hash() const {
-        hash_type hash_value = 0;
-        for (Color c : constants::COLORS) {
-            for (PieceType pt : constants::PIECE_TYPES) {
-                Bitboard bb = piece_type_bb(pt, c);
-                while (bb) {
-                    hash_value ^= zobrist::piece_square_key(bb.forward_bitscan(), pt, c);
-                    bb.forward_popbit();
-                }
-            }
-        }
-        auto ep_sq = enpassant_square();
-        if (ep_sq) {
-            hash_value ^= zobrist::enpassant_key(*ep_sq);
-        }
-        hash_value ^= zobrist::castling_rights_key(castling_rights());
-        hash_value ^= zobrist::side_to_move_key(side_to_move());
-        return hash_value;
     }
     hash_type calculate_pawn_hash() const {
         hash_type hash_value = 0;
