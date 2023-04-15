@@ -47,6 +47,7 @@ TEST_CASE("Hash Test", "[Position]") {
     REQUIRE(pos.hash() != old_hash);
     REQUIRE(pos.hash() == pos.calculate_hash());
     pos.make_move({B8, C6});
+    REQUIRE(pos.hash() != old_hash);
     REQUIRE(pos.hash() == pos.calculate_hash());
     pos.make_move({C3, B1});
     REQUIRE(pos.hash() != old_hash);
