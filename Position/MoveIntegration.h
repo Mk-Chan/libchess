@@ -177,6 +177,8 @@ inline void Position::make_move(Move move) {
             break;
         case Move::Type::DOUBLE_PUSH:
             move_piece(from_square, to_square, constants::PAWN, stm);
+            calc_hash = false;
+            next_state.hash_ = prev_state.hash_;
             next_state.enpassant_square_ =
                 stm == constants::WHITE ? Square(from_square + 8) : Square(from_square - 8);
             next_state.hash_ ^= zobrist::enpassant_key(next_state.enpassant_square_.value());
