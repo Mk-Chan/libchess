@@ -48,7 +48,7 @@ class TunableParameter {
     }
 
    private:
-    std::string name_;
+    const std::string name_;
     int value_;
 };
 
