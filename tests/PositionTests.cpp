@@ -38,6 +38,8 @@ TEST_CASE("Hash Test", "[Position]") {
     Position pos{STARTPOS_FEN};
     Position::hash_type old_hash = pos.hash();
 
+    REQUIRE(old_hash == 0xcd6a67da5a29065);
+
     pos.make_move({E2, E4});
     REQUIRE(pos.hash() != old_hash);
     REQUIRE(pos.hash() == pos.calculate_hash());

@@ -10,14 +10,7 @@
 namespace libchess::zobrist {
 
 constexpr inline std::uint64_t piece_square_key(Square square, PieceType piece_type, Color color) {
-    Piece piece = Piece{piece_type, color};
-    int piece_offset = -1;
-    for (int i = 0; i < 12; ++i) {
-        if (constants::PIECES[i] == piece) {
-            piece_offset = i;
-            break;
-        }
-    }
+    int piece_offset = piece_type.value() * 2 + (color == constants::WHITE);
     return polyglot::random_u64[piece_offset * 64 + square.value()];
 }
 constexpr inline std::uint64_t castling_rights_key(CastlingRights castling_rights) {
