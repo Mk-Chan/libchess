@@ -22,6 +22,7 @@ TEST_CASE("Null Move Test", "[Position]") {
     REQUIRE(!pos.previous_move());
     REQUIRE(pos.halfmoves() == old_halfmoves + 1);
     REQUIRE(pos.hash() != old_hash);
+    REQUIRE(pos.hash() == pos.calculate_hash());
 
     pos.unmake_move();
 
@@ -39,8 +40,28 @@ TEST_CASE("Hash Test", "[Position]") {
 
     pos.make_move({E2, E4});
     REQUIRE(pos.hash() != old_hash);
+    REQUIRE(pos.hash() == pos.calculate_hash());
     pos.unmake_move();
     REQUIRE(pos.hash() == old_hash);
+
+    pos.make_move({E2, E3});
+    REQUIRE(pos.hash() != old_hash);
+    REQUIRE(pos.hash() == pos.calculate_hash());
+    pos.unmake_move();
+    REQUIRE(pos.hash() == old_hash);
+
+    pos.make_move({B1, C3});
+    REQUIRE(pos.hash() != old_hash);
+    REQUIRE(pos.hash() == pos.calculate_hash());
+    pos.make_move({B8, C6});
+    REQUIRE(pos.hash() != old_hash);
+    REQUIRE(pos.hash() == pos.calculate_hash());
+    pos.make_move({C3, B1});
+    REQUIRE(pos.hash() != old_hash);
+    REQUIRE(pos.hash() == pos.calculate_hash());
+    pos.make_move({C6, B8});
+    REQUIRE(pos.hash() == old_hash);
+    REQUIRE(pos.hash() == pos.calculate_hash());
 }
 
 TEST_CASE("Repetition Test", "[Position]") {

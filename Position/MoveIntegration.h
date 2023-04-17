@@ -156,18 +156,34 @@ inline void Position::make_move(Move move) {
         next_state.halfmoves_ = 0;
     }
 
+    bool calc_hash = true;
+
     switch (move_type) {
         case Move::Type::NORMAL:
             move_piece(from_square, to_square, *moving_pt, stm);
+            calc_hash = false;
+            next_state.hash_ = prev_state.hash_;
+            next_state.hash_ ^= zobrist::piece_square_key(from_square, *moving_pt, stm);
+            next_state.hash_ ^= zobrist::piece_square_key(to_square, *moving_pt, stm);
             break;
         case Move::Type::CAPTURE:
             remove_piece(to_square, *captured_pt, !stm);
             move_piece(from_square, to_square, *moving_pt, stm);
+            calc_hash = false;
+            next_state.hash_ = prev_state.hash_;
+            next_state.hash_ ^= zobrist::piece_square_key(to_square, *captured_pt, !stm);
+            next_state.hash_ ^= zobrist::piece_square_key(from_square, *moving_pt, stm);
+            next_state.hash_ ^= zobrist::piece_square_key(to_square, *moving_pt, stm);
             break;
         case Move::Type::DOUBLE_PUSH:
             move_piece(from_square, to_square, constants::PAWN, stm);
+            calc_hash = false;
+            next_state.hash_ = prev_state.hash_;
             next_state.enpassant_square_ =
                 stm == constants::WHITE ? Square(from_square + 8) : Square(from_square - 8);
+            next_state.hash_ ^= zobrist::enpassant_key(next_state.enpassant_square_.value());
+            next_state.hash_ ^= zobrist::piece_square_key(from_square, constants::PAWN, stm);
+            next_state.hash_ ^= zobrist::piece_square_key(to_square, constants::PAWN, stm);
             break;
         case Move::Type::ENPASSANT:
             move_piece(from_square, to_square, constants::PAWN, stm);
@@ -209,12 +225,20 @@ inline void Position::make_move(Move move) {
     next_state.captured_pt_ = captured_pt;
     next_state.move_type_ = move_type;
     reverse_side_to_move();
-    next_state.hash_ = calculate_hash();
+    if (calc_hash)
+        next_state.hash_ = calculate_hash();
+    else {
+        if (prev_state.enpassant_square_.has_value())
+            next_state.hash_ ^= zobrist::enpassant_key(prev_state.enpassant_square_.value());
+        next_state.hash_ ^= zobrist::side_to_move_key(!stm);
+        next_state.hash_ ^= zobrist::side_to_move_key(stm);
+    }
     next_state.pawn_hash_ = calculate_pawn_hash();
 }
 
 inline void Position::make_null_move() {
-    if (side_to_move() == constants::BLACK) {
+    Color stm = side_to_move();
+    if (stm == constants::BLACK) {
         ++fullmoves_;
     }
     ++ply_;
@@ -224,9 +248,13 @@ inline void Position::make_null_move() {
     reverse_side_to_move();
     next.previous_move_ = {};
     next.halfmoves_ = prev.halfmoves_ + 1;
-    next.enpassant_square_ = {};
     next.castling_rights_ = prev.castling_rights_;
-    next.hash_ = calculate_hash();
+    next.hash_ = prev.hash_;
+    if (prev.enpassant_square_.has_value())
+        next.hash_ ^= zobrist::enpassant_key(prev.enpassant_square_.value());
+    next.hash_ ^= zobrist::side_to_move_key(!stm);
+    next.hash_ ^= zobrist::side_to_move_key(stm);
+    next.enpassant_square_ = {};
     next.pawn_hash_ = calculate_pawn_hash();
 }
 
