@@ -26,25 +26,25 @@ class TunableParameter {
     TunableParameter operator-(int rhs) const noexcept {
         return TunableParameter{name(), value_ - rhs};
     }
-    virtual void operator+=(int rhs) noexcept {
+    void operator+=(int rhs) noexcept {
         value_ += rhs;
     }
-    virtual void operator-=(int rhs) noexcept {
+    void operator-=(int rhs) noexcept {
         value_ -= rhs;
     }
 
-    [[nodiscard]] virtual const std::string& name() const noexcept {
+    [[nodiscard]] const std::string& name() const noexcept {
         return name_;
     }
-    [[nodiscard]] virtual int value() const noexcept {
+    [[nodiscard]] int value() const noexcept {
         return value_;
     }
 
-    virtual void set_value(int value) noexcept {
+    void set_value(int value) noexcept {
         value_ = value;
     }
 
-    [[nodiscard]] virtual std::string to_str() const noexcept {
+    [[nodiscard]] std::string to_str() const noexcept {
         return name_ + ": " + std::to_string(value_);
     }
 
@@ -237,17 +237,9 @@ class Tuner {
         for (int step = 0; step < max_steps; ++step) {
             double temperature = 1.0 / (1.667 * (1.0 + double(step)));
 
-	    int increment_n = parameter_distribution(rng);
-
-	    std::vector<std::pair<size_t, int> > undo;
-
-	    for(int inc_loop=1; inc_loop<increment_n; inc_loop++) {
-		    int increment = random_increment();
-		    size_t nr = parameter_distribution(rng);
-		    undo.push_back({ nr, increment });
-		    TunableParameter& tunable_parameter = tunable_parameters_[nr];
-		    tunable_parameter += increment;
-	    }
+            int increment = random_increment();
+            TunableParameter& tunable_parameter = tunable_parameters_[parameter_distribution(rng)];
+            tunable_parameter += increment;
 
             double new_error = error();
 
@@ -258,10 +250,7 @@ class Tuner {
             if (random_bool(acceptance_probability)) {
                 current_error = new_error;
             } else {
-                for(auto & u : undo) {
-		    TunableParameter& tunable_parameter = tunable_parameters_[u.first];
-		    tunable_parameter -= u.second;
-		}
+                tunable_parameter -= increment;
             }
 
             display();
