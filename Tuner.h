@@ -3,6 +3,7 @@
 
 #include <array>
 #include <cmath>
+#include <ctime>
 #include <fstream>
 #include <functional>
 #include <iomanip>
@@ -264,8 +265,9 @@ class Tuner {
             }
 
             display();
+	    time_t t = time(nullptr);
             std::cout << "acceptance prob: " << acceptance_probability << " step: " << step
-                      << " temperature: " << temperature << " error: " << current_error << "\n";
+                      << " temperature: " << temperature << " error: " << current_error << " " << ctime(&t);
         }
     }
 
