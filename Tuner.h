@@ -100,8 +100,8 @@ class NormalizedResult {
             for (unsigned i = 0; i < 4; ++i) {
                 curr_pos = line_view.find(' ', curr_pos + 1);
             }
-            std::string fen{line_view.begin(), curr_pos};
-            std::string post_fen{curr_pos + 1, line_view.end()};
+            std::string fen{line_view.begin(), line_view.begin() + curr_pos};
+            std::string post_fen{line_view.begin() + curr_pos + 1, line_view.end()};
             Result result = [&result_opcode, &post_fen] {
                 std::istringstream post_fen_stream{post_fen};
                 std::string opcode;
