@@ -97,9 +97,9 @@ class NormalizedResult {
                 break;
             }
             std::string_view line_view{line};
-            auto curr_pos = line_view.begin();
+            size_t curr_pos = 0;
             for (unsigned i = 0; i < 4; ++i) {
-                curr_pos = std::find(curr_pos + 1, line_view.end(), ' ');
+                curr_pos = line_view.find(' ', curr_pos + 1);
             }
             std::string fen{line_view.begin(), curr_pos};
             std::string post_fen{curr_pos + 1, line_view.end()};
