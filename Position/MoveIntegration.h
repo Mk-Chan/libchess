@@ -232,6 +232,8 @@ inline void Position::make_move(Move move) {
             next_state.hash_ ^= zobrist::enpassant_key(prev_state.enpassant_square_.value());
         next_state.hash_ ^= zobrist::side_to_move_key(!stm);
         next_state.hash_ ^= zobrist::side_to_move_key(stm);
+        next_state.hash_ ^= zobrist::castling_rights_key(prev_state.castling_rights_);
+        next_state.hash_ ^= zobrist::castling_rights_key(next_state.castling_rights_);
     }
     next_state.pawn_hash_ = calculate_pawn_hash();
 }
