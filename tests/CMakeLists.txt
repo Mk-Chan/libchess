@@ -4,7 +4,7 @@ cmake_minimum_required(VERSION 3.12)
 add_executable(libchess_test Tests.cpp ColorTests.cpp BitboardTests.cpp PieceTests.cpp PieceTypeTests.cpp MoveTests.cpp CastlingRightsTests.cpp PositionTests.cpp UCIServiceTests.cpp)
 
 # Linked libs
-target_link_libraries(libchess_test Catch2::Catch2)
+target_link_libraries(libchess_test Catch2::Catch2WithMain)
 
 # Tests
 add_test(libchess_test_build "${CMAKE_COMMAND}" --build "${CMAKE_BINARY_DIR}" --target libchess_test)
