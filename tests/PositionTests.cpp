@@ -35,33 +35,66 @@ TEST_CASE("Null Move Test", "[Position]") {
 }
 
 TEST_CASE("Hash Test", "[Position]") {
-    Position pos{STARTPOS_FEN};
-    Position::hash_type old_hash = pos.hash();
+    {
+        Position pos{STARTPOS_FEN};
+        Position::hash_type old_hash = pos.hash();
 
-    pos.make_move({E2, E4});
-    REQUIRE(pos.hash() != old_hash);
-    REQUIRE(pos.hash() == pos.calculate_hash());
-    pos.unmake_move();
-    REQUIRE(pos.hash() == old_hash);
+        pos.make_move({E2, E4});
+        REQUIRE(pos.hash() != old_hash);
+        REQUIRE(pos.hash() == pos.calculate_hash());
+        pos.unmake_move();
+        REQUIRE(pos.hash() == old_hash);
 
-    pos.make_move({E2, E3});
-    REQUIRE(pos.hash() != old_hash);
-    REQUIRE(pos.hash() == pos.calculate_hash());
-    pos.unmake_move();
-    REQUIRE(pos.hash() == old_hash);
+        pos.make_move({E2, E3});
+        REQUIRE(pos.hash() != old_hash);
+        REQUIRE(pos.hash() == pos.calculate_hash());
+        pos.unmake_move();
+        REQUIRE(pos.hash() == old_hash);
 
-    pos.make_move({B1, C3});
-    REQUIRE(pos.hash() != old_hash);
-    REQUIRE(pos.hash() == pos.calculate_hash());
-    pos.make_move({B8, C6});
-    REQUIRE(pos.hash() != old_hash);
-    REQUIRE(pos.hash() == pos.calculate_hash());
-    pos.make_move({C3, B1});
-    REQUIRE(pos.hash() != old_hash);
-    REQUIRE(pos.hash() == pos.calculate_hash());
-    pos.make_move({C6, B8});
-    REQUIRE(pos.hash() == old_hash);
-    REQUIRE(pos.hash() == pos.calculate_hash());
+        pos.make_move({B1, C3});
+        REQUIRE(pos.hash() != old_hash);
+        REQUIRE(pos.hash() == pos.calculate_hash());
+        pos.make_move({B8, C6});
+        REQUIRE(pos.hash() != old_hash);
+        REQUIRE(pos.hash() == pos.calculate_hash());
+        pos.make_move({C3, B1});
+        REQUIRE(pos.hash() != old_hash);
+        REQUIRE(pos.hash() == pos.calculate_hash());
+        pos.make_move({C6, B8});
+        REQUIRE(pos.hash() == old_hash);
+        REQUIRE(pos.hash() == pos.calculate_hash());
+    }
+    {
+        Position pos{STARTPOS_FEN};
+        Position::hash_type old_hash_a = pos.hash();
+
+        pos.make_move({G1, F3});  // should not affect castling rights
+        pos.make_move({G8, F6});
+        REQUIRE(pos.calculate_hash() != old_hash_a);
+        REQUIRE(pos.hash() != old_hash_a);
+        REQUIRE(pos.calculate_hash() == pos.hash());
+
+        pos.make_move({F3, G1});
+        pos.make_move({F6, G8});
+        REQUIRE(pos.calculate_hash() == old_hash_a);
+        REQUIRE(pos.hash() == old_hash_a);
+        REQUIRE(pos.calculate_hash() == pos.hash());
+
+        pos.make_move({G1, F3});  // move knight out of the way
+        pos.make_move({G8, F6});
+        REQUIRE(pos.calculate_hash() != old_hash_a);
+        REQUIRE(pos.hash() != old_hash_a);
+        REQUIRE(pos.calculate_hash() == pos.hash());
+
+        Position::hash_type old_hash_b = pos.hash();
+        pos.make_move({H1, G1});  // clear castling rights
+        pos.make_move({H8, G8});
+        pos.make_move({G1, H1});
+        pos.make_move({G8, H8});
+        REQUIRE(pos.hash() != old_hash_b);
+        REQUIRE(pos.calculate_hash() != old_hash_b);
+        REQUIRE(pos.calculate_hash() == pos.hash());
+    }
 }
 
 TEST_CASE("Repetition Test", "[Position]") {
