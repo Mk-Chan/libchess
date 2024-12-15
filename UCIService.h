@@ -377,8 +377,9 @@ class UCIService {
         stop_handler_ = std::move(handler);
     }
     void register_handler(const std::string& command,
-                          std::function<void(std::istringstream&)> handler) noexcept {
-        command_handlers_[command] = std::move(handler);
+                          std::function<void(std::istringstream&)> handler,
+			  const bool terminate_search_before) noexcept {
+        command_handlers_[command] = { std::move(handler), terminate_search_before };
     }
 
     void stop() {
@@ -412,7 +413,10 @@ class UCIService {
             std::istringstream line_stream{line};
             line_stream >> word;
             if (command_handlers_.find(word) != command_handlers_.end()) {
-                command_handlers_[word](line_stream);
+                auto & handler = command_handlers_[word];
+                if (handler.second)
+                    stop_search();
+                handler.first(line_stream);
             } else if (word == "uci") {
                 uci_handler();
             } else if (word == "position") {
@@ -748,7 +752,7 @@ class UCIService {
     std::function<void(UCIPositionParameters)> position_handler_;
     std::function<void(UCIGoParameters)> go_handler_;
     std::function<void(void)> stop_handler_;
-    std::unordered_map<std::string, std::function<void(std::istringstream&)>> command_handlers_;
+    std::unordered_map<std::string, std::pair<std::function<void(std::istringstream&)>, bool>> command_handlers_;
 
     std::string name_;
     std::string author_;
