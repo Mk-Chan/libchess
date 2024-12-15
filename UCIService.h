@@ -412,6 +412,7 @@ class UCIService {
             std::istringstream line_stream{line};
             line_stream >> word;
             if (command_handlers_.find(word) != command_handlers_.end()) {
+                stop_search();
                 command_handlers_[word](line_stream);
             } else if (word == "uci") {
                 uci_handler();
