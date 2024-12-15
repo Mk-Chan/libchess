@@ -21,7 +21,7 @@ class Color : public MetaValueType<int> {
     constexpr explicit Color(value_type value) : MetaValueType<value_type>(value) {
     }
 
-    constexpr Color operator!() {
+    constexpr Color operator!() const {
         return Color{!value()};
     }
 
