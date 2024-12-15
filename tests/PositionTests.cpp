@@ -72,16 +72,19 @@ TEST_CASE("Hash Test", "[Position]") {
         pos.make_move({G8, F6});
         REQUIRE(pos.calculate_hash() != old_hash_a);
         REQUIRE(pos.hash() != old_hash_a);
+        REQUIRE(pos.calculate_hash() == pos.hash());
 
         pos.make_move({F3, G1});
         pos.make_move({F6, G8});
         REQUIRE(pos.calculate_hash() == old_hash_a);
         REQUIRE(pos.hash() == old_hash_a);
+        REQUIRE(pos.calculate_hash() == pos.hash());
 
         pos.make_move({G1, F3});  // move knight out of the way
         pos.make_move({G8, F6});
         REQUIRE(pos.calculate_hash() != old_hash_a);
         REQUIRE(pos.hash() != old_hash_a);
+        REQUIRE(pos.calculate_hash() == pos.hash());
 
         Position::hash_type old_hash_b = pos.hash();
         pos.make_move({H1, G1});  // clear castling rights
@@ -90,6 +93,7 @@ TEST_CASE("Hash Test", "[Position]") {
         pos.make_move({G8, H8});
         REQUIRE(pos.hash() != old_hash_b);
         REQUIRE(pos.calculate_hash() != old_hash_b);
+        REQUIRE(pos.calculate_hash() == pos.hash());
     }
 }
 
