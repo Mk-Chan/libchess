@@ -213,11 +213,20 @@ inline void Position::make_move(Move move) {
         case Move::Type::PROMOTION:
             remove_piece(from_square, constants::PAWN, stm);
             put_piece(to_square, *promotion_pt, stm);
+            next_state.hash_ = prev_state.hash_;
+            next_state.hash_ ^= zobrist::piece_square_key(from_square, constants::PAWN, stm);
+            next_state.hash_ ^= zobrist::piece_square_key(to_square, *promotion_pt, stm);
+            calc_hash = false;
             break;
         case Move::Type::CAPTURE_PROMOTION:
             remove_piece(to_square, *captured_pt, !stm);
             remove_piece(from_square, constants::PAWN, stm);
             put_piece(to_square, *promotion_pt, stm);
+            next_state.hash_ = prev_state.hash_;
+            next_state.hash_ ^= zobrist::piece_square_key(to_square, *captured_pt, !stm);
+            next_state.hash_ ^= zobrist::piece_square_key(from_square, constants::PAWN, stm);
+            next_state.hash_ ^= zobrist::piece_square_key(to_square, *promotion_pt, stm);
+            calc_hash = false;
             break;
         case Move::Type::NONE:
             break;
