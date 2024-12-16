@@ -95,6 +95,13 @@ TEST_CASE("Hash Test", "[Position]") {
         REQUIRE(pos.calculate_hash() != old_hash_b);
         REQUIRE(pos.calculate_hash() == pos.hash());
     }
+    {
+        Position pos_with{"rnbqkbnr/p2pp1pp/1pp2p2/8/4P3/3B1N2/PPPP1PPP/RNBQK2R w KQkq - 0 1"};
+        Position pos_without{"rnbqkbnr/p2pp1pp/1pp2p2/8/4P3/3B1N2/PPPP1PPP/RNBQK2R w kq - 0 1"};
+	REQUIRE(pos_with.hash() != pos_without.hash());
+	REQUIRE(pos_with.hash() == pos_with.calculate_hash());
+	REQUIRE(pos_without.hash() == pos_without.calculate_hash());
+    }
 }
 
 TEST_CASE("Repetition Test", "[Position]") {
