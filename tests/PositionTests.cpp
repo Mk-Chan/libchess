@@ -36,18 +36,39 @@ TEST_CASE("Null Move Test", "[Position]") {
 
 TEST_CASE("Hash Test", "[Position]") {
     {
+	REQUIRE(A1 == 0);
+	REQUIRE(E5 == 36);
+	REQUIRE(H8 == 63);
+	REQUIRE(E4.file() == 4);
+	REQUIRE(E4.rank() == 3);
+	REQUIRE(WHITE.value() == 0);
+	REQUIRE(BLACK.value() == 1);
+	REQUIRE(zobrist::side_to_move_key() != 0);
+
+	Position pos{ "rnbqkbnr/ppp1pppp/8/8/3pP3/PPP5/3P1PPP/RNBQKBNR b KQkq e3 0 1" };
+	REQUIRE(pos.hash() == 0xe33c19b44bb1087cll);
+        REQUIRE(pos.hash() == pos.calculate_hash());
+    }
+    {
         Position pos{STARTPOS_FEN};
         Position::hash_type old_hash = pos.hash();
+        REQUIRE(old_hash == 0x463b96181691fc9cll);
 
-        pos.make_move({E2, E4});
+        pos.make_move({E2, E3});
+        REQUIRE(pos.side_to_move() == BLACK);
         REQUIRE(pos.hash() != old_hash);
         REQUIRE(pos.hash() == pos.calculate_hash());
+	REQUIRE(pos.hash() == Position("rnbqkbnr/pppppppp/8/8/8/4P3/PPPP1PPP/RNBQKBNR b KQkq - 0 1").calculate_hash());
+	REQUIRE(pos.enpassant_square().has_value() == false);
+        REQUIRE(pos.hash() == 0xeb16d4aa32ce7438);
         pos.unmake_move();
         REQUIRE(pos.hash() == old_hash);
 
-        pos.make_move({E2, E3});
+        pos.make_move({E2, E4});
         REQUIRE(pos.hash() != old_hash);
+        REQUIRE(pos.calculate_hash() == 0x823c9b50fd114196ll);
         REQUIRE(pos.hash() == pos.calculate_hash());
+	REQUIRE(pos.side_to_move() == BLACK);
         pos.unmake_move();
         REQUIRE(pos.hash() == old_hash);
 

@@ -32,8 +32,8 @@ constexpr inline std::uint64_t castling_rights_key(CastlingRights castling_right
 constexpr inline std::uint64_t enpassant_key(Square square) {
     return polyglot::random_u64[772 + square.file().value()];
 }
-constexpr inline std::uint64_t side_to_move_key(Color stm) {
-    return polyglot::random_u64[780 + stm.value()];
+constexpr inline std::uint64_t side_to_move_key() {
+    return polyglot::random_u64[780];
 }
 
 }  // namespace libchess::zobrist
