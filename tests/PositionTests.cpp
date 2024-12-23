@@ -85,6 +85,19 @@ TEST_CASE("Hash Test", "[Position]") {
         REQUIRE(pos.hash() == pos.calculate_hash());
     }
     {
+        Position pos{ "rnbqkbnr/ppp3pp/4p3/3p1p2/3P1P2/4P3/PPP3PP/RNBQKBNR w KQkq - 0 1" };
+	std::vector<std::pair<Move, uint64_t> > tests {
+		{ { F1, B5 }, 0x8799e11e657c04dall },
+		{ { F8, B4 }, 0x4ed888182e8bccf8ll },
+		{ { D1, D3 }, 0xeebf24d481c95d8fll },
+	};
+	for(auto & p: tests) {
+		pos.make_move(p.first);
+		REQUIRE(pos.hash() == pos.calculate_hash());
+		REQUIRE(pos.calculate_hash() == p.second);
+	}
+    }
+    {
         Position pos{STARTPOS_FEN};
 	std::vector<std::pair<Move, uint64_t> > tests {
 		{ { E2, E4 }, 0x823c9b50fd114196ll },
