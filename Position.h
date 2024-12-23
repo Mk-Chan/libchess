@@ -127,7 +127,25 @@ class Position {
     static std::optional<Position> from_fen(const std::string& fen);
     static std::optional<Position> from_uci_position_line(const std::string& line);
 
-    hash_type calculate_hash() const {
+    std::uint64_t zobrist_enpassant_key(Square square) {
+	Color sq_c = side_to_move();
+
+        if (square.file() && piece_on(Square{square + 7}).has_value()) {
+            auto piece = piece_on(Square{square + 7}).value();
+	    if (piece.color() == sq_c && piece.type() == constants::PAWN)
+                return zobrist::enpassant_key(square);
+        }
+
+        if (square.file() < 7 && piece_on(Square{square + 9}).has_value()) {
+            auto piece = piece_on(Square{square + 9}).value();
+	    if (piece.color() == sq_c && piece.type() == constants::PAWN)
+                return zobrist::enpassant_key(square);
+        }
+
+        return 0;
+    }
+
+    hash_type calculate_hash() {
         hash_type hash_value = 0;
         for (Color c : constants::COLORS) {
             for (PieceType pt : constants::PIECE_TYPES) {
@@ -140,10 +158,11 @@ class Position {
         }
         auto ep_sq = enpassant_square();
         if (ep_sq) {
-            hash_value ^= zobrist::enpassant_key(*ep_sq);
+            hash_value ^= zobrist_enpassant_key(*ep_sq);
         }
         hash_value ^= zobrist::castling_rights_key(castling_rights());
-        hash_value ^= zobrist::side_to_move_key(side_to_move());
+	if (side_to_move() == constants::WHITE)
+            hash_value ^= zobrist::side_to_move_key();
         return hash_value;
     }
 
