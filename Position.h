@@ -128,10 +128,20 @@ class Position {
     static std::optional<Position> from_uci_position_line(const std::string& line);
 
     std::uint64_t zobrist_enpassant_key(Square square) {
-        if ((square.file() && piece_on(Square{square + 7}).has_value()) ||
-            (square.file() < 7 && piece_on(Square{square + 9}).has_value())) {
-            return zobrist::enpassant_key(square);
+	Color sq_c = side_to_move();
+
+        if (square.file() && piece_on(Square{square + 7}).has_value()) {
+            auto piece = piece_on(Square{square + 7}).value();
+	    if (piece.color() == sq_c && piece.type() == constants::PAWN)
+                return zobrist::enpassant_key(square);
         }
+
+        if (square.file() < 7 && piece_on(Square{square + 9}).has_value()) {
+            auto piece = piece_on(Square{square + 9}).value();
+	    if (piece.color() == sq_c && piece.type() == constants::PAWN)
+                return zobrist::enpassant_key(square);
+        }
+
         return 0;
     }
 
