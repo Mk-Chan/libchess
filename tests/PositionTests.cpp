@@ -45,10 +45,23 @@ TEST_CASE("Hash Test", "[Position]") {
 	REQUIRE(WHITE.value() == 0);
 	REQUIRE(BLACK.value() == 1);
 	REQUIRE(zobrist::side_to_move_key() != 0);
-
-	// en-passant (without history)
+    }
+    {
+	// en-passant (without history), e2e4 with opponent on d4
 	Position pos{ "rnbqkbnr/ppp1pppp/8/8/3pP3/PPP5/3P1PPP/RNBQKBNR b KQkq e3 0 1" };
 	REQUIRE(pos.hash() == 0xe33c19b44bb1087cll);
+        REQUIRE(pos.hash() == pos.calculate_hash());
+    }
+    {
+	// no en-passant (without history), e2e4
+	Position pos{ "rnbqkbnr/pppppppp/8/8/4P3/8/PPPP1PPP/RNBQKBNR w KQkq - 0 1" };
+	REQUIRE(pos.hash() == 0x7aeabdfa5236c49fll);
+        REQUIRE(pos.hash() == pos.calculate_hash());
+    }
+    {
+	// no en-passant, e2e4 with own color on the side
+	Position pos{ "rnbqkbnr/pppppppp/8/8/3PPP2/8/PPP3PP/RNBQKBNR w KQkq - 0 1" };
+	REQUIRE(pos.hash() == 0);
         REQUIRE(pos.hash() == pos.calculate_hash());
     }
     {
