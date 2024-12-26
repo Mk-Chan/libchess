@@ -46,6 +46,16 @@ TEST_CASE("Hash Test", "[Position]") {
 	REQUIRE(BLACK.value() == 1);
 	REQUIRE(zobrist::side_to_move_key() != 0);
     }
+    // en-passant with same color pieces on the side (white)
+    {
+        libchess::Position pos{ "rnbqkbnr/pppppppp/8/8/3PPP2/8/PPP3PP/RNBQKBNR w KQkq - 0 1" };
+        REQUIRE(pos.zobrist_enpassant_key(libchess::constants::E3) == 0);
+    }
+    // en-passant with same color pieces on the side (black)
+    {
+        libchess::Position pos{ "rnbqkbnr/ppp3pp/8/3ppp2/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1" };
+        REQUIRE(pos.zobrist_enpassant_key(libchess::constants::D6) == 0);
+    }
     {
 	// en-passant (without history), e2e4 with opponent on d4
 	Position pos{ "rnbqkbnr/ppp1pppp/8/8/3pP3/PPP5/3P1PPP/RNBQKBNR b KQkq e3 0 1" };
@@ -61,7 +71,7 @@ TEST_CASE("Hash Test", "[Position]") {
     {
 	// no en-passant, e2e4 with own color on the side
 	Position pos{ "rnbqkbnr/pppppppp/8/8/3PPP2/8/PPP3PP/RNBQKBNR w KQkq - 0 1" };
-	REQUIRE(pos.hash() == 0);
+	REQUIRE(pos.hash() == 0x42c9ef5d5a6ed454ll);
         REQUIRE(pos.hash() == pos.calculate_hash());
     }
     {
