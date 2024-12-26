@@ -75,6 +75,12 @@ TEST_CASE("Hash Test", "[Position]") {
         REQUIRE(pos.hash() == pos.calculate_hash());
     }
     {
+        // no en-passant
+	Position pos{ "rnbqkbnr/pppp1ppp/3P1P2/4p3/8/8/PPP1P1PP/RNBQKBNR w KQkq - 0 1" };
+	REQUIRE(pos.hash() == 0xdbe62744792e27fdll);
+        REQUIRE(pos.hash() == pos.calculate_hash());
+    }
+    {
 	// basic start position
         Position pos{STARTPOS_FEN};
         Position::hash_type old_hash = pos.hash();
@@ -141,9 +147,8 @@ TEST_CASE("Hash Test", "[Position]") {
 	};
 	for(auto & p: tests) {
 		pos.make_move(p.first);
-		printf("%s %d\n", p.first.to_str().c_str(), pos.enpassant_square().has_value());
-		REQUIRE(pos.hash() == pos.calculate_hash());
 		REQUIRE(pos.calculate_hash() == p.second);
+		REQUIRE(pos.hash() == pos.calculate_hash());
 	}
     }
     // castling rights
@@ -237,13 +242,13 @@ TEST_CASE("FEN Test", "[Position]") {
 }
 
 TEST_CASE("Flip Test", "[Position]") {
-    Position pos{"rnbqkbnr/ppppppp1/8/7p/8/8/PPPPPPPP/RNBQKBN1 w Qkq h7 0 1"};
+    Position pos{"rnbqkbnr/ppppppp1/8/7p/8/8/PPPPPPPP/RNBQKBN1 w Qkq h6 0 1"};
 
     pos.vflip();
-    REQUIRE(pos.fen() == "rnbqkbn1/pppppppp/8/8/7P/8/PPPPPPP1/RNBQKBNR b KQq h2 0 1");
+    REQUIRE(pos.fen() == "rnbqkbn1/pppppppp/8/8/7P/8/PPPPPPP1/RNBQKBNR b KQq h3 0 1");
 
     pos.vflip();
-    REQUIRE(pos.fen() == "rnbqkbnr/ppppppp1/8/7p/8/8/PPPPPPPP/RNBQKBN1 w Qkq h7 0 1");
+    REQUIRE(pos.fen() == "rnbqkbnr/ppppppp1/8/7p/8/8/PPPPPPPP/RNBQKBN1 w Qkq h6 0 1");
 }
 
 TEST_CASE("UCI Position Line Test", "[Position]") {

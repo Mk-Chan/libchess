@@ -192,6 +192,7 @@ class Position {
     struct State {
         CastlingRights castling_rights_;
         std::optional<Square> enpassant_square_;
+        std::optional<std::uint64_t> zobrist_undo;
         std::optional<Move> previous_move_;
         std::optional<PieceType> captured_pt_;
         Move::Type move_type_ = Move::Type::NONE;
