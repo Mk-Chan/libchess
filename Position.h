@@ -130,7 +130,7 @@ class Position {
     std::uint64_t zobrist_enpassant_key(Square square) {
         int file = square.file();  // x
         int rank = square.rank();  // y
-        int hunter_rank = rank == 5 ? 4 : 3;
+        int hunter_rank = rank == 5 ? 4 : 3;  // Ex/Dx
 	int hunted_index = file + hunter_rank * 8;
 	// determine color of EP piece
         Color hunted = color_of(Square{hunted_index}).value();
