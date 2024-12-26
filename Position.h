@@ -128,12 +128,29 @@ class Position {
     static std::optional<Position> from_uci_position_line(const std::string& line);
 
     std::uint64_t zobrist_enpassant_key(Square square) {
-        if ((square.file() && piece_on(Square{square + 7}).has_value()) ||
-            (square.file() < 7 && piece_on(Square{square + 9}).has_value())) {
-            return zobrist::enpassant_key(square);
+        int file = square.file();  // x
+        int rank = square.rank();  // y
+        int hunter_rank = rank == 5 ? 4 : 3;
+        Color hunted = color_of(rank == 5 ? Square{file + hunter_rank * 8}:Square{file + hunter_rank * 8}).value();
+
+        int left_index = hunter_rank * 8 - 1 + file;
+        int right_index = hunter_rank * 8 + 1 + file;
+
+        if (file > 0) {
+            auto piece = piece_on(Square{left_index});
+            if (piece.has_value() && piece.value().color() != hunted && piece.value().type() == constants::PAWN)
+                return zobrist::enpassant_key(square);
         }
+
+        if (file < 7) {
+            auto piece = piece_on(Square{right_index});
+            if (piece.has_value() && piece.value().color() != hunted && piece.value().type() == constants::PAWN)
+                return zobrist::enpassant_key(square);
+        }
+
         return 0;
     }
+
 
     hash_type calculate_hash() {
         hash_type hash_value = 0;
