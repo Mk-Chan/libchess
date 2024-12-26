@@ -131,10 +131,12 @@ class Position {
         int file = square.file();  // x
         int rank = square.rank();  // y
         int hunter_rank = rank == 5 ? 4 : 3;
-        Color hunted = color_of(rank == 5 ? Square{file + hunter_rank * 8}:Square{file + hunter_rank * 8}).value();
+	int hunted_index = file + hunter_rank * 8;
+	// determine color of EP piece
+        Color hunted = color_of(Square{hunted_index}).value();
 
-        int left_index = hunter_rank * 8 - 1 + file;
-        int right_index = hunter_rank * 8 + 1 + file;
+        int left_index = hunted_index - 1;
+        int right_index = hunted_index + 1;
 
         if (file > 0) {
             auto piece = piece_on(Square{left_index});
