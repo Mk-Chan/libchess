@@ -57,30 +57,6 @@ TEST_CASE("Hash Test", "[Position]") {
         REQUIRE(pos.zobrist_enpassant_key(libchess::constants::D6) == 0);
     }
     {
-	// en-passant (without history), e2e4 with opponent on d4
-	Position pos{ "rnbqkbnr/ppp1pppp/8/8/3pP3/PPP5/3P1PPP/RNBQKBNR b KQkq e3 0 1" };
-	REQUIRE(pos.hash() == 0xe33c19b44bb1087cll);
-        REQUIRE(pos.hash() == pos.calculate_hash());
-    }
-    {
-	// no en-passant (without history), e2e4
-	Position pos{ "rnbqkbnr/pppppppp/8/8/4P3/8/PPPP1PPP/RNBQKBNR w KQkq - 0 1" };
-	REQUIRE(pos.hash() == 0x7aeabdfa5236c49fll);
-        REQUIRE(pos.hash() == pos.calculate_hash());
-    }
-    {
-	// no en-passant, e2e4 with own color on the side
-	Position pos{ "rnbqkbnr/pppppppp/8/8/3PPP2/8/PPP3PP/RNBQKBNR w KQkq - 0 1" };
-	REQUIRE(pos.hash() == 0x42c9ef5d5a6ed454ll);
-        REQUIRE(pos.hash() == pos.calculate_hash());
-    }
-    {
-        // no en-passant
-	Position pos{ "rnbqkbnr/pppp1ppp/3P1P2/4p3/8/8/PPP1P1PP/RNBQKBNR w KQkq - 0 1" };
-	REQUIRE(pos.hash() == 0xdbe62744792e27fdll);
-        REQUIRE(pos.hash() == pos.calculate_hash());
-    }
-    {
 	// basic start position
         Position pos{STARTPOS_FEN};
         Position::hash_type old_hash = pos.hash();
@@ -130,10 +106,23 @@ TEST_CASE("Hash Test", "[Position]") {
 	}
     }
     {
-	// e2e4, d7d5
-	Position pos{ "rnbqkbnr/ppp1pppp/8/3p4/4P3/8/PPPP1PPP/RNBQKBNR w KQkq - 0 1" };
-	REQUIRE(pos.calculate_hash() == 0x0756b94461c50fb0ll);
-        REQUIRE(pos.hash() == pos.calculate_hash());
+	std::vector<std::pair<std::string, std::uint64_t> > fens {
+		{ "rnbqkbnr/p1pppppp/8/8/PpP4P/8/1P1PPPP1/RNBQKBNR b KQkq c3 0 3", 0x3c8123ea7b067637ll },
+		{ "rnbqkbnr/p1pppppp/8/8/P6P/R1p5/1P1PPPP1/1NBQKBNR b Kkq - 0 4", 0x5c3f9b829b279560ll },
+		// en-passant (without history), e2e4 with opponent on d4
+		{ "rnbqkbnr/ppp1pppp/8/8/3pP3/PPP5/3P1PPP/RNBQKBNR b KQkq e3 0 1", 0xe33c19b44bb1087cll },
+		// no en-passant (without history), e2e4
+		{ "rnbqkbnr/pppppppp/8/8/4P3/8/PPPP1PPP/RNBQKBNR w KQkq - 0 1", 0x7aeabdfa5236c49fll },
+		// no en-passant, e2e4 with own color on the side
+		{ "rnbqkbnr/pppppppp/8/8/3PPP2/8/PPP3PP/RNBQKBNR w KQkq - 0 1", 0x42c9ef5d5a6ed454ll },
+		// no en-passant
+		{ "rnbqkbnr/pppp1ppp/3P1P2/4p3/8/8/PPP1P1PP/RNBQKBNR w KQkq - 0 1", 0xdbe62744792e27fdll },
+	};
+	for(auto & entry: fens) {
+            Position pos{entry.first};
+	    REQUIRE(pos.calculate_hash() == entry.second);
+            REQUIRE(pos.hash() == pos.calculate_hash());
+	}
     }
     {
         Position pos{STARTPOS_FEN};
