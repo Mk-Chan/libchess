@@ -36,6 +36,7 @@ TEST_CASE("Null Move Test", "[Position]") {
 
 TEST_CASE("Hash Test", "[Position]") {
     {
+	// basic sanity checks
 	REQUIRE(A1 == 0);
 	REQUIRE(E5 == 36);
 	REQUIRE(H8 == 63);
@@ -45,11 +46,13 @@ TEST_CASE("Hash Test", "[Position]") {
 	REQUIRE(BLACK.value() == 1);
 	REQUIRE(zobrist::side_to_move_key() != 0);
 
+	// en-passant (without history)
 	Position pos{ "rnbqkbnr/ppp1pppp/8/8/3pP3/PPP5/3P1PPP/RNBQKBNR b KQkq e3 0 1" };
 	REQUIRE(pos.hash() == 0xe33c19b44bb1087cll);
         REQUIRE(pos.hash() == pos.calculate_hash());
     }
     {
+	// basic start position
         Position pos{STARTPOS_FEN};
         Position::hash_type old_hash = pos.hash();
         REQUIRE(old_hash == 0x463b96181691fc9cll);
@@ -98,10 +101,16 @@ TEST_CASE("Hash Test", "[Position]") {
 	}
     }
     {
+	// e2e4, d7d5
+	Position pos{ "rnbqkbnr/ppp1pppp/8/3p4/4P3/8/PPPP1PPP/RNBQKBNR w KQkq - 0 1" };
+	REQUIRE(pos.calculate_hash() == 0x0756b94461c50fb0ll);
+        REQUIRE(pos.hash() == pos.calculate_hash());
+    }
+    {
         Position pos{STARTPOS_FEN};
 	std::vector<std::pair<Move, uint64_t> > tests {
 		{ { E2, E4 }, 0x823c9b50fd114196ll },
-		{ { D7, D5 }, 0x0756b94461c50fb0ll },
+		{ { D7, D5 }, 0x0756b94461c50fb0ll },  // rnbqkbnr/ppp1pppp/8/3p4/4P3/8/PPPP1PPP/RNBQKBNR w KQkq - 0 1
 		{ { E4, E5 }, 0x662fafb965db29d4ll },
 		{ { F7, F5 }, 0x22a48b5a8e47ff78ll },
 		{ { E1, E2 }, 0x652a607ca3f242c1ll },
@@ -109,11 +118,12 @@ TEST_CASE("Hash Test", "[Position]") {
 	};
 	for(auto & p: tests) {
 		pos.make_move(p.first);
-		printf("%s\n", p.first.to_str().c_str());
+		printf("%s %d\n", p.first.to_str().c_str(), pos.enpassant_square().has_value());
 		REQUIRE(pos.hash() == pos.calculate_hash());
 		REQUIRE(pos.calculate_hash() == p.second);
 	}
     }
+    // castling rights
     {
         Position pos{STARTPOS_FEN};
         Position::hash_type old_hash_a = pos.hash();
