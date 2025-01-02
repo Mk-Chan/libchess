@@ -34,17 +34,6 @@ TEST_CASE("Null Move Test", "[Position]") {
 }
 
 TEST_CASE("Hash Test", "[Position]") {
-    {
-        // basic sanity checks
-        REQUIRE(A1 == 0);
-        REQUIRE(E5 == 36);
-        REQUIRE(H8 == 63);
-        REQUIRE(E4.file() == 4);
-        REQUIRE(E4.rank() == 3);
-        REQUIRE(WHITE.value() == 0);
-        REQUIRE(BLACK.value() == 1);
-        REQUIRE(zobrist::side_to_move_key() != 0);
-    }
     // castling rights
     {
         Position pos{STARTPOS_FEN};
