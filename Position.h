@@ -127,33 +127,6 @@ class Position {
     static std::optional<Position> from_fen(const std::string& fen);
     static std::optional<Position> from_uci_position_line(const std::string& line);
 
-    std::uint64_t zobrist_enpassant_key(Square square) const {
-        int file = square.file();  // x
-        int rank = square.rank();  // y
-        int hunter_rank = rank == 5 ? 4 : 3;  // Ex/Dx
-	int hunted_index = file + hunter_rank * 8;
-	// determine color of EP piece
-        Color hunted = color_of(Square{hunted_index}).value();
-
-        int left_index = hunted_index - 1;
-        int right_index = hunted_index + 1;
-
-        if (file > 0) {
-            auto piece = piece_on(Square{left_index});
-            if (piece.has_value() && piece.value().color() != hunted && piece.value().type() == constants::PAWN)
-                return zobrist::enpassant_key(square);
-        }
-
-        if (file < 7) {
-            auto piece = piece_on(Square{right_index});
-            if (piece.has_value() && piece.value().color() != hunted && piece.value().type() == constants::PAWN)
-                return zobrist::enpassant_key(square);
-        }
-
-        return 0;
-    }
-
-
     hash_type calculate_hash() const {
         hash_type hash_value = 0;
         for (Color c : constants::COLORS) {
@@ -167,10 +140,10 @@ class Position {
         }
         auto ep_sq = enpassant_square();
         if (ep_sq) {
-            hash_value ^= zobrist_enpassant_key(*ep_sq);
+            hash_value ^= zobrist::enpassant_key(*ep_sq);
         }
         hash_value ^= zobrist::castling_rights_key(castling_rights());
-	if (side_to_move() == constants::WHITE)
+        if (side_to_move() == constants::WHITE)
             hash_value ^= zobrist::side_to_move_key();
         return hash_value;
     }
@@ -192,7 +165,6 @@ class Position {
     struct State {
         CastlingRights castling_rights_;
         std::optional<Square> enpassant_square_;
-        std::optional<std::uint64_t> zobrist_undo;
         std::optional<Move> previous_move_;
         std::optional<PieceType> captured_pt_;
         Move::Type move_type_ = Move::Type::NONE;

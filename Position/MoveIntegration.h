@@ -138,7 +138,6 @@ inline void Position::make_move(Move move) {
     next_state.halfmoves_ = prev_state.halfmoves_ + 1;
     next_state.previous_move_ = move;
     next_state.enpassant_square_ = {};
-    next_state.zobrist_undo = {};
 
     Square from_square = move.from_square();
     Square to_square = move.to_square();
@@ -169,10 +168,6 @@ inline void Position::make_move(Move move) {
             move_piece(from_square, to_square, constants::PAWN, stm);
             next_state.enpassant_square_ =
                 stm == constants::WHITE ? Square(from_square + 8) : Square(from_square - 8);
-            if (next_state.enpassant_square_.has_value()) {
-                next_state.zobrist_undo =
-                    zobrist_enpassant_key(next_state.enpassant_square_.value());
-            }
             break;
         case Move::Type::ENPASSANT:
             move_piece(from_square, to_square, constants::PAWN, stm);
