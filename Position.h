@@ -127,7 +127,7 @@ class Position {
     static std::optional<Position> from_fen(const std::string& fen);
     static std::optional<Position> from_uci_position_line(const std::string& line);
 
-    std::uint64_t zobrist_enpassant_key(Square square) {
+    std::uint64_t zobrist_enpassant_key(Square square) const {
         int file = square.file();  // x
         int rank = square.rank();  // y
         int hunter_rank = rank == 5 ? 4 : 3;  // Ex/Dx
@@ -154,7 +154,7 @@ class Position {
     }
 
 
-    hash_type calculate_hash() {
+    hash_type calculate_hash() const {
         hash_type hash_value = 0;
         for (Color c : constants::COLORS) {
             for (PieceType pt : constants::PIECE_TYPES) {
