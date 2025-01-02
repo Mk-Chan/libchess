@@ -140,7 +140,12 @@ class Position {
         }
         auto ep_sq = enpassant_square();
         if (ep_sq) {
-            hash_value ^= zobrist::enpassant_key(*ep_sq);
+            Color stm = side_to_move();
+            Bitboard ep_candidates = piece_type_bb(constants::PAWN) & color_bb(stm) &
+                                     lookups::pawn_attacks(*ep_sq, !stm);
+            if (ep_candidates) {
+                hash_value ^= zobrist::enpassant_key(*ep_sq);
+            }
         }
         hash_value ^= zobrist::castling_rights_key(castling_rights());
         if (side_to_move() == constants::WHITE)
