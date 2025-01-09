@@ -160,7 +160,7 @@ class MoveList {
     void sort(F move_evaluator) {
         auto& moves = values_mut_ref();
         std::vector<int> scores;
-        scores.reserve(values_.size());
+        scores.resize(values_.size());
         for (int i = 0; i < size(); ++i) {
             scores[i] = move_evaluator(moves[i]);
         }
