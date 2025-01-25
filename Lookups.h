@@ -9,24 +9,24 @@
 
 namespace libchess::lookups {
 
-static Bitboard RANK_1_MASK{std::uint64_t(0xff)};
-static Bitboard RANK_2_MASK{std::uint64_t(0xff00)};
-static Bitboard RANK_3_MASK{std::uint64_t(0xff0000)};
-static Bitboard RANK_4_MASK{std::uint64_t(0xff000000)};
-static Bitboard RANK_5_MASK{std::uint64_t(0xff00000000)};
-static Bitboard RANK_6_MASK{std::uint64_t(0xff0000000000)};
-static Bitboard RANK_7_MASK{std::uint64_t(0xff000000000000)};
-static Bitboard RANK_8_MASK{std::uint64_t(0xff00000000000000)};
-static Bitboard FILE_A_MASK{std::uint64_t(0x0101010101010101)};
-static Bitboard FILE_B_MASK{std::uint64_t(0x0202020202020202)};
-static Bitboard FILE_C_MASK{std::uint64_t(0x0404040404040404)};
-static Bitboard FILE_D_MASK{std::uint64_t(0x0808080808080808)};
-static Bitboard FILE_E_MASK{std::uint64_t(0x1010101010101010)};
-static Bitboard FILE_F_MASK{std::uint64_t(0x2020202020202020)};
-static Bitboard FILE_G_MASK{std::uint64_t(0x4040404040404040)};
-static Bitboard FILE_H_MASK{std::uint64_t(0x8080808080808080)};
+constexpr static Bitboard RANK_1_MASK{std::uint64_t(0xff)};
+constexpr static Bitboard RANK_2_MASK{std::uint64_t(0xff00)};
+constexpr static Bitboard RANK_3_MASK{std::uint64_t(0xff0000)};
+constexpr static Bitboard RANK_4_MASK{std::uint64_t(0xff000000)};
+constexpr static Bitboard RANK_5_MASK{std::uint64_t(0xff00000000)};
+constexpr static Bitboard RANK_6_MASK{std::uint64_t(0xff0000000000)};
+constexpr static Bitboard RANK_7_MASK{std::uint64_t(0xff000000000000)};
+constexpr static Bitboard RANK_8_MASK{std::uint64_t(0xff00000000000000)};
+constexpr static Bitboard FILE_A_MASK{std::uint64_t(0x0101010101010101)};
+constexpr static Bitboard FILE_B_MASK{std::uint64_t(0x0202020202020202)};
+constexpr static Bitboard FILE_C_MASK{std::uint64_t(0x0404040404040404)};
+constexpr static Bitboard FILE_D_MASK{std::uint64_t(0x0808080808080808)};
+constexpr static Bitboard FILE_E_MASK{std::uint64_t(0x1010101010101010)};
+constexpr static Bitboard FILE_F_MASK{std::uint64_t(0x2020202020202020)};
+constexpr static Bitboard FILE_G_MASK{std::uint64_t(0x4040404040404040)};
+constexpr static Bitboard FILE_H_MASK{std::uint64_t(0x8080808080808080)};
 
-static std::array<Bitboard, 8> RANK_MASK = {RANK_1_MASK,
+constexpr static std::array<Bitboard, 8> RANK_MASK = {RANK_1_MASK,
                                             RANK_2_MASK,
                                             RANK_3_MASK,
                                             RANK_4_MASK,
@@ -34,7 +34,7 @@ static std::array<Bitboard, 8> RANK_MASK = {RANK_1_MASK,
                                             RANK_6_MASK,
                                             RANK_7_MASK,
                                             RANK_8_MASK};
-static std::array<Bitboard, 8> FILE_MASK = {FILE_A_MASK,
+constexpr static std::array<Bitboard, 8> FILE_MASK = {FILE_A_MASK,
                                             FILE_B_MASK,
                                             FILE_C_MASK,
                                             FILE_D_MASK,
@@ -52,7 +52,7 @@ inline Bitboard file_mask(File file) {
 
 namespace init {
 
-inline std::array<Bitboard, 64> north() {
+constexpr inline std::array<Bitboard, 64> north() {
     std::array<Bitboard, 64> attacks{};
     for (Square sq = constants::A1; sq <= constants::H7; ++sq) {
         Bitboard bb;
@@ -64,7 +64,7 @@ inline std::array<Bitboard, 64> north() {
     return attacks;
 }
 
-inline std::array<Bitboard, 64> south() {
+constexpr inline std::array<Bitboard, 64> south() {
     std::array<Bitboard, 64> attacks{};
     for (Square sq = constants::A2; sq <= constants::H8; ++sq) {
         Bitboard bb;
@@ -76,7 +76,7 @@ inline std::array<Bitboard, 64> south() {
     return attacks;
 }
 
-inline std::array<Bitboard, 64> east() {
+constexpr inline std::array<Bitboard, 64> east() {
     std::array<Bitboard, 64> attacks{};
     for (Square sq = constants::A1; sq <= constants::G8; ++sq) {
         Bitboard bb;
@@ -91,7 +91,7 @@ inline std::array<Bitboard, 64> east() {
     return attacks;
 }
 
-inline std::array<Bitboard, 64> west() {
+constexpr inline std::array<Bitboard, 64> west() {
     std::array<Bitboard, 64> attacks{};
     for (Square sq = constants::B1; sq <= constants::H8; ++sq) {
         Bitboard bb;
@@ -106,7 +106,7 @@ inline std::array<Bitboard, 64> west() {
     return attacks;
 }
 
-inline std::array<Bitboard, 64> northwest() {
+constexpr inline std::array<Bitboard, 64> northwest() {
     std::array<Bitboard, 64> attacks{};
     for (Square sq = constants::A1; sq <= constants::H7; ++sq) {
         Bitboard bb;
@@ -121,7 +121,7 @@ inline std::array<Bitboard, 64> northwest() {
     return attacks;
 }
 
-inline std::array<Bitboard, 64> southwest() {
+constexpr inline std::array<Bitboard, 64> southwest() {
     std::array<Bitboard, 64> attacks{};
     for (Square sq = constants::B2; sq <= constants::H8; ++sq) {
         Bitboard bb;
@@ -136,7 +136,7 @@ inline std::array<Bitboard, 64> southwest() {
     return attacks;
 }
 
-inline std::array<Bitboard, 64> northeast() {
+constexpr inline std::array<Bitboard, 64> northeast() {
     std::array<Bitboard, 64> attacks{};
     for (Square sq = constants::A1; sq <= constants::G7; ++sq) {
         Bitboard bb;
@@ -151,7 +151,7 @@ inline std::array<Bitboard, 64> northeast() {
     return attacks;
 }
 
-inline std::array<Bitboard, 64> southeast() {
+constexpr inline std::array<Bitboard, 64> southeast() {
     std::array<Bitboard, 64> attacks{};
     for (Square sq = constants::A2; sq <= constants::H8; ++sq) {
         Bitboard bb;
@@ -166,7 +166,7 @@ inline std::array<Bitboard, 64> southeast() {
     return attacks;
 }
 
-inline std::array<std::array<Bitboard, 64>, 64> intervening() {
+constexpr inline std::array<std::array<Bitboard, 64>, 64> intervening() {
     std::array<std::array<Bitboard, 64>, 64> intervening_bb{};
     for (Square from = constants::A1; from <= constants::H8; ++from) {
         for (Square to = constants::A1; to <= constants::H8; ++to) {
@@ -207,47 +207,47 @@ inline std::array<std::array<Bitboard, 64>, 64> intervening() {
 }  // namespace init
 
 // Direction bitboards
-static std::array<Bitboard, 64> NORTH = init::north();
-static std::array<Bitboard, 64> SOUTH = init::south();
-static std::array<Bitboard, 64> EAST = init::east();
-static std::array<Bitboard, 64> WEST = init::west();
-static std::array<Bitboard, 64> NORTHWEST = init::northwest();
-static std::array<Bitboard, 64> SOUTHWEST = init::southwest();
-static std::array<Bitboard, 64> NORTHEAST = init::northeast();
-static std::array<Bitboard, 64> SOUTHEAST = init::southeast();
-static std::array<std::array<Bitboard, 64>, 64> INTERVENING = init::intervening();
+constexpr static std::array<Bitboard, 64> NORTH = init::north();
+constexpr static std::array<Bitboard, 64> SOUTH = init::south();
+constexpr static std::array<Bitboard, 64> EAST = init::east();
+constexpr static std::array<Bitboard, 64> WEST = init::west();
+constexpr static std::array<Bitboard, 64> NORTHWEST = init::northwest();
+constexpr static std::array<Bitboard, 64> SOUTHWEST = init::southwest();
+constexpr static std::array<Bitboard, 64> NORTHEAST = init::northeast();
+constexpr static std::array<Bitboard, 64> SOUTHEAST = init::southeast();
+constexpr static std::array<std::array<Bitboard, 64>, 64> INTERVENING = init::intervening();
 
-static Bitboard north(Square square) {
+constexpr static Bitboard north(Square square) {
     return NORTH[square];
 }
-static Bitboard south(Square square) {
+constexpr static Bitboard south(Square square) {
     return SOUTH[square];
 }
-static Bitboard east(Square square) {
+constexpr static Bitboard east(Square square) {
     return EAST[square];
 }
-static Bitboard west(Square square) {
+constexpr static Bitboard west(Square square) {
     return WEST[square];
 }
-static Bitboard northwest(Square square) {
+constexpr static Bitboard northwest(Square square) {
     return NORTHWEST[square];
 }
-static Bitboard southwest(Square square) {
+constexpr static Bitboard southwest(Square square) {
     return SOUTHWEST[square];
 }
-static Bitboard northeast(Square square) {
+constexpr static Bitboard northeast(Square square) {
     return NORTHEAST[square];
 }
-static Bitboard southeast(Square square) {
+constexpr static Bitboard southeast(Square square) {
     return SOUTHEAST[square];
 }
-static Bitboard intervening(Square from, Square to) {
+constexpr static Bitboard intervening(Square from, Square to) {
     return INTERVENING[from][to];
 }
 
 namespace init {
 
-inline std::array<std::array<libchess::Bitboard, 64>, 2> pawn_attacks() {
+constexpr inline std::array<std::array<libchess::Bitboard, 64>, 2> pawn_attacks() {
     std::array<std::array<libchess::Bitboard, 64>, 2> attacks{};
     for (Square sq = constants::A1; sq <= constants::H8; ++sq) {
         if (sq <= constants::H7) {
@@ -266,7 +266,7 @@ inline std::array<std::array<libchess::Bitboard, 64>, 2> pawn_attacks() {
     return attacks;
 }
 
-inline std::array<Bitboard, 64> knight_attacks() {
+constexpr inline std::array<Bitboard, 64> knight_attacks() {
     std::array<Bitboard, 64> attacks{};
     for (Square sq = constants::A1; sq <= constants::H8; ++sq) {
         if (sq <= constants::G6) {
@@ -297,7 +297,7 @@ inline std::array<Bitboard, 64> knight_attacks() {
     return attacks;
 }
 
-inline std::array<Bitboard, 64> king_attacks() {
+constexpr inline std::array<Bitboard, 64> king_attacks() {
     std::array<Bitboard, 64> attacks{};
     for (Square sq = constants::A1; sq <= constants::H8; ++sq) {
         if (sq <= constants::G7) {
@@ -324,7 +324,7 @@ inline std::array<Bitboard, 64> king_attacks() {
     return attacks;
 }
 
-inline std::array<Bitboard, 64> bishop_attacks() {
+constexpr inline std::array<Bitboard, 64> bishop_attacks() {
     std::array<Bitboard, 64> attacks{};
     for (Square sq = constants::A1; sq <= constants::H8; ++sq) {
         attacks[sq] = lookups::northeast(sq) | lookups::southeast(sq) | lookups::southwest(sq) |
@@ -333,7 +333,7 @@ inline std::array<Bitboard, 64> bishop_attacks() {
     return attacks;
 }
 
-inline std::array<Bitboard, 64> rook_attacks() {
+constexpr inline std::array<Bitboard, 64> rook_attacks() {
     std::array<Bitboard, 64> attacks{};
     for (Square sq = constants::A1; sq <= constants::H8; ++sq) {
         attacks[sq] =
@@ -342,7 +342,7 @@ inline std::array<Bitboard, 64> rook_attacks() {
     return attacks;
 }
 
-inline std::array<Bitboard, 64> queen_attacks() {
+constexpr inline std::array<Bitboard, 64> queen_attacks() {
     std::array<Bitboard, 64> attacks{};
     for (Square sq = constants::A1; sq <= constants::H8; ++sq) {
         attacks[sq] = lookups::north(sq) | lookups::east(sq) | lookups::south(sq) |
@@ -355,32 +355,32 @@ inline std::array<Bitboard, 64> queen_attacks() {
 }  // namespace init
 
 // Piece attack bitboards
-static std::array<std::array<Bitboard, 64>, 2> PAWN_ATTACKS = init::pawn_attacks();
-static std::array<Bitboard, 64> KNIGHT_ATTACKS = init::knight_attacks();
-static std::array<Bitboard, 64> KING_ATTACKS = init::king_attacks();
-static std::array<Bitboard, 64> BISHOP_ATTACKS = init::bishop_attacks();
-static std::array<Bitboard, 64> ROOK_ATTACKS = init::rook_attacks();
-static std::array<Bitboard, 64> QUEEN_ATTACKS = init::queen_attacks();
+constexpr static std::array<std::array<Bitboard, 64>, 2> PAWN_ATTACKS = init::pawn_attacks();
+constexpr static std::array<Bitboard, 64> KNIGHT_ATTACKS = init::knight_attacks();
+constexpr static std::array<Bitboard, 64> KING_ATTACKS = init::king_attacks();
+constexpr static std::array<Bitboard, 64> BISHOP_ATTACKS = init::bishop_attacks();
+constexpr static std::array<Bitboard, 64> ROOK_ATTACKS = init::rook_attacks();
+constexpr static std::array<Bitboard, 64> QUEEN_ATTACKS = init::queen_attacks();
 
-inline Bitboard pawn_attacks(Square square, Color color) {
+constexpr inline Bitboard pawn_attacks(Square square, Color color) {
     return PAWN_ATTACKS[color][square];
 }
-inline Bitboard knight_attacks(Square square, Bitboard = Bitboard{0}) {
+constexpr inline Bitboard knight_attacks(Square square, Bitboard = Bitboard{0}) {
     return KNIGHT_ATTACKS[square];
 }
-inline Bitboard king_attacks(Square square, Bitboard = Bitboard{0}) {
+constexpr inline Bitboard king_attacks(Square square, Bitboard = Bitboard{0}) {
     return KING_ATTACKS[square];
 }
-inline Bitboard bishop_attacks(Square square) {
+constexpr inline Bitboard bishop_attacks(Square square) {
     return BISHOP_ATTACKS[square];
 }
-inline Bitboard rook_attacks(Square square) {
+constexpr inline Bitboard rook_attacks(Square square) {
     return ROOK_ATTACKS[square];
 }
-inline Bitboard queen_attacks(Square square) {
+constexpr inline Bitboard queen_attacks(Square square) {
     return QUEEN_ATTACKS[square];
 }
-inline Bitboard bishop_attacks(Square square, Bitboard occupancy) {
+constexpr inline Bitboard bishop_attacks(Square square, Bitboard occupancy) {
     Bitboard attacks = bishop_attacks(square);
     Bitboard nw_blockers = (northwest(square) & occupancy) | Bitboard{constants::A8};
     Bitboard ne_blockers = (northeast(square) & occupancy) | Bitboard{constants::H8};
@@ -462,7 +462,7 @@ inline Bitboard non_pawn_piece_type_attacks(PieceType piece_type,
 
 namespace init {
 
-inline std::array<std::array<Bitboard, 64>, 64> full_ray() {
+constexpr inline std::array<std::array<Bitboard, 64>, 64> full_ray() {
     std::array<std::array<Bitboard, 64>, 64> full_ray_bb{};
     for (Square from = constants::A1; from <= constants::H8; ++from) {
         for (Square to = constants::A1; to <= constants::H8; ++to) {
@@ -500,7 +500,7 @@ inline std::array<std::array<Bitboard, 64>, 64> full_ray() {
 
 }  // namespace init
 
-static std::array<std::array<Bitboard, 64>, 64> FULL_RAY = init::full_ray();
+constexpr static std::array<std::array<Bitboard, 64>, 64> FULL_RAY = init::full_ray();
 
 inline Bitboard full_ray(Square from, Square to) {
     return FULL_RAY[from][to];
